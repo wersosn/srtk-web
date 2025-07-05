@@ -1,4 +1,4 @@
-Mobile app: [Click here](https://github.com/wersosn/srtk-mobile)
+Mobile app: [Click here](https://github.com/wersosn/srtk-mobile)  
 Version: [PL](#system-rezerwacji-toru-kolarskiego) | [ENG](#reservation-system-for-a-cycle-track) 
 
 # System rezerwacji toru kolarskiego
