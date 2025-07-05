@@ -1,0 +1,6 @@
+@srtk_HostAddress = http://localhost:5048
+
+GET {{srtk_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

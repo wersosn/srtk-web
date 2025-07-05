@@ -1,0 +1,100 @@
+# Build files
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.vs
+*.vscode
+*.userosscache
+*.sln.cache
+
+# Logs and databases
+*.log
+logs/
+*.db
+*.sqlite
+
+# Environment files
+.env
+appsettings.*.json
+secrets.json
+
+# Dependency folders
+node_modules/
+packages/
+
+# Resharper files
+*.DotSettings.user
+
+# Rider files
+.idea/
+
+# Visual Studio Code files
+.vscode/
+
+# Docker files
+**/[Dd]ockerfile
+**/docker-compose*
+
+# Publish output
+publish/
+*.publishsettings
+
+# Backup files
+*.bak
+
+# OS generated files
+*.DS_Store
+Thumbs.db
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+###############
+# Directories #
+###############
+/node_modules/
+
+###################
+# Web publish log #
+###################
+*.Publish.xml
+
+#############
+# Resharper #
+#############
+/_ReSharper.*
+*.ReSharper.*
+
+############
+# Packages #
+############
+# it’s better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+######################
+# Logs and databases #
+######################
+*.log
+*.sqlite
+
+# OS generated files #
+######################
+*.[Cc]ache
+*[Rr]esharper*
+*.dll
+*.nupkg
+*.ncrunchsolution
+*.dot[Cc]over
+*.htm
