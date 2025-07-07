@@ -5,7 +5,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'https://localhost:5001', // Tu będzie Backend ASP.NET Core Web API
+      '/api': {
+        target: 'http://localhost:5048',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });
