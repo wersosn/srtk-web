@@ -34,7 +34,6 @@ namespace srtk.Controllers
             {
                 Email = dto.Email,
                 Password = hashedPassword,
-                RoleId = 1
             };
             context.Users.Add(user);
             await context.SaveChangesAsync();
