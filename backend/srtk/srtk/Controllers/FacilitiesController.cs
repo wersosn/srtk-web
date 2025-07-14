@@ -24,7 +24,7 @@ namespace srtk.Controllers
             return facilities;
         }
 
-        // Pobranie konkkretnego obiektu:
+        // Pobranie konkretnego obiektu:
         [HttpGet("{id}")]
         public async Task<ActionResult<Facility>> GetFacilityById(int id)
         {
