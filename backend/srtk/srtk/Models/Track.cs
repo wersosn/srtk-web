@@ -20,6 +20,6 @@ namespace srtk.Models
         public int FacilityId { get; set; }
         public Facility Facility { get; set; }
 
-        public ICollection<Reservation> Reservations { get; set; }
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

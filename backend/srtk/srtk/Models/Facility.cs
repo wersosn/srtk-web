@@ -24,6 +24,6 @@ namespace srtk.Models
         [StringLength(50)]
         public string Address { get; set; }
 
-        public ICollection<Track> Tracks { get; set; }
+        public ICollection<Track> Tracks { get; set; } = new List<Track>();
     }
 }

@@ -15,6 +15,6 @@ namespace srtk.Models
 
         public double Cost { get; set; }
 
-        public ICollection<EquipmentReservation> EquipmentReservations { get; set; }
+        public ICollection<EquipmentReservation> EquipmentReservations { get; set; } = new List<EquipmentReservation>();
     }
 }

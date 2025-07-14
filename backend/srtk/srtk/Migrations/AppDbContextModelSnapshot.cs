@@ -344,7 +344,7 @@ namespace srtk.Migrations
                         .IsRequired();
 
                     b.HasOne("srtk.Models.User", "User")
-                        .WithMany("RservationList")
+                        .WithMany("ResrvationList")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -423,7 +423,7 @@ namespace srtk.Migrations
                 {
                     b.Navigation("NotificationList");
 
-                    b.Navigation("RservationList");
+                    b.Navigation("ResrvationList");
                 });
 #pragma warning restore 612, 618
         }

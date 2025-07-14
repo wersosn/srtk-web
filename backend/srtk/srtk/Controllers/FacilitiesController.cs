@@ -9,39 +9,36 @@ namespace srtk.Controllers
     [ApiController]
     public class FacilitiesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext context;
 
         public FacilitiesController(AppDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Facility>>> GetFacilities()
+        public async Task<ActionResult<List<Facility>>> GetAllFacilities()
         {
-            var facilities = await _context.Facilities.ToListAsync();
+            var facilities = await context.Facilities.ToListAsync();
             return facilities;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Facility>> PostFacility(Facility facility)
+        public async Task<ActionResult<Facility>> AddFacility(Facility facility)
         {
-            _context.Facilities.Add(facility);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetFacility), new { id = facility.Id }, facility);
+            context.Facilities.Add(facility);
+            await context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetFacilityById), new { id = facility.Id }, facility);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Facility>> GetFacility(int id)
+        public async Task<ActionResult<Facility>> GetFacilityById(int id)
         {
-            var facility = await _context.Facilities.FindAsync(id);
-
+            var facility = await context.Facilities.FindAsync(id);
             if (facility == null)
             {
                 return NotFound();
             }
-
             return facility;
         }
     }

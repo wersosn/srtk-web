@@ -29,6 +29,6 @@ namespace srtk.Models
         public int StatusId { get; set; }
         public Status Status { get; set; }
 
-        public ICollection<EquipmentReservation> EquipmentReservations { get; set; }
+        public ICollection<EquipmentReservation> EquipmentReservations { get; set; } = new List<EquipmentReservation>();
     }
 }
