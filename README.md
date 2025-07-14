@@ -12,5 +12,28 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 - [Wykorzystane technologie](#wykorzystane-technologie)
 - [Instrukcja użytkowania](#instrukcja-użytkowania)
 
+## Funkcjonalności
+
+## Wykorzystane technologie
+*Backend (serwer REST API)*:
+- C#
+- ASP.NET Core Web API
+- Entity Framework Core
+- PostgreSQL
+- Swagger
+- JWT (do autentykacji)
+- CORS (dostęp do API dla frontendu)
+
+*Frontend*:
+- React + Vite
+- JavaScript, TypeScript
+- HTML, CSS
+- Axios
+- Bootstrap
+- SignalR
+- FullCalendar
+
+## Instrukcja użytkowania
+
 ---
 # Reservation system for a cycle track
