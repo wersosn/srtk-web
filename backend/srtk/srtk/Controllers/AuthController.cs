@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -20,6 +22,14 @@ namespace srtk.Controllers
             this.passwordService = passwordService;
         }
 
+        // Pobranie wszystkich użytkowników:
+        [HttpGet]
+        public async Task<ActionResult<List<User>>> GetAllUsers()
+        {
+            var users = await context.Users.ToListAsync();
+            return users;
+        }
+
         // Rejestracja użytkownika:
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
@@ -34,6 +44,7 @@ namespace srtk.Controllers
             {
                 Email = dto.Email,
                 Password = hashedPassword,
+                RoleId = 1
             };
             context.Users.Add(user);
             await context.SaveChangesAsync();
@@ -47,7 +58,7 @@ namespace srtk.Controllers
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
             if(user == null)
             {
-                return BadRequest("Użytkownik nie istnieje"); ;
+                return BadRequest("Użytkownik nie istnieje");
             }
             var isValid = passwordService.VerifyPassword(user.Password, dto.Password);
             if (!isValid)
@@ -66,6 +77,13 @@ namespace srtk.Controllers
                     role = user.GetType().Name
                 }
             });
+        }
+
+        // Wylogowanie użytkownika:
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            return Ok(new { message = "Wylogowano pomyślnie" });
         }
     }
 }

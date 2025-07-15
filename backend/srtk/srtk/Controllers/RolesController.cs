@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using srtk.DTO;
 using srtk.Models;
 
 namespace srtk.Controllers
@@ -46,20 +47,14 @@ namespace srtk.Controllers
 
         // Edycja istniejącej roli:
         [HttpPut("{id}")]
-        public async Task<ActionResult<Role>> EditRole(int id, Role updatedRole)
+        public async Task<ActionResult<Role>> UpdateRole(int id, [FromBody] RoleDto dto)
         {
-            if (id != updatedRole.Id)
-            {
-                return BadRequest("Id w adresie i roli nie są takie same");
-            }
-
             var role = await context.Roles.FindAsync(id);
             if (role == null)
             {
-                return NotFound();
+                return NotFound("Rola nie istnieje");
             }
-
-            role.Name = updatedRole.Name;
+            role.Name = dto.Name;
             await context.SaveChangesAsync();
             return Ok(role);
         }

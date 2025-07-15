@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using srtk.DTO;
 using srtk.Models;
 
 namespace srtk.Controllers
@@ -47,22 +48,16 @@ namespace srtk.Controllers
 
         // Edycja istniejącego obiektu:
         [HttpPut("{id}")]
-        public async Task<ActionResult<Facility>> EditFacility(int id, Facility updatedFacility)
+        public async Task<IActionResult> UpdateFacility(int id, [FromBody] FacilityDto dto)
         {
-            if (id != updatedFacility.Id)
-            {
-                return BadRequest("Id w adresie i obiekcie nie są takie same");
-            }
-
             var facility = await context.Facilities.FindAsync(id);
             if (facility == null)
             {
-                return NotFound();
+                return NotFound("Obiekt nie istnieje");
             }
-
-            facility.Name = updatedFacility.Name;
-            facility.City = updatedFacility.City;
-            facility.Address = updatedFacility.Address;
+            facility.Name = dto.Name;
+            facility.City = dto.City;
+            facility.Address = dto.Address;
             await context.SaveChangesAsync();
             return Ok(facility);
         }
