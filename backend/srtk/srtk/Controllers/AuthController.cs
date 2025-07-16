@@ -60,6 +60,7 @@ namespace srtk.Controllers
             {
                 return BadRequest("Użytkownik nie istnieje");
             }
+
             var isValid = passwordService.VerifyPassword(user.Password, dto.Password);
             if (!isValid)
             {

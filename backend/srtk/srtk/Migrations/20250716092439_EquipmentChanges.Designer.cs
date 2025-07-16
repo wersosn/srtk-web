@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace srtk.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716092439_EquipmentChanges")]
+    partial class EquipmentChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,10 +148,13 @@ namespace srtk.Migrations
                     b.Property<double>("Cost")
                         .HasColumnType("double precision");
 
-                    b.Property<DateTime>("End")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("Start")
+                    b.Property<int>("Duration")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Hour")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StatusId")
@@ -357,7 +363,7 @@ namespace srtk.Migrations
                         .IsRequired();
 
                     b.HasOne("srtk.Models.User", "User")
-                        .WithMany("ReservationList")
+                        .WithMany("ResrvationList")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -438,7 +444,7 @@ namespace srtk.Migrations
                 {
                     b.Navigation("NotificationList");
 
-                    b.Navigation("ReservationList");
+                    b.Navigation("ResrvationList");
                 });
 #pragma warning restore 612, 618
         }

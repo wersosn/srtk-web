@@ -25,5 +25,6 @@ namespace srtk.Models
         public string Address { get; set; }
 
         public ICollection<Track> Tracks { get; set; } = new List<Track>();
+        public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
     }
 }

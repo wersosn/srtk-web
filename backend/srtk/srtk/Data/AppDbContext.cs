@@ -21,6 +21,12 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Reservation>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.ReservationList)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<EquipmentReservation>()
             .HasKey(re => new { re.ReservationId, re.EquipmentId });
 

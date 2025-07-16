@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace srtk.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716100805_ReservationUpdate")]
+    partial class ReservationUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -357,7 +360,7 @@ namespace srtk.Migrations
                         .IsRequired();
 
                     b.HasOne("srtk.Models.User", "User")
-                        .WithMany("ReservationList")
+                        .WithMany("ResrvationList")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -438,7 +441,7 @@ namespace srtk.Migrations
                 {
                     b.Navigation("NotificationList");
 
-                    b.Navigation("ReservationList");
+                    b.Navigation("ResrvationList");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace srtk.Models
 {
@@ -14,6 +15,10 @@ namespace srtk.Models
         public string Type { get; set; }
 
         public double Cost { get; set; }
+
+        [ForeignKey(nameof(Facility))]
+        public int FacilityId { get; set; }
+        public Facility Facility { get; set; }
 
         public ICollection<EquipmentReservation> EquipmentReservations { get; set; } = new List<EquipmentReservation>();
     }

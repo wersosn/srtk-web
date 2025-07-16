@@ -8,12 +8,8 @@ namespace srtk.Models
     {
         [Key]
         public int Id { get; set; }
-
-        public DateTime Hour { get; set; }
-
-        public DateTime Date { get; set; }
-
-        public int Duration { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
 
         public double Cost { get; set; }
 
