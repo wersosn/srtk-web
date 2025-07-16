@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Services;
 
 namespace srtk.Controllers
 {
@@ -10,18 +11,17 @@ namespace srtk.Controllers
     [ApiController]
     public class FacilitiesController : ControllerBase
     {
-        private readonly AppDbContext context;
-
-        public FacilitiesController(AppDbContext context)
+        private readonly FacilityService service;
+        public FacilitiesController(FacilityService service)
         {
-            this.context = context;
+            this.service = service;
         }
 
         // Pobranie wszystkich obiektów:
         [HttpGet]
         public async Task<ActionResult<List<Facility>>> GetAllFacilities()
         {
-            var facilities = await context.Facilities.ToListAsync();
+            var facilities = await service.GetAll();
             return facilities;
         }
 
@@ -29,7 +29,7 @@ namespace srtk.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Facility>> GetFacilityById(int id)
         {
-            var facility = await context.Facilities.FindAsync(id);
+            var facility = await service.GetById(id);
             if (facility == null)
             {
                 return NotFound();
@@ -41,24 +41,19 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<Facility>> AddFacility(Facility facility)
         {
-            context.Facilities.Add(facility);
-            await context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetFacilityById), new { id = facility.Id }, facility);
+            var f = await service.Add(facility);
+            return CreatedAtAction(nameof(GetFacilityById), new { id = f.Id }, f);
         }
 
         // Edycja istniejącego obiektu:
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateFacility(int id, [FromBody] FacilityDto dto)
         {
-            var facility = await context.Facilities.FindAsync(id);
+            var facility = await service.Update(id, dto);
             if (facility == null)
             {
                 return NotFound("Obiekt nie istnieje");
             }
-            facility.Name = dto.Name;
-            facility.City = dto.City;
-            facility.Address = dto.Address;
-            await context.SaveChangesAsync();
             return Ok(facility);
         }
 
@@ -66,13 +61,11 @@ namespace srtk.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Facility>> DeleteFacility(int id)
         {
-            var facility = await context.Facilities.FindAsync(id);
-            if (facility == null)
+            var facility = await service.Delete(id);
+            if (!facility)
             {
                 return NotFound();
             }
-            context.Facilities.Remove(facility);
-            await context.SaveChangesAsync();
             return Ok(new { message = "Obiekt został usunięty" });
         }
     }

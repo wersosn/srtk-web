@@ -72,6 +72,10 @@ builder.Services.AddAuthentication(options =>
 // Rejestracja serwisu do generowania tokenów JWT:
 builder.Services.AddScoped<JwtService>();
 
+// Rejestracja pozosta³ych serwisów:
+builder.Services.AddScoped<FacilityService>();
+// TBA...
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
