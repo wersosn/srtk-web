@@ -41,11 +41,9 @@ namespace srtk.Services
             { 
                 return null; 
             }
-
             facility.Name = dto.Name;
             facility.City = dto.City;
             facility.Address = dto.Address;
-
             await context.SaveChangesAsync();
             return facility;
         }

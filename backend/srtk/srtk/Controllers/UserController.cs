@@ -3,26 +3,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Services;
 
 namespace srtk.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
-        private readonly AppDbContext context;
+        private readonly UserService service;
 
-        public UserController(AppDbContext context)
+        public UserController(UserService service)
         {
-            this.context = context;
+            this.service = service;
         }
 
         // Pobranie wszystkich użytkowników:
         [HttpGet]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
-            var users = await context.Users.ToListAsync();
+            var users = await service.GetAll();
             return users;
         }
 
@@ -30,7 +30,7 @@ namespace srtk.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserById(int id)
         {
-            var user = await context.Users.FindAsync(id);
+            var user = await service.GetById(id);
             if (user == null)
             {
                 return NotFound();
@@ -42,24 +42,19 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> AddUser(User user)
         {
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+            var u = await service.Add(user);
+            return CreatedAtAction(nameof(GetUserById), new { id = u.Id }, u);
         }
 
         // Edycja istniejącego użytkownika:
-        // DO ROZSZERZENIA!
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto dto)
         {
-            var user = await context.Users.FindAsync(id);
+            var user = await service.Update(id, dto);
             if (user == null)
             {
                 return NotFound("Użytkownik nie istnieje");
             }
-            user.Email = dto.Email;
-            user.RoleId = dto.RoleId;
-            await context.SaveChangesAsync();
             return Ok(user);
         }
 
@@ -67,14 +62,11 @@ namespace srtk.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<User>> DeleteUser(int id)
         {
-            var user = await context.Users.Include(r => r.ReservationList).FirstOrDefaultAsync(r => r.Id == id);
-            if (user == null)
+            var user = await service.Delete(id);
+            if (!user)
             {
                 return NotFound();
             }
-            context.Reservations.RemoveRange(user.ReservationList);
-            context.Users.Remove(user);
-            await context.SaveChangesAsync();
             return Ok(new { message = "Użytkownik został usunięty" });
         }
     }

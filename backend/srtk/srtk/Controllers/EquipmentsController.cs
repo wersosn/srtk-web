@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Services;
 
 namespace srtk.Controllers
 {
@@ -9,18 +10,18 @@ namespace srtk.Controllers
     [ApiController]
     public class EquipmentsController : ControllerBase
     {
-        private readonly AppDbContext context;
+        private readonly EquipmentService service;
 
-        public EquipmentsController(AppDbContext context)
+        public EquipmentsController(EquipmentService service)
         {
-            this.context = context;
+            this.service = service;
         }
 
         // Pobranie wszystkich sprzętów:
         [HttpGet]
         public async Task<ActionResult<List<Equipment>>> GetAllEquipments()
         {
-            var equipments = await context.Equipments.ToListAsync();
+            var equipments = await service.GetAll();
             return equipments;
         }
 
@@ -28,7 +29,7 @@ namespace srtk.Controllers
         [HttpGet("facility/{facilityId}")]
         public async Task<ActionResult<List<Equipment>>> GetAllEquipmentsInFacility(int facilityId)
         {
-            var equipments = await context.Equipments.Where(e => e.FacilityId == facilityId).ToListAsync();
+            var equipments = await service.GetAllInFacility(facilityId);
             return equipments;
         }
 
@@ -36,7 +37,7 @@ namespace srtk.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Equipment>> GetEquipmentById(int id)
         {
-            var equipment = await context.Equipments.FindAsync(id);
+            var equipment = await service.GetById(id);
             if (equipment == null)
             {
                 return NotFound();
@@ -48,25 +49,19 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<Equipment>> AddEquipment(Equipment equipment)
         {
-            context.Equipments.Add(equipment);
-            await context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetEquipmentById), new { id = equipment.Id }, equipment);
+            var eq = await service.Add(equipment);
+            return CreatedAtAction(nameof(GetEquipmentById), new { id = eq.Id }, eq);
         }
 
         // Edycja istniejącego sprzętu:
         [HttpPut("{id}")]
         public async Task<ActionResult<Equipment>> UpdateEquipment(int id, [FromBody] EquipmentDto dto)
         {
-            var equipment = await context.Equipments.FindAsync(id);
+            var equipment = await service.Update(id, dto);
             if (equipment == null)
             {
-                return NotFound("Status nie istnieje");
+                return NotFound("Sprzęt nie istnieje");
             }
-            equipment.Name = dto.Name;
-            equipment.Cost = dto.Cost;
-            equipment.Type = dto.Type;
-            equipment.FacilityId = dto.FacilityId;
-            await context.SaveChangesAsync();
             return Ok(equipment);
         }
 
@@ -74,13 +69,11 @@ namespace srtk.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Equipment>> DeleteEquipment(int id)
         {
-            var equipment = await context.Equipments.FindAsync(id);
-            if (equipment == null)
+            var equipment = await service.Delete(id);
+            if (!equipment)
             {
                 return NotFound();
             }
-            context.Equipments.Remove(equipment);
-            await context.SaveChangesAsync();
             return Ok(new { message = "Sprzęt został usunięty" });
         }
     }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Services;
 
 namespace srtk.Controllers
 {
@@ -9,18 +10,17 @@ namespace srtk.Controllers
     [ApiController]
     public class StatusesController : ControllerBase
     {
-        private readonly AppDbContext context;
-
-        public StatusesController(AppDbContext context)
+        private readonly StatusService service;
+        public StatusesController(StatusService service)
         {
-            this.context = context;
+            this.service = service;
         }
 
         // Pobranie wszystkich statusów rezerwacji:
         [HttpGet]
         public async Task<ActionResult<List<Status>>> GetAllStatuses()
         {
-            var statuses = await context.Statuses.ToListAsync();
+            var statuses = await service.GetAll();
             return statuses;
         }
 
@@ -28,7 +28,7 @@ namespace srtk.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Status>> GetStatusById(int id)
         {
-            var status = await context.Statuses.FindAsync(id);
+            var status = await service.GetById(id);
             if (status == null)
             {
                 return NotFound();
@@ -38,24 +38,21 @@ namespace srtk.Controllers
 
         // Dodanie nowego statusu rezerwacji:
         [HttpPost]
-        public async Task<ActionResult<Status>> AddRole(Status status)
+        public async Task<ActionResult<Status>> AddStatus(Status status)
         {
-            context.Statuses.Add(status);
-            await context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetStatusById), new { id = status.Id }, status);
+            var s = service.Add(status);
+            return CreatedAtAction(nameof(GetStatusById), new { id = s.Id }, s);
         }
 
         // Edycja istniejącego statusu rezerwacji:
         [HttpPut("{id}")]
         public async Task<ActionResult<Status>> UpdateStatus(int id, [FromBody] StatusDto dto)
         {
-            var status = await context.Statuses.FindAsync(id);
+            var status = await service.Update(id, dto);
             if (status == null)
             {
                 return NotFound("Status nie istnieje");
             }
-            status.Name = dto.Name;
-            await context.SaveChangesAsync();
             return Ok(status);
         }
 
@@ -63,13 +60,11 @@ namespace srtk.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Status>> DeleteStatus(int id)
         {
-            var status = await context.Statuses.FindAsync(id);
-            if (status == null)
+            var status = await service.Delete(id);
+            if (!status)
             {
                 return NotFound();
             }
-            context.Statuses.Remove(status);
-            await context.SaveChangesAsync();
             return Ok(new { message = "Status został usunięty" });
         }
     }

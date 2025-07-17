@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Services;
 
 namespace srtk.Controllers
 {
@@ -9,18 +10,18 @@ namespace srtk.Controllers
     [ApiController]
     public class ReservationsController : ControllerBase
     {
-        private readonly AppDbContext context;
+        private readonly ReservationService service;
 
-        public ReservationsController(AppDbContext context)
+        public ReservationsController(ReservationService service)
         {
-            this.context = context;
+            this.service = service;
         }
 
         // Pobranie wszystkich rezerwacji (ogółem):
         [HttpGet]
         public async Task<ActionResult<List<Reservation>>> GetAllReservations()
         {
-            var reservations = await context.Reservations.ToListAsync();
+            var reservations = await service.GetAll();
             return reservations;
         }
 
@@ -28,7 +29,7 @@ namespace srtk.Controllers
         [HttpGet("track/{trackId}")]
         public async Task<ActionResult<List<Reservation>>> GetAllReservationsInTrack(int trackId)
         {
-            var reservations = await context.Reservations.Where(r => r.TrackId == trackId).ToListAsync();
+            var reservations = await service.GetAllInTrack(trackId);
             return reservations;
         }
 
@@ -36,7 +37,7 @@ namespace srtk.Controllers
         [HttpGet("status/{statusId}")]
         public async Task<ActionResult<List<Reservation>>> GetAllReservationsWithStatus(int statusId)
         {
-            var reservations = await context.Reservations.Where(r => r.StatusId == statusId).ToListAsync();
+            var reservations = await service.GetAllWithStatus(statusId);
             return reservations;
         }
 
@@ -44,7 +45,7 @@ namespace srtk.Controllers
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<List<Reservation>>> GetAllUserReservations(int userId)
         {
-            var reservations = await context.Reservations.Where(r => r.UserId == userId).ToListAsync();
+            var reservations = await service.GetAllWithUser(userId);
             return reservations;
         }
 
@@ -52,7 +53,7 @@ namespace srtk.Controllers
         [HttpGet("startDateTime")]
         public async Task<ActionResult<List<Reservation>>> GetReservationsByStartDateAndHour(DateTime date, TimeSpan hour)
         {
-            var reservations = await context.Reservations.Where(r => r.Start.Date == date.Date && r.Start.TimeOfDay == hour).ToListAsync();
+            var reservations = await service.GetByStartDateAndHour(date, hour);
             return reservations;
         }
 
@@ -60,7 +61,7 @@ namespace srtk.Controllers
         [HttpGet("endDateTime")]
         public async Task<ActionResult<List<Reservation>>> GetReservationsByEndDateAndHour(DateTime date, TimeSpan hour)
         {
-            var reservations = await context.Reservations.Where(r => r.End.Date == date.Date && r.End.TimeOfDay == hour).ToListAsync();
+            var reservations = await service.GetByEndDateAndHour(date, hour);
             return reservations;
         }
 
@@ -68,9 +69,7 @@ namespace srtk.Controllers
         [HttpGet("overlapping")]
         public async Task<ActionResult<List<Reservation>>> GetReservationsOverlapping(DateTime start, DateTime end)
         {
-            var reservations = await context.Reservations
-                .Where(r => r.Start < end && r.End > start) // Rezerwacje, które się nakładają
-                .ToListAsync();
+            var reservations = await service.GetOverlapping(start, end);
             return reservations;
         }
 
@@ -78,7 +77,7 @@ namespace srtk.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Reservation>> GetReservationById(int id)
         {
-            var reservation = await context.Reservations.FindAsync(id);
+            var reservation = await service.GetById(id);
             if (reservation == null)
             {
                 return NotFound();
@@ -90,50 +89,19 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<Reservation>> AddReservation(Reservation reservation)
         {
-            context.Reservations.Add(reservation);
-            await context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetReservationById), new { id = reservation.Id }, reservation);
+            var r = await service.Add(reservation);
+            return CreatedAtAction(nameof(GetReservationById), new { id = r.Id }, r);
         }
 
         // Edycja istniejącej rezerwacji:
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReservation(int id, [FromBody] ReservationDto dto)
         {
-            var reservation = await context.Reservations.Include(r => r.EquipmentReservations).FirstOrDefaultAsync(r => r.Id == id);
+            var reservation = await service.Update(id, dto);
             if (reservation == null)
             {
                 return NotFound("Rezerwacja nie istnieje");
             }
-
-            // Aktualizacja głównych parametrów:
-            reservation.Start = dto.Start;
-            reservation.End = dto.End;
-            reservation.TrackId = dto.TrackId;
-
-            // Aktualizacja sprzętu oraz kosztów:
-            if (dto.Equipment != null && dto.Equipment.Count != 0)
-            {
-                context.EquipmentReservations.RemoveRange(reservation.EquipmentReservations);
-                double totalCost = 0;
-                foreach (var equipmentDto in dto.Equipment)
-                {
-                    var equipment = await context.Equipments.FindAsync(equipmentDto.EquipmentId);
-                    if (equipment == null)
-                    {
-                        return BadRequest($"Sprzęt z Id = {equipmentDto.EquipmentId} nie istnieje");
-                    }
-
-                    reservation.EquipmentReservations.Add(new EquipmentReservation
-                    {
-                        ReservationId = reservation.Id,
-                        EquipmentId = equipmentDto.EquipmentId,
-                        Quantity = equipmentDto.Quantity
-                    });
-                    totalCost += equipment.Cost * equipmentDto.Quantity;
-                }
-                reservation.Cost = totalCost;
-            }
-            await context.SaveChangesAsync();
             return Ok(reservation);
         }
 
@@ -141,13 +109,11 @@ namespace srtk.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Reservation>> DeleteReservation(int id)
         {
-            var reservation = await context.Reservations.FindAsync(id);
-            if (reservation == null)
+            var reservation = await service.Delete(id);
+            if (!reservation)
             {
                 return NotFound();
             }
-            context.Reservations.Remove(reservation);
-            await context.SaveChangesAsync();
             return Ok(new { message = "Rezerwacja została usunięta" });
         }
     }
