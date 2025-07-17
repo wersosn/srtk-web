@@ -37,7 +37,10 @@ namespace srtk.Services
         public async Task<Facility?> Update(int id, FacilityDto dto)
         {
             var facility = await context.Facilities.FindAsync(id);
-            if (facility == null) return null;
+            if (facility == null) 
+            { 
+                return null; 
+            }
 
             facility.Name = dto.Name;
             facility.City = dto.City;
@@ -51,8 +54,10 @@ namespace srtk.Services
         public async Task<bool> Delete(int id)
         {
             var facility = await context.Facilities.FindAsync(id);
-            if (facility == null) return false;
-
+            if (facility == null)
+            {
+                return false;
+            }
             context.Facilities.Remove(facility);
             await context.SaveChangesAsync();
             return true;

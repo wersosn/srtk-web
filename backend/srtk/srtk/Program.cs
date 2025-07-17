@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using srtk.Services;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -19,13 +18,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // CORS - dostêp do danych z API:
 builder.Services.AddCors(options =>
 {
-    /*options.AddPolicy("AllowLocalhost",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });*/
     options.AddPolicy("AllowAll",
         policy =>
         {
@@ -73,8 +65,14 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<JwtService>();
 
 // Rejestracja pozosta³ych serwisów:
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<EquipmentService>();
 builder.Services.AddScoped<FacilityService>();
-// TBA...
+builder.Services.AddScoped<ReservationService>();
+builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<StatusService>();
+builder.Services.AddScoped<TrackService>();
 
 var app = builder.Build();
 

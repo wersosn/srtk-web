@@ -9,16 +9,15 @@ namespace srtk.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class AdminController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly AppDbContext context;
 
-        public AdminController(AppDbContext context)
+        public UserController(AppDbContext context)
         {
             this.context = context;
         }
 
-        // Zarządzanie użytkownikami:
         // Pobranie wszystkich użytkowników:
         [HttpGet]
         public async Task<ActionResult<List<User>>> GetAllUsers()

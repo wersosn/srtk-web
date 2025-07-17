@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Services;
+using System.Data;
 
 namespace srtk.Controllers
 {
@@ -9,18 +11,18 @@ namespace srtk.Controllers
     [ApiController]
     public class TracksController : ControllerBase
     {
-        private readonly AppDbContext context;
+        private readonly TrackService service;
 
-        public TracksController(AppDbContext context)
+        public TracksController(TrackService service)
         {
-            this.context = context;
+            this.service = service;
         }
 
         // Pobranie wszystkich torów (ogółem):
         [HttpGet]
         public async Task<ActionResult<List<Track>>> GetAllTracks()
         {
-            var tracks = await context.Tracks.ToListAsync();
+            var tracks = await service.GetAll();
             return tracks;
         }
 
@@ -28,7 +30,7 @@ namespace srtk.Controllers
         [HttpGet("facility/{facilityId}")]
         public async Task<ActionResult<List<Track>>> GetAllTracksInFacility(int facilityId)
         {
-            var tracks = await context.Tracks.Where(t => t.FacilityId == facilityId).ToListAsync();
+            var tracks = await service.GetAllInFacility(facilityId);
             return tracks;
         }
 
@@ -36,7 +38,7 @@ namespace srtk.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Track>> GetTrackById(int id)
         {
-            var track = await context.Tracks.FindAsync(id);
+            var track = await service.GetById(id);
             if (track == null)
             {
                 return NotFound();
@@ -48,25 +50,19 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<Track>> AddTrack(Track track)
         {
-            context.Tracks.Add(track);
-            await context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetTrackById), new { id = track.Id }, track);
+            var t = await service.Add(track);
+            return CreatedAtAction(nameof(GetTrackById), new { id = t.Id }, t);
         }
 
         // Edycja istniejącego toru:
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTrack(int id, [FromBody] TrackDto dto)
         {
-            var track = await context.Tracks.FindAsync(id);
+            var track = await service.Update(id, dto);
             if (track == null)
             {
                 return NotFound("Tor nie istnieje");
             }
-            track.Name = dto.Name;
-            track.TypeOfSurface = dto.TypeOfSurface;
-            track.Length = dto.Length;
-            track.FacilityId = dto.FacilityId;
-            await context.SaveChangesAsync();
             return Ok(track);
         }
 
@@ -74,13 +70,11 @@ namespace srtk.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Track>> DeleteTrack(int id)
         {
-            var track = await context.Tracks.FindAsync(id);
-            if (track == null)
+            var track = await service.Delete(id);
+            if (!track)
             {
                 return NotFound();
             }
-            context.Tracks.Remove(track);
-            await context.SaveChangesAsync();
             return Ok(new { message = "Tor został usunięty" });
         }
     }

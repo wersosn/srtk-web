@@ -10,13 +10,12 @@ namespace srtk.Services
     public class JwtService
     {
         private readonly IConfiguration config;
-
         public JwtService(IConfiguration configuration)
         {
             config = configuration;
         }
 
-        public string GenerateToken(User user)
+        public virtual string GenerateToken(User user)
         {
             var claims = new[]
             {

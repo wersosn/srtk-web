@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Services;
 
 namespace srtk.Controllers
 {
@@ -9,18 +10,18 @@ namespace srtk.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly AppDbContext context;
+        private readonly RoleService service;
 
-        public RolesController(AppDbContext context)
+        public RolesController(RoleService service)
         {
-            this.context = context;
+            this.service = service;
         }
 
         // Pobranie wszystkich ról:
         [HttpGet]
         public async Task<ActionResult<List<Role>>> GetAllRoles()
         {
-            var roles = await context.Roles.ToListAsync();
+            var roles = await service.GetAll();
             return roles;
         }
 
@@ -28,7 +29,7 @@ namespace srtk.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Role>> GetRoleById(int id)
         {
-            var role = await context.Roles.FindAsync(id);
+            var role = await service.GetById(id);
             if (role == null)
             {
                 return NotFound();
@@ -40,22 +41,19 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<Role>> AddRole(Role role)
         {
-            context.Roles.Add(role);
-            await context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetRoleById), new { id = role.Id }, role);
+            var r = await service.Add(role);
+            return CreatedAtAction(nameof(GetRoleById), new { id = r.Id }, r);
         }
 
         // Edycja istniejącej roli:
         [HttpPut("{id}")]
         public async Task<ActionResult<Role>> UpdateRole(int id, [FromBody] RoleDto dto)
         {
-            var role = await context.Roles.FindAsync(id);
+            var role = await service.Update(id, dto);
             if (role == null)
             {
                 return NotFound("Rola nie istnieje");
             }
-            role.Name = dto.Name;
-            await context.SaveChangesAsync();
             return Ok(role);
         }
 
@@ -63,13 +61,11 @@ namespace srtk.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Role>> DeleteRole(int id)
         {
-            var role = await context.Roles.FindAsync(id);
-            if (role == null)
+            var role = await service.Delete(id);
+            if (!role)
             {
                 return NotFound();
             }
-            context.Roles.Remove(role);
-            await context.SaveChangesAsync();
             return Ok(new { message = "Rola została usunięta" });
         }
     }

@@ -14,6 +14,7 @@ namespace srtk.tests.Helpers
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Unikalna baza dla każdego testu, aby nie powielały się obiekty
+                .EnableSensitiveDataLogging()
                 .Options;
             return new AppDbContext(options);
         }

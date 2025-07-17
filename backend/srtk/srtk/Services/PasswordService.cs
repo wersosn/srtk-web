@@ -6,12 +6,12 @@ namespace srtk.Services
     {
         private readonly PasswordHasher<object> hasher = new();
 
-        public string HashPassword(string password)
+        public virtual string HashPassword(string password)
         {
             return hasher.HashPassword(null, password);
         }
 
-        public bool VerifyPassword(string hashedPassword, string providedPassword)
+        public virtual bool VerifyPassword(string hashedPassword, string providedPassword)
         {
             var result = hasher.VerifyHashedPassword(null, hashedPassword, providedPassword);
             return result == PasswordVerificationResult.Success;
