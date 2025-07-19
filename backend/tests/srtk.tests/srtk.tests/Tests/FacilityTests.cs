@@ -8,11 +8,11 @@ using srtk.tests.Helpers;
 
 namespace srtk.tests.Tests
 {
-    public class FacilitiesTests
+    public class FacilityTests
     {
         // Wypisywanie komunikatów w wynikach testu:
         private readonly ITestOutputHelper output;
-        public FacilitiesTests(ITestOutputHelper output)
+        public FacilityTests(ITestOutputHelper output)
         {
             this.output = output;
         }
