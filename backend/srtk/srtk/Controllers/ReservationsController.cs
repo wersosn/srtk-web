@@ -26,7 +26,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie rezerwacji konkretnego toru:
-        [HttpGet("track/{trackId}")]
+        [HttpGet("tracks/{trackId}/reservations")]
         public async Task<ActionResult<List<Reservation>>> GetAllReservationsInTrack(int trackId)
         {
             var reservations = await service.GetAllInTrack(trackId);
@@ -34,7 +34,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie rezerwacji z konkretnym statusem rezerwacji:
-        [HttpGet("status/{statusId}")]
+        [HttpGet("statuses/{statusId}/reservations")]
         public async Task<ActionResult<List<Reservation>>> GetAllReservationsWithStatus(int statusId)
         {
             var reservations = await service.GetAllWithStatus(statusId);
@@ -42,7 +42,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie rezerwacji konkretnego użytkownika:
-        [HttpGet("user/{userId}")]
+        [HttpGet("users/{userId}/reservations")]
         public async Task<ActionResult<List<Reservation>>> GetAllUserReservations(int userId)
         {
             var reservations = await service.GetAllWithUser(userId);

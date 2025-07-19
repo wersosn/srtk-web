@@ -14,10 +14,9 @@ namespace srtk.Models
         [Required]
         public string Description { get; set; }
 
-        public DateTime Date { get; set; }
-        public DateTime Hour { get; set; }
+        public DateTime TimeStamp { get; set; } = DateTime.Now;
 
-        public bool IsRead { get; set; }
+        public bool IsRead { get; set; } = false;
 
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }

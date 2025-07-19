@@ -27,7 +27,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie wszystkich torów należących do konkretnego obiektu:
-        [HttpGet("facility/{facilityId}")]
+        [HttpGet("facilities/{facilityId}/tracks")]
         public async Task<ActionResult<List<Track>>> GetAllTracksInFacility(int facilityId)
         {
             var tracks = await service.GetAllInFacility(facilityId);

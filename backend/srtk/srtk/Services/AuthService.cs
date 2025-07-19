@@ -9,12 +9,14 @@ namespace srtk.Services
         private readonly AppDbContext context;
         private readonly JwtService jwtService;
         private readonly PasswordService passwordService;
+        private readonly UserService userService;
 
-        public AuthService(AppDbContext context, JwtService jwtService, PasswordService passwordService)
+        public AuthService(AppDbContext context, JwtService jwtService, PasswordService passwordService, UserService userService)
         {
             this.context = context;
             this.jwtService = jwtService;
             this.passwordService = passwordService;
+            this.userService = userService;
         }
 
         public async Task<string?> Register(RegisterDto dto)
@@ -33,10 +35,9 @@ namespace srtk.Services
                 Name = dto.Name,
                 Surname = dto.LastName,
                 PhoneNumber = "",
-                RoleId = 1 // Rola - Klient
+                RoleId = 1 // Domyślna rola - Klient
             };
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
+            await userService.Add(user);
             return null;
         }
 

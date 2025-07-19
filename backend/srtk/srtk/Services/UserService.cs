@@ -26,6 +26,12 @@ namespace srtk.Services
             return await context.Users.FindAsync(id);
         }
 
+        // Pobranie użytkowników według roli:
+        public async Task<List<User>> GetByRole(int roleId)
+        {
+            return await context.Users.Where(u => u.RoleId == roleId).ToListAsync();
+        }
+
         // Dodanie nowego użytkownika:
         public async Task<User> Add(User user)
         {

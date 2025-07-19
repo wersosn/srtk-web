@@ -49,6 +49,45 @@ namespace srtk.tests.Tests
             output.WriteLine("Wynik (ilość sprzętów): " + result.Count);
         }
 
+        // Test - pobranie wszystkich sprzętów należących do danego obiektu:
+        [Fact]
+        public async Task Getting_Equipment_In_Facility()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var facilityService = new FacilityService(context);
+            var service = new EquipmentService(context);
+            var facility = new Facility
+            {
+                Name = "Duży obiekt",
+                City = "Białystok",
+                Address = "ul. Sportowa 1"
+            };
+            await facilityService.Add(facility);
+
+            var eq = new Equipment
+            {
+                Name = "Rower",
+                Type = "Górski",
+                Cost = 50,
+            };
+            await service.Add(eq);
+
+            var eq2 = new Equipment
+            {
+                Name = "Rower",
+                Type = "BMX",
+                Cost = 80,
+                FacilityId = facility.Id
+            };
+            await service.Add(eq2);
+
+            var result = await service.GetAllInFacility(facility.Id);
+
+            Assert.NotNull(result);
+            Assert.Single(result);
+            output.WriteLine("Wynik - ilość sprzętów w danym obiekcie: " + result.Count);
+        }
+
         // Test - pobranie konkretnego sprzętu:
         [Fact]
         public async Task Getting_Equipment_ById()

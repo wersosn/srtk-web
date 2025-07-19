@@ -26,7 +26,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie wszystkich sprzętów należących do konkretnego obiektu:
-        [HttpGet("facility/{facilityId}")]
+        [HttpGet("facilities/{facilityId}/equipment")]
         public async Task<ActionResult<List<Equipment>>> GetAllEquipmentsInFacility(int facilityId)
         {
             var equipments = await service.GetAllInFacility(facilityId);

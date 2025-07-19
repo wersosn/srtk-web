@@ -26,6 +26,18 @@ namespace srtk.Controllers
             return users;
         }
 
+        // Pobranie użytkowników według roli:
+        [HttpGet("users/role/{roleId}")]
+        public async Task<ActionResult<List<User>>> GetUsersByRole(int roleId)
+        {
+            var users = await service.GetByRole(roleId);
+            if (users == null)
+            {
+                return NotFound();
+            }
+            return users;
+        }
+
         // Pobranie konkretnego użytkownika:
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserById(int id)
