@@ -10,7 +10,6 @@ namespace srtk.Models
         public int Id { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-
         public double Cost { get; set; }
 
         [ForeignKey(nameof(User))]

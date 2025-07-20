@@ -43,7 +43,7 @@ namespace srtk.Services
 
         public async Task<LoginResult> Login(LoginDto dto)
         {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            var user = await context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == dto.Email);
             if (user == null)
             {
                 return new LoginResult

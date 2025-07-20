@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../User/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ const Login = () => {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token);
+      login(data.token);
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'Błąd logowania');

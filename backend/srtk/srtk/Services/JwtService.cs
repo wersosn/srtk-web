@@ -21,7 +21,8 @@ namespace srtk.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Id użytkownika
                 new Claim(ClaimTypes.Email, user.Email), // Email użytkownika
-                new Claim(ClaimTypes.Role, user.GetType().Name) // Rola: Admin lub Klient
+                new Claim(ClaimTypes.Role, user.Role.Name), // Rola: Admin lub Klient
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Zapewni unikalność tokena
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
@@ -31,7 +32,7 @@ namespace srtk.Services
                 issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(config["Jwt:ExpiresInMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(config["Jwt:ExpiresInMinutes"])),
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);

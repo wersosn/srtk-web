@@ -1,27 +1,37 @@
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../User/AuthContext';
 
-function Navb() {
+const Navb: React.FC = () => {
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
-      <Container>
-        <Navbar.Brand as={Link} to="/">SRTK</Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbar-nav" />
-        <Navbar.Collapse id="navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link as={Link} to="/facilities">Obiekty</Nav.Link>
-            <Nav.Link as={Link} to="/about">O nas</Nav.Link>
-          </Nav>
-          <Nav>
-            <Nav.Link as={Link} to="/login">Zaloguj</Nav.Link>
-            <Nav.Link as={Link} to="/register">Zarejestruj</Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+    <nav className="flex items-center justify-between bg-blue-600 text-white px-6 py-3 shadow">
+      <Link to="/" className="text-xl font-bold">SRTK</Link>
+
+      <div className="space-x-4">
+        {isLoggedIn ? (
+          <>
+            <Link to="/profile" className="hover:underline">Profil</Link>
+            <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
+              Wyloguj
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="hover:underline">Zaloguj</Link>
+            <Link to="/register" className="hover:underline">Rejestracja</Link>
+          </>
+        )}
+      </div>
+    </nav>
   );
-}
+};
 
 export default Navb;
