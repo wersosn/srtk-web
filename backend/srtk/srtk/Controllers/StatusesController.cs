@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -38,14 +39,16 @@ namespace srtk.Controllers
 
         // Dodanie nowego statusu rezerwacji:
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Status>> AddStatus(Status status)
         {
-            var s = service.Add(status);
+            var s = await service.Add(status);
             return CreatedAtAction(nameof(GetStatusById), new { id = s.Id }, s);
         }
 
         // Edycja istniejącego statusu rezerwacji:
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Status>> UpdateStatus(int id, [FromBody] StatusDto dto)
         {
             var status = await service.Update(id, dto);
@@ -58,6 +61,7 @@ namespace srtk.Controllers
 
         // Usunięcie istniejącego statusu rezerwacji:
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Status>> DeleteStatus(int id)
         {
             var status = await service.Delete(id);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.Models;
+using System.Data;
 
 namespace srtk.Services
 {
@@ -49,6 +50,19 @@ namespace srtk.Services
             context.Notifications.Add(notification);
             await context.SaveChangesAsync();
             return notification;
+        }
+
+        // Usuwanie istniejącego powiadomienia:
+        public async Task<bool> Delete(int id)
+        {
+            var notification = await context.Notifications.FindAsync(id);
+            if (notification == null)
+            {
+                return false;
+            }
+            context.Notifications.Remove(notification);
+            await context.SaveChangesAsync();
+            return true;
         }
     }
 }

@@ -84,6 +84,9 @@ namespace srtk.tests.Tests
             var jwtMock = new srtk.tests.Helpers.JwtServiceHelper(); // Metoda pomocnicza do tokenów JWT w testach
             var passwordService = new srtk.tests.Helpers.PasswordServiceHelper(); // Metoda pomocnicza do haszowania haseł w testach
             var userService = new UserService(context); // Serwis użytkowników
+
+            context.Roles.Add(new Role { Id = 1, Name = "Client" }); // Rola do testów
+
             var user = new Client
             {
                 Email = "test@gmail.com",
@@ -95,6 +98,7 @@ namespace srtk.tests.Tests
             };
             context.Users.Add(user);
             await context.SaveChangesAsync();
+
             var service = new AuthService(context, jwtMock, passwordService, userService);
             var loginDto = new LoginDto
             {

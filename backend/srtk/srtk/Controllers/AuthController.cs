@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
 using srtk.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace srtk.Controllers
 {
@@ -50,6 +51,7 @@ namespace srtk.Controllers
 
         // Wylogowanie użytkownika:
         [HttpPost("logout")]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             return Ok(new { message = "Wylogowano pomyślnie" });

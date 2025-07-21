@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -48,6 +49,7 @@ namespace srtk.Controllers
 
         // Dodanie nowego toru:
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Track>> AddTrack(Track track)
         {
             var t = await service.Add(track);
@@ -56,6 +58,7 @@ namespace srtk.Controllers
 
         // Edycja istniejącego toru:
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTrack(int id, [FromBody] TrackDto dto)
         {
             var track = await service.Update(id, dto);
@@ -68,6 +71,7 @@ namespace srtk.Controllers
 
         // Usunięcie istniejącego toru:
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Track>> DeleteTrack(int id)
         {
             var track = await service.Delete(id);

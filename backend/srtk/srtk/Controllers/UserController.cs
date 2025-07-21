@@ -28,6 +28,7 @@ namespace srtk.Controllers
 
         // Pobranie użytkowników według roli:
         [HttpGet("users/role/{roleId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<User>>> GetUsersByRole(int roleId)
         {
             var users = await service.GetByRole(roleId);
@@ -60,6 +61,7 @@ namespace srtk.Controllers
 
         // Edycja istniejącego użytkownika:
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto dto)
         {
             var user = await service.Update(id, dto);
@@ -72,6 +74,7 @@ namespace srtk.Controllers
 
         // Usunięcie istniejącego użytkownika:
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<User>> DeleteUser(int id)
         {
             var user = await service.Delete(id);

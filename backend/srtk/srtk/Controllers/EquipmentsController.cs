@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -47,6 +48,7 @@ namespace srtk.Controllers
 
         // Dodanie nowego sprzętu:
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Equipment>> AddEquipment(Equipment equipment)
         {
             var eq = await service.Add(equipment);
@@ -55,6 +57,7 @@ namespace srtk.Controllers
 
         // Edycja istniejącego sprzętu:
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Equipment>> UpdateEquipment(int id, [FromBody] EquipmentDto dto)
         {
             var equipment = await service.Update(id, dto);
@@ -67,6 +70,7 @@ namespace srtk.Controllers
 
         // Usunięcie istniejącego sprzętu:
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Equipment>> DeleteEquipment(int id)
         {
             var equipment = await service.Delete(id);

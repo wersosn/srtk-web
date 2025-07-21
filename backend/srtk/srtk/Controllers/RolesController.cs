@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -8,6 +9,7 @@ namespace srtk.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class RolesController : ControllerBase
     {
         private readonly RoleService service;
@@ -39,6 +41,7 @@ namespace srtk.Controllers
 
         // Dodanie nowej roli:
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Role>> AddRole(Role role)
         {
             var r = await service.Add(role);
@@ -47,6 +50,7 @@ namespace srtk.Controllers
 
         // Edycja istniejącej roli:
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Role>> UpdateRole(int id, [FromBody] RoleDto dto)
         {
             var role = await service.Update(id, dto);
@@ -59,6 +63,7 @@ namespace srtk.Controllers
 
         // Usunięcie istniejącej roli:
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Role>> DeleteRole(int id)
         {
             var role = await service.Delete(id);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
@@ -39,6 +40,7 @@ namespace srtk.Controllers
 
         // Dodanie nowego obiektu:
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Facility>> AddFacility(Facility facility)
         {
             var f = await service.Add(facility);
@@ -47,6 +49,7 @@ namespace srtk.Controllers
 
         // Edycja istniejącego obiektu:
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateFacility(int id, [FromBody] FacilityDto dto)
         {
             var facility = await service.Update(id, dto);
@@ -59,6 +62,7 @@ namespace srtk.Controllers
 
         // Usunięcie istniejącego obiektu:
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Facility>> DeleteFacility(int id)
         {
             var facility = await service.Delete(id);

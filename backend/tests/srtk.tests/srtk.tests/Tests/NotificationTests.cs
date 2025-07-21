@@ -230,5 +230,35 @@ namespace srtk.tests.Tests
             Assert.Single(context.Notifications);
             output.WriteLine($"Wynik: Dodano nowe powiadomienie dla użytkownika: {result.User.Email}");
         }
+
+        // Test - usuwanie powiadomienia:
+        [Fact]
+        public async Task Deleting_Notification()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var userService = new UserService(context);
+            var service = new NotificationService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "abc123",
+                RoleId = 1
+            };
+            await userService.Add(user);
+
+            var notif = new Notification
+            {
+                Title = "Dodano rezerwację",
+                Description = "Dodano nową rezerwację na tor kolarski",
+                UserId = user.Id,
+                IsRead = true
+            };
+            await service.Add(notif);
+
+            var deleted = await service.Delete(notif.Id);
+
+            Assert.Empty(context.Notifications);
+            output.WriteLine("Wynik: Usunięto powiadomienie");
+        }
     }
 }

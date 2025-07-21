@@ -60,12 +60,24 @@ namespace srtk.Controllers
             return notification;
         }
 
-        // Dodanie nowej roli:
+        // Dodanie nowego powiadomienia:
         [HttpPost]
         public async Task<ActionResult<Notification>> AddNotification(Notification notification)
         {
             var n = await service.Add(notification);
             return CreatedAtAction(nameof(GetNotificationById), new { id = n.Id }, n);
+        }
+
+        // Usuwanie istniejącego powiadomienia:
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Notification>> DeleteNotification(int id)
+        {
+            var notification = await service.Delete(id);
+            if (!notification)
+            {
+                return NotFound();
+            }
+            return Ok(new { message = "Powiadomienie zostało usunięte" });
         }
     }
 }
