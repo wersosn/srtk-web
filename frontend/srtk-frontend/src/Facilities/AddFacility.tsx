@@ -5,6 +5,7 @@ const AddFacility: React.FC = () => {
   const [city, setCity] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const token = localStorage.getItem('token');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -15,7 +16,8 @@ const AddFacility: React.FC = () => {
       const response = await fetch("/api/facilities", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(newFacility)
       });

@@ -5,6 +5,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   login: (token: string) => void;
   logout: () => void;
+  isAuthChecked: boolean;
 }
 
 // Tworzenie kontekstu:
@@ -12,10 +13,12 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    setIsLoggedIn(!token);
+    setIsLoggedIn(Boolean(token));
+    setIsAuthChecked(true);
   }, []);
 
   // Funkcja logowania:
@@ -32,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Udostępnienie stanu i funkcji:
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, isAuthChecked }}>
       {children}
     </AuthContext.Provider>
   );

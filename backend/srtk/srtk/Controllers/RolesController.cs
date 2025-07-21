@@ -9,7 +9,7 @@ namespace srtk.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class RolesController : ControllerBase
     {
         private readonly RoleService service;

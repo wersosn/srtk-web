@@ -1,10 +1,22 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import Spinner from 'react-bootstrap/Spinner';
 
 const Navb: React.FC = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, isAuthChecked } = useAuth();
   const navigate = useNavigate();
+
+  if (!isAuthChecked) {
+    return (
+      <div className="d-flex justify-content-center align-items-center p-3">
+        <Spinner animation="border" role="status" />
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     logout();
@@ -12,25 +24,26 @@ const Navb: React.FC = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between bg-blue-600 text-white px-6 py-3 shadow">
-      <Link to="/" className="text-xl font-bold">SRTK</Link>
-
-      <div className="space-x-4">
-        {isLoggedIn ? (
-          <>
-            <Link to="/profile" className="hover:underline">Profil</Link>
-            <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
-              Wyloguj
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="hover:underline">Zaloguj</Link>
-            <Link to="/register" className="hover:underline">Rejestracja</Link>
-          </>
-        )}
-      </div>
-    </nav>
+    <Navbar bg="dark" data-bs-theme="dark">
+      <Container>
+        <Navbar.Brand href="/">SRTK</Navbar.Brand>
+        <Nav className="me-auto">
+          {isLoggedIn ? (
+            <>
+              <Nav.Link href="/profile">Profil</Nav.Link>
+              <button onClick={handleLogout}>
+                Wyloguj
+              </button>
+            </>
+          ) : (
+            <>
+              <Nav.Link href="/login">Logowanie</Nav.Link>
+              <Nav.Link href="/register">Rejestracja</Nav.Link>
+            </>
+          )}
+        </Nav>
+      </Container>
+    </Navbar>
   );
 };
 

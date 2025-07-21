@@ -12,4 +12,14 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: [
+      '@fullcalendar/react',
+      '@fullcalendar/daygrid',
+      '@fullcalendar/common',
+      '@fullcalendar/core',
+      '@fullcalendar/interaction',
+      '@fullcalendar/timegrid',
+    ],
+  },
 });

@@ -10,6 +10,7 @@ namespace srtk.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class FacilitiesController : ControllerBase
     {
         private readonly FacilityService service;

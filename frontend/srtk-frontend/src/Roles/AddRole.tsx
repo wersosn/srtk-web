@@ -3,17 +3,19 @@ import React, { useState, type FormEvent } from "react";
 const AddRole: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const token = localStorage.getItem('token');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const newRole = { name };
+    const newRole = { Name: name };
 
     try {
       const response = await fetch("/api/roles", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(newRole)
       });
