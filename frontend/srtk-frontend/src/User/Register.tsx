@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Register.css';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -25,7 +26,7 @@ const Register = () => {
                 throw new Error(msg);
             }
 
-            setInfo('Rejestracja przebiegła pomyślnie');
+            setInfo('Rejestracja przebiegła pomyślnie, przekierowanie na stronę logowania');
             setTimeout(() => navigate('/login'), 2000);
         } catch (err: any) {
             setInfo(err.message || 'Błąd rejestracji');
@@ -33,19 +34,49 @@ const Register = () => {
     };
 
     return (
-        <div>
-            <h2>Rejestracja</h2>
-            <form onSubmit={handleRegister}>
-                <input type="email" placeholder="Email" value={email}
-                    onChange={(e) => setEmail(e.target.value)} required />
-                <input type="name" placeholder="Imię" value={name}
-                    onChange={(e) => setName(e.target.value)} required />
-                <input type="lastName" placeholder="Nazwisko" value={lastName}
-                    onChange={(e) => setLastName(e.target.value)} required />
-                <input type="password" placeholder="Hasło" value={password}
-                    onChange={(e) => setPassword(e.target.value)} required />
-                <button type="submit">Zarejestruj</button>
-                {info && <p>{info}</p>}
+        <div className="register-container">
+            <form className="register-form" onSubmit={handleRegister}>
+                <h2>Rejestracja</h2>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="register-input"
+                />
+                <input
+                    type="text"
+                    placeholder="Imię"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="register-input"
+                />
+                <input
+                    type="text"
+                    placeholder="Nazwisko"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    className="register-input"
+                />
+                <input
+                    type="password"
+                    placeholder="Hasło"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="register-input"
+                />
+                <button type="submit">
+                    Zarejestruj
+                </button>
+                {info && <p className="register-info">{info}</p>}
+                <hr />
+                <a href="/login" style={{ fontSize: '0.9rem', color: '#101d26' }}>
+                    Masz już konto? Zaloguj się
+                </a>
             </form>
         </div>
     );

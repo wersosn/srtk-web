@@ -1,9 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
+import { Navbar, Container, Nav, Button } from 'react-bootstrap';
 import Spinner from 'react-bootstrap/Spinner';
 
 const Navb: React.FC = () => {
@@ -24,26 +22,25 @@ const Navb: React.FC = () => {
   };
 
   return (
-    <Navbar bg="dark" data-bs-theme="dark">
-      <Container>
-        <Navbar.Brand href="/">SRTK</Navbar.Brand>
-        <Nav className="me-auto">
+    <Navbar expand="lg" className="custom-navbar">
+      <Container fluid className="px-4">
+        <Navbar.Brand href="/" className="fw-bold text-dark">SRTK</Navbar.Brand>
+        <Nav className="ms-auto align-items-center">
           {isLoggedIn ? (
             <>
-              <Nav.Link href="/profile">Profil</Nav.Link>
-              <button onClick={handleLogout}>
-                Wyloguj
-              </button>
+              <Nav.Link href="/profile" className="text-dark">Profil</Nav.Link>
+              <button onClick={handleLogout}>Wyloguj</button>
             </>
           ) : (
             <>
-              <Nav.Link href="/login">Logowanie</Nav.Link>
-              <Nav.Link href="/register">Rejestracja</Nav.Link>
+              <Nav.Link href="/login" className="text-dark me-2">Logowanie</Nav.Link>
+              <button onClick={() => window.location.href = '/register'}>Rejestracja</button>
             </>
           )}
         </Nav>
       </Container>
     </Navbar>
+
   );
 };
 
