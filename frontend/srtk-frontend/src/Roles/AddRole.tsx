@@ -1,57 +1,61 @@
 import React, { useState, type FormEvent } from "react";
 
-const AddRole: React.FC = () => {
-  const [name, setName] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const token = localStorage.getItem('token');
+type Role = {
+    id: number;
+    name: string;
+};
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+interface AddRoleProps {
+    onAddRole: (newRole: Role) => void;
+}
 
-    const newRole = { Name: name };
+const AddRole: React.FC<AddRoleProps> = ({ onAddRole }) => {
+    const [name, setName] = useState<string>("");
+    const [message, setMessage] = useState<string>("");
+    const token = localStorage.getItem('token');
 
-    try {
-      const response = await fetch("/api/roles", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(newRole)
-      });
+    const handleSubmit = async (e: FormEvent) => {
+      e.preventDefault();
+      const newRole = { Name: name };
+      try {
+          const response = await fetch("/api/roles", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(newRole)
+        });
 
-      if (response.ok) {
-        setMessage("Dodano rolę");
-        setName("");
-      } else {
-        let errorText = await response.text();
-        try {
-            const errorData = JSON.parse(errorText);
-            setMessage("Error: " + (errorData.detail || JSON.stringify(errorData)));
-        } catch {
-            setMessage("Error: " + (errorText || "Wystąpił błąd"));
+        if (response.ok) {
+            const createdRole: Role = await response.json();
+            setMessage("Dodano rolę");
+            setName("");
+            onAddRole(createdRole);
+        } else {
+            let errorText = await response.text();
+            try {
+                const errorData = JSON.parse(errorText);
+                setMessage("Error: " + (errorData.detail || JSON.stringify(errorData)));
+            } catch {
+                setMessage("Error: " + (errorText || "Wystąpił błąd"));
+            }
         }
+      } catch (error: any) {
+          setMessage("Error: " + error.message);
       }
-    } catch (error: any) {
-      setMessage("Error: " + error.message);
-    }
-  };
+    };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Nazwa: </label>
-        <input
-          value={name}
-          onChange={e => setName(e.target.value)}
-          required
-          maxLength={100}
-        />
-      </div>
-      <button type="submit">Dodaj nową rolę</button>
-      <div>{message}</div>
-    </form>
-  );
+    return (
+      <form onSubmit={handleSubmit}>
+          <div>
+            <label>Nazwa</label>
+            <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input"/>
+          </div>
+          <button type="submit">Dodaj nową rolę</button>
+          <div>{message}</div>
+      </form>
+    );
 };
 
 export default AddRole;

@@ -1,13 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
-import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import { Navbar, Container, Nav } from 'react-bootstrap';
 import Spinner from 'react-bootstrap/Spinner';
 
 const Navb: React.FC = () => {
-  const { isLoggedIn, logout, isAuthChecked } = useAuth();
+  const { isLoggedIn, logout, isAuthChecked, userRole } = useAuth();
   const navigate = useNavigate();
 
+  // Czekanie na poprawne załadowanie navbara:
   if (!isAuthChecked) {
     return (
       <div className="d-flex justify-content-center align-items-center p-3">
@@ -26,7 +27,12 @@ const Navb: React.FC = () => {
       <Container fluid className="px-4">
         <Navbar.Brand href="/" className="fw-bold text-dark">SRTK</Navbar.Brand>
         <Nav className="ms-auto align-items-center">
-          {isLoggedIn ? (
+          {isLoggedIn && userRole === 'Admin' ? (
+            <>
+              <Nav.Link href="/adminPanel" className="text-dark no-wrap">Panel admina</Nav.Link>
+              <button onClick={handleLogout}>Wyloguj</button>
+            </>
+          ) : isLoggedIn && userRole === 'Client' ? (
             <>
               <Nav.Link href="/profile" className="text-dark">Profil</Nav.Link>
               <button onClick={handleLogout}>Wyloguj</button>
@@ -40,7 +46,6 @@ const Navb: React.FC = () => {
         </Nav>
       </Container>
     </Navbar>
-
   );
 };
 
