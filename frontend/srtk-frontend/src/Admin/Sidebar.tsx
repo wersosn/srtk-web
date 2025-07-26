@@ -7,12 +7,12 @@ function Sidebar() {
         <nav className="admin-nav">
             <ul className="nav flex-column">
                 <li className="nav-item">
-                    <NavLink to="dashboard" className={getClassName}>
+                    <NavLink to="." end className={getClassName}>
                         Dashboard
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="users" className={getClassName}>
+                    <NavLink to="usersManagement" className={getClassName}>
                         Zarządzanie użytkownikami
                     </NavLink>
                 </li>
@@ -22,22 +22,22 @@ function Sidebar() {
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="tracks" className={getClassName}>
+                    <NavLink to="tracksManagement" className={getClassName}>
                         Zarządzanie torami
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="equipments" className={getClassName}>
+                    <NavLink to="equipmentsManagement" className={getClassName}>
                         Zarządzanie sprzętem
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="addFacility" className={getClassName}>
+                    <NavLink to="facilitiesManagement" className={getClassName}>
                         Zarządzanie obiektem
                     </NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink to="statuses" className={getClassName}>
+                    <NavLink to="statusesManagement" className={getClassName}>
                         Zarządzanie statusami rezerwacji
                     </NavLink>
                 </li>

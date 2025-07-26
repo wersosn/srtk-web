@@ -103,3 +103,10 @@ label {
   font-size: 1rem;
 }
 
+.details {
+  background: #f1f3f5;
+  border-top: 1px solid #f5f5f5;
+  font-size: 0.95rem;
+  padding: 5px;
+}
+

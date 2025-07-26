@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 
-interface EditRoleProps {
-    roleId: number;
+interface EditFacilityProps {
+    facilityId: number;
     currentName: string;
-    onUpdated: (updatedRole: { id: number; name: string }) => void;
+    currentCity: string;
+    currentAddress: string;
+    onUpdated: (updatedFacility: { id: number; name: string; city: string; address: string }) => void;
     onCancel: () => void;
 }
 
-const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onCancel }) => {
+const EditFacility: React.FC<EditFacilityProps> = ({ facilityId, currentName, currentCity, currentAddress, onUpdated, onCancel }) => {
     const [name, setName] = useState(currentName);
+    const [city, setCity] = useState(currentCity);
+    const [address, setAddress] = useState(currentAddress);
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
 
@@ -16,17 +20,17 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
         e.preventDefault();
 
         try {
-            const response = await fetch(`/api/roles/${roleId}`, {
+            const response = await fetch(`/api/facilities/${facilityId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ name })
+                body: JSON.stringify({ name, city, address })
             });
             if (response.ok) {
-                const updatedRole = await response.json();
-                onUpdated(updatedRole);
+                const updatedFacility = await response.json();
+                onUpdated(updatedFacility);
                 setMessage('');
             } else {
                 const error = await response.text();
@@ -44,6 +48,14 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
                     <label>Nazwa</label>
                     <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
+                <div>
+                    <label>Miasto</label>
+                    <input value={city} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
+                </div>
+                <div>
+                    <label>Adres</label>
+                    <input value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
+                </div>
                 <div className="d-flex gap-2">
                     <button type="submit">Zapisz zmiany</button>
                     <button type="button" onClick={onCancel}>Anuluj</button>
@@ -54,4 +66,4 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
     );
 };
 
-export default EditRole;
+export default EditFacility;

@@ -1,78 +1,76 @@
 import React, { useState, type FormEvent } from "react";
 
-const AddFacility: React.FC = () => {
-  const [name, setName] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const token = localStorage.getItem('token');
+type Facility = {
+    id: number;
+    name: string;
+    city: string;
+    address: string;
+};
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+interface AddFacilityProps {
+  onAddFacility: (newFacility: Facility) => void;
+}
 
-    const newFacility = { name, city, address };
+const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
+    const [name, setName] = useState<string>("");
+    const [city, setCity] = useState<string>("");
+    const [address, setAddress] = useState<string>("");
+    const [message, setMessage] = useState<string>("");
+    const token = localStorage.getItem('token');
 
-    try {
-      const response = await fetch("/api/facilities", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(newFacility)
-      });
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
 
-      if (response.ok) {
-        setMessage("Dodano obiekt");
-        setName("");
-        setCity("");
-        setAddress("");
-      } else {
-        let errorText = await response.text();
+        const newFacility = { name, city, address };
+
         try {
-            const errorData = JSON.parse(errorText);
-            setMessage("Error: " + (errorData.detail || JSON.stringify(errorData)));
-        } catch {
-            setMessage("Error: " + (errorText || "Wystąpił błąd"));
+            const response = await fetch("/api/facilities", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
+              body: JSON.stringify(newFacility)
+          });
+
+          if (response.ok) {
+              const createdFacility: Facility = await response.json();
+              setMessage("Dodano obiekt");
+              setName("");
+              setCity("");
+              setAddress("");
+              onAddFacility(createdFacility);
+          } else {
+              let errorText = await response.text();
+              try {
+                  const errorData = JSON.parse(errorText);
+                  setMessage("Error: " + (errorData.detail || JSON.stringify(errorData)));
+              } catch {
+                  setMessage("Error: " + (errorText || "Wystąpił błąd"));
+              }
+          }
+        } catch (error: any) {
+            setMessage("Error: " + error.message);
         }
-      }
-    } catch (error: any) {
-      setMessage("Error: " + error.message);
-    }
-  };
+    };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Nazwa: </label>
-        <input
-          value={name}
-          onChange={e => setName(e.target.value)}
-          required
-          maxLength={100}
-        />
-      </div>
-      <div>
-        <label>Miasto: </label>
-        <input
-          value={city}
-          onChange={e => setCity(e.target.value)}
-          required
-          maxLength={50}
-        />
-      </div>
-      <div>
-        <label>Ulica: </label>
-        <input
-          value={address}
-          onChange={e => setAddress(e.target.value)}
-          required
-          maxLength={50}
-        />
-      </div>
-      <button type="submit">Dodaj nowy obiekt</button>
-      <div>{message}</div>
-    </form>
+    <>
+          <form onSubmit={handleSubmit}>
+              <div>
+                  <label>Nazwa</label>
+                  <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+
+                  <label>Miasto</label>
+                  <input value={name} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
+
+                  <label>Adres</label>
+                  <input value={name} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
+              </div>
+              <button type="submit">Dodaj nowy obiekt</button>
+              <div>{message}</div>
+          </form>
+      </>
   );
 };
 

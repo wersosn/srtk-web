@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import AddRole from './AddRole';
+import EditRole from './EditRole';
 import DeleteRole from './DeleteRole';
+import editIcon from '../assets/edit.png';
 
 type Role = {
     id: number;
@@ -9,9 +11,11 @@ type Role = {
 
 function RoleManagement() {
     const [roles, setRoles] = useState<Role[]>([]);
+    const [editingRole, setEditingRole] = useState<Role | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Pobieranie wszystkich ról z bazy:
     useEffect(() => {
         const fetchRoles = async () => {
             try {
@@ -35,14 +39,19 @@ function RoleManagement() {
         fetchRoles();
     }, []);
 
+    // Obsługa dodawania roli:
     const handleAdd = (newRole: Role) => {
         setRoles(prev => [...prev, newRole]);
     };
 
-    const handleEdit = (id: number) => {
-
+    // Obsługa edycji roli:
+    const handleEdit = (updated: Role) => {
+        const updatedRole = roles.map(r => r.id === updated.id ? updated : r);
+        setRoles(updatedRole);
+        setEditingRole(null);
     };
 
+    // Obsługa usuwania roli:
     const handleDelete = (id: number) => {
         setRoles(prevRoles => prevRoles.filter(role => role.id !== id));
     };
@@ -63,12 +72,27 @@ function RoleManagement() {
                         {roles.map((role) => (
                             <li key={role.id} className="list-group-item d-flex justify-content-between align-items-center">
                                 {role.name}
-                                <DeleteRole roleId={role.id} onDeleted={() => handleDelete(role.id)} />
+                                <div className="d-flex gap-2">
+                                    <button onClick={() => setEditingRole(role)} disabled={loading} className="icon-button">
+                                        <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }}/>
+                                    </button>
+                                    <DeleteRole roleId={role.id} onDeleted={() => handleDelete(role.id)} />
+                                </div>
                             </li>
                         ))}
                     </ul>
                     <hr />
-                    <AddRole onAddRole={handleAdd} />
+                    {editingRole ? (
+                        <>
+                            <h5 className="mt-4">Edycja roli</h5>
+                            <EditRole roleId={editingRole.id} currentName={editingRole.name} onUpdated={handleEdit} onCancel={() => setEditingRole(null)}/>
+                        </>
+                    ) : (
+                        <>
+                            <h5 className="mt-4">Nowa rola</h5>
+                            <AddRole onAddRole={handleAdd} />
+                        </>
+                    )}
                 </>
             )}
         </div>

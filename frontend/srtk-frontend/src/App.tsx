@@ -7,7 +7,12 @@ import Home from "./Home/Home";
 import RequireAdmin from "./Admin/RequireAdmin";
 import AdminPanel from "./Admin/AdminPanel";
 import Dashboard from "./Admin/Dashboard";
+import EquipmentsManagement from "./Equipments/EquipmentsManagement";
+import FacilitiesManagement from "./Facilities/FacilitiesManagement";
 import RoleManagement from "./Roles/RolesManagement";
+import StatusesManagement from "./Statuses/StatusesManagement";
+import TrackManagement from "./Tracks/TracksManagement";
+import UserManagement from "./User/UserManagement";
 
 function App() {
   return (
@@ -24,8 +29,12 @@ function App() {
           </RequireAdmin>
         }>
           <Route index element={<Dashboard />} />
+          <Route path="equipmentsManagement" element={<EquipmentsManagement />} />
+          <Route path="facilitiesManagement" element={<FacilitiesManagement />} />
           <Route path="roleManagement" element={<RoleManagement />} />
-          <Route path="addFacility" element={<AddFacility />} />
+          <Route path="statusesManagement" element={<StatusesManagement />} />
+          <Route path="tracksManagement" element={<TrackManagement />}/>
+          <Route path="usersManagement" element={<UserManagement />} />
         </Route>
 
       </Routes>
