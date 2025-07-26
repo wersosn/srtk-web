@@ -9,6 +9,7 @@ namespace srtk.Models
         public int Id { get; set; }
 
         [Required]
+        [StringLength(100)]
         public string Name { get; set; }
 
         [Required]
@@ -18,7 +19,7 @@ namespace srtk.Models
 
         [ForeignKey(nameof(Facility))]
         public int FacilityId { get; set; }
-        public Facility Facility { get; set; }
+        public Facility? Facility { get; set; }
 
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }

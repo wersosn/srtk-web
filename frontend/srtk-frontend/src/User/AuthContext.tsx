@@ -6,6 +6,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   isAuthChecked: boolean;
   userRole: string | null;
+  facilityId: number | null;
   login: (token: string) => void;
   logout: () => void;
 }
@@ -17,6 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [facilityId, setFacilityId] = useState<number | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -26,8 +28,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const decoded: any = jwtDecode(token);
         setUserRole(decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]);
+        setFacilityId(decoded["FacilityId"] ? parseInt(decoded["FacilityId"]) : null);
       } catch {
         setUserRole(null);
+        setFacilityId(null);
       }
     }
   }, []);
@@ -39,8 +43,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const decoded: any = jwtDecode(token);
       setUserRole(decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]);
+      setFacilityId(decoded["FacilityId"] ? parseInt(decoded["FacilityId"]) : null);
     } catch {
       setUserRole(null);
+      setFacilityId(null);
     }
   };
 
@@ -53,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Udostępnienie stanu i funkcji:
   return (
-    <AuthContext.Provider value={{ isLoggedIn, isAuthChecked, userRole, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, isAuthChecked, userRole, facilityId, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

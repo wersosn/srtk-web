@@ -14,15 +14,15 @@ namespace srtk.Models
 
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [ForeignKey(nameof(Track))]
         public int TrackId { get; set; }
-        public Track Track { get; set; }
+        public Track? Track { get; set; }
 
         [ForeignKey(nameof(Status))]
         public int StatusId { get; set; }
-        public Status Status { get; set; }
+        public Status? Status { get; set; }
 
         public ICollection<EquipmentReservation> EquipmentReservations { get; set; } = new List<EquipmentReservation>();
     }

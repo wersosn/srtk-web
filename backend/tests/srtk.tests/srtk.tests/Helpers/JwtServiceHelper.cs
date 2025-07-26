@@ -11,7 +11,7 @@ namespace srtk.tests.Helpers
 {
     public class JwtServiceHelper : JwtService
     {
-        public JwtServiceHelper() : base(new ConfigurationBuilder().Build()) { }
+        public JwtServiceHelper() : base(new ConfigurationBuilder().AddInMemoryCollection().Build(), DbContextHelper.GetDbContext()) { }
 
         public override string GenerateToken(User user)
         {

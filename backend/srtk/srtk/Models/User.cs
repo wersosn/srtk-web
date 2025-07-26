@@ -16,7 +16,7 @@ namespace srtk.Models
 
         [ForeignKey(nameof(Role))]
         public int RoleId { get; set; }
-        public Role Role { get; set; }
+        public Role? Role { get; set; }
 
         public ICollection<Reservation> ReservationList { get; set; } = new List<Reservation>();
         public ICollection<Notification> NotificationList { get; set; } = new List<Notification>();

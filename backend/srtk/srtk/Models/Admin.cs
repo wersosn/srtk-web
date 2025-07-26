@@ -6,6 +6,6 @@ namespace srtk.Models
     {
         [ForeignKey(nameof(Facility))]
         public int FacilityId { get; set; }
-        public Facility Facility { get; set; }
+        public Facility? Facility { get; set; }
     }
 }

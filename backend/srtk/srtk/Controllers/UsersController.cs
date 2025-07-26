@@ -9,11 +9,11 @@ namespace srtk.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly UserService service;
 
-        public UserController(UserService service)
+        public UsersController(UserService service)
         {
             this.service = service;
         }
