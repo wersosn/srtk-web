@@ -20,6 +20,18 @@ namespace srtk.Services
             return await context.Users.ToListAsync();
         }
 
+        // Pobranie wszystkich klientów:
+        public async Task<List<Client>> GetAllClients()
+        {
+            return await context.Clients.ToListAsync();
+        }
+
+        // Pobranie wszystkich adminów:
+        public async Task<List<Admin>> GetAllAdmins()
+        {
+            return await context.Admins.ToListAsync();
+        }
+
         // Pobranie konkretnego użytkownika:
         public async Task<User?> GetById(int id)
         {
@@ -41,7 +53,6 @@ namespace srtk.Services
         }
 
         // Edycja istniejącego użytkownika:
-        // DO ROZSZERZENIA!
         public async Task<User?> Update(int id, [FromBody] UserDto dto)
         {
             var user = await context.Users.FindAsync(id);
@@ -49,8 +60,75 @@ namespace srtk.Services
             {
                 return null;
             }
-            user.Email = dto.Email;
-            user.RoleId = dto.RoleId;
+
+            var currentClient = await context.Clients.FirstOrDefaultAsync(c => c.Id == user.Id);
+            var currentAdmin = await context.Admins.FirstOrDefaultAsync(a => a.Id == user.Id);
+
+            bool roleChanged = dto.RoleId != user.RoleId;
+
+            // Aktualizacja pól i nowy typ użytkownika przy zmianie roli:
+            if (roleChanged)
+            {
+                if (currentClient != null)
+                {
+                    context.Clients.Remove(currentClient);
+                }
+
+                if (currentAdmin != null)
+                {
+                    context.Admins.Remove(currentAdmin);
+                }
+
+                if (dto.RoleId == 1) // Client
+                {
+                    var newClient = new Client
+                    {
+                        Id = user.Id,
+                        Email = dto.Email ?? user.Email,
+                        Password = user.Password,
+                        RoleId = 1,
+                        Name = dto.Name ?? "",
+                        Surname = dto.Surname ?? "",
+                        PhoneNumber = dto.PhoneNumber ?? ""
+                    };
+                    context.Clients.Add(newClient);
+                }
+                else if (dto.RoleId == 2) // Admin
+                {
+                    var newAdmin = new Admin
+                    {
+                        Id = user.Id,
+                        Email = dto.Email ?? user.Email,
+                        Password = user.Password,
+                        RoleId = 2,
+                        FacilityId = dto.FacilityId ?? 0
+                    };
+                    context.Admins.Add(newAdmin);
+                }
+
+                user.RoleId = dto.RoleId;
+            }
+            else
+            {
+                // Aktualizacja pól jeśli nie zmieniamy typu
+                if (currentClient != null)
+                {
+                    if (dto.Name != null) currentClient.Name = dto.Name;
+                    if (dto.Surname != null) currentClient.Surname = dto.Surname;
+                    if (dto.PhoneNumber != null) currentClient.PhoneNumber = dto.PhoneNumber;
+                }
+
+                if (currentAdmin != null && dto.FacilityId.HasValue)
+                {
+                    currentAdmin.FacilityId = dto.FacilityId.Value;
+                }
+            }
+
+            if (dto.Email != null)
+            {
+                user.Email = dto.Email;
+            }
+
             await context.SaveChangesAsync();
             return user;
         }

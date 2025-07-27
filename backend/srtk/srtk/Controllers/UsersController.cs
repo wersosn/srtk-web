@@ -26,6 +26,22 @@ namespace srtk.Controllers
             return users;
         }
 
+        // Pobranie wszystkich klientów:
+        [HttpGet("clients")]
+        public async Task<List<Client>> GetAllClients()
+        {
+            var clients = await service.GetAllClients();
+            return clients;
+        }
+
+        // Pobranie wszystkich adminów:
+        [HttpGet("admins")]
+        public async Task<List<Admin>> GetAllAdmins()
+        {
+            var admins = await service.GetAllAdmins();
+            return admins;
+        }
+
         // Pobranie użytkowników według roli:
         [HttpGet("users/role/{roleId}")]
         [Authorize]

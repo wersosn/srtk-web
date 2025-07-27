@@ -23,7 +23,6 @@ button:focus-visible {
   font-weight: 400;
 
   color: #1f2f40;
-  background-color: #dde2e5;
   accent-color: #f8500a;
 
   font-synthesis: none;
@@ -35,7 +34,6 @@ button:focus-visible {
 html, body, #root {
   height: 100%;
   margin: 0;
-  background-color: #dde2e5;
 }
 
 form {
@@ -52,6 +50,7 @@ button {
   border: none;
   border-radius: 4px !important;
   cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h2, h5 {
@@ -109,4 +108,26 @@ label {
   font-size: 0.95rem;
   padding: 5px;
 }
+
+.blob-bg {
+  position: fixed;
+  top: -200px;
+  right: -350px;
+  width: 1200px;
+  height: auto;
+  z-index: -1;
+  opacity: 0.6;
+  pointer-events: none;
+  background: #dde2e5;
+}
+
+.app-wrapper {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #dde2e5;
+  z-index: 0;
+}
+
+
 

@@ -1,72 +1,106 @@
 import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
+import EditUser from './EditUser';
+import DeleteUser from './DeleteUser';
 
-
-type User = {
+type Client = {
     id: number;
     email: string;
     password: string;
     roleId: number;
-}
-
-type Client = User & {
-  name: string;
-  surname: string;
-  phoneNumber: string;
+    name: string;
+    surname: string;
+    phoneNumber: string;
 };
 
-type Admin = User & {
-  facilityId: number;
-}
+type Admin = {
+    id: number;
+    email: string;
+    password: string;
+    roleId: number;
+    facilityId: number;
+};
 
 function UserManagement() {
-    const [users, setUsers] = useState<(User | Client | Admin)[]>([]);
-    const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [showDetails, setShowDetails] = useState<User | null>(null);
+    const [clients, setClients] = useState<Client[]>([]);
+    const [admins, setAdmins] = useState<Admin[]>([]);
+    const [editingUser, setEditingUser] = useState<Client | Admin | null>(null);
+    const [showDetails, setShowDetails] = useState<Client | Admin | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     // Pobieranie wszystkich użytkowników z bazy:
     useEffect(() => {
-        const fetchAllUsers = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch('/api/users', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!res.ok) {
-                    const text = await res.text();
-                    console.error('Fetch error:', res.status, text);
-                    throw new Error('Błąd podczas pobierania użytkowników');
-                }
-                const data = await res.json();
-                setUsers(data);
-            } catch (err: any) {
-                setError(err.message || 'Wystąpił błąd');
-            } finally {
-                setLoading(false);
+        const token = localStorage.getItem('token');
+        setLoading(true);
+        setError(null);
+
+        const fetchClients = async () => {
+            const res = await fetch('/api/users/clients', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Błąd podczas pobierania klientów: ${res.status} ${text}`);
             }
+            return res.json() as Promise<Client[]>;
         };
-        fetchAllUsers();
+
+        const fetchAdmins = async () => {
+            const res = await fetch('/api/users/admins', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Błąd podczas pobierania adminów: ${res.status} ${text}`);
+            }
+            return res.json() as Promise<Admin[]>;
+        };
+
+        Promise.all([fetchClients(), fetchAdmins()])
+            .then(([clientsData, adminsData]) => {
+                setClients(clientsData);
+                setAdmins(adminsData);
+            })
+            .catch(err => setError(err.message || 'Wystąpił błąd'))
+            .finally(() => setLoading(false));
     }, []);
 
-    // Obsługa dodawania użytkownika:
-    const handleAdd = (newUser: User | Client | Admin) => {
-        setUsers(prev => [...prev, newUser]);
-    };
-
-    // Obsługa edycji uzytkownika:
-    const handleEdit = (updated: User | Client | Admin) => {
-        const updatedUser = users.map(r => r.id === updated.id ? updated : r);
-        setUsers(updatedUser);
+    // Edycja użytkownika:
+    const handleEdit = (updated: Client | Admin) => {
+        if (updated.roleId === 1) {
+            setAdmins(prev => prev.filter(a => a.id !== updated.id));
+            setClients(prev => {
+                const exists = prev.some(c => c.id === updated.id);
+                if (exists) {
+                    return prev.map(c => (c.id === updated.id ? updated as Client : c));
+                } else {
+                    return [...prev, updated as Client];
+                }
+            });
+        } else {
+            setClients(prev => prev.filter(c => c.id !== updated.id));
+            setAdmins(prev => {
+                const exists = prev.some(a => a.id === updated.id);
+                if (exists) {
+                    return prev.map(a => (a.id === updated.id ? updated as Admin : a));
+                } else {
+                    return [...prev, updated as Admin];
+                }
+            });
+        }
         setEditingUser(null);
     };
 
-    // Obsługa usuwania użytkownika:
-    const handleDelete = (id: number) => {
-        setUsers(prevUser => prevUser.filter(User => User.id !== id));
+    // Usuwanie użytkownika:
+    const handleDelete = (id: number, roleId: number) => {
+        if (roleId === 1) {
+            setClients(prev => prev.filter(c => c.id !== id));
+        } else {
+            setAdmins(prev => prev.filter(a => a.id !== id));
+        }
+        if (editingUser?.id === id) setEditingUser(null);
+        if (showDetails?.id === id) setShowDetails(null);
     };
 
     return (
@@ -80,51 +114,98 @@ function UserManagement() {
                 <p className="text-danger">{error}</p>
             ) : (
                 <>
-                    <h5 className="mt-4">Lista użytkowników</h5>
-                    <ul className="list-group">
-                        {users.map((user) => (
-                            <li key={user.id} className="list-group-item p-0">
-                                <div onClick={() => setShowDetails(prev => (prev?.id === user.id ? null : user))} className="d-flex justify-content-between align-items-center px-3 py-2">
-                                    {user.email}
-                                    <div className="d-flex gap-2" onClick={(e) => e.stopPropagation()}>
-                                        <button onClick={() => setEditingUser(user)} disabled={loading} className="icon-button">
-                                            <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
+                    {/* Lista klientów */}
+                    <h5 className="mt-4">Klienci</h5>
+                    <ul className="list-group mb-4">
+                        {clients.map(client => (
+                            <li key={client.id} className="list-group-item p-0">
+                                <div
+                                    onClick={() => setShowDetails(prev => (prev?.id === client.id ? null : client))}
+                                    className="d-flex justify-content-between align-items-center px-3 py-2"
+                                >
+                                    {client.email}
+                                    <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
+                                        <button onClick={() => setEditingUser(client)} className="icon-button">
+                                            <img src={editIcon} alt="Edytuj" style={{ width: 16, height: 16 }} />
                                         </button>
-                                        {/*Usuwanie*/}
+                                        <DeleteUser userId={client.id} onDeleted={() => handleDelete(client.id, 1)} />
                                     </div>
                                 </div>
 
-                                {showDetails?.id === user.id && (
+                                {showDetails?.id === client.id && (
                                     <div className="mt-2 ps-2 details">
-                                        {user.roleId === 1 ? (
-                                            <>
-                                                <strong>Imię:</strong> <br />
-                                                <strong>Nazwisko:</strong> <br /> {/*Dopisać dane*/}
-                                            </>
-                                        ) : (
-                                            <em>Admin</em>
-                                        )}
+                                        <strong>Imię:</strong> {client.name} <br />
+                                        <strong>Nazwisko:</strong> {client.surname} <br />
+                                        <strong>Numer telefonu:</strong> {client.phoneNumber}
                                     </div>
                                 )}
                             </li>
                         ))}
                     </ul>
+
+                    {/* Lista adminów */}
+                    <h5>Administratorzy</h5>
+                    <ul className="list-group">
+                        {admins.map(admin => (
+                            <li key={admin.id} className="list-group-item p-0">
+                                <div
+                                    onClick={() => setShowDetails(prev => (prev?.id === admin.id ? null : admin))}
+                                    className="d-flex justify-content-between align-items-center px-3 py-2"
+                                >
+                                    {admin.email}
+                                    <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
+                                        <button onClick={() => setEditingUser(admin)} className="icon-button">
+                                            <img src={editIcon} alt="Edytuj" style={{ width: 16, height: 16 }} />
+                                        </button>
+                                        <DeleteUser userId={admin.id} onDeleted={() => handleDelete(admin.id, admin.roleId)} />
+                                    </div>
+                                </div>
+
+                                {showDetails?.id === admin.id && (
+                                    <div className="mt-2 ps-2 details">
+                                        <em>Admin</em> <br />
+                                        <strong>Facility ID:</strong> {admin.facilityId}
+                                    </div>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+
                     <hr />
-                    {editingUser ? (
+                    {editingUser && (
                         <>
                             <h5 className="mt-4">Edycja użytkownika</h5>
-                            {/*Edycja*/}
-                        </>
-                    ) : (
-                        <>
-                            <h5 className="mt-4">Nowy użytkownik</h5>
-                            {/*Dodawanie?*/}
+                            {editingUser.roleId === 1 ? (
+                                <EditUser
+                                    userId={editingUser.id}
+                                    currentEmail={editingUser.email}
+                                    currentName={(editingUser as Client).name}
+                                    currentSurname={(editingUser as Client).surname}
+                                    currentPhoneNumber={(editingUser as Client).phoneNumber}
+                                    currentRoleId={editingUser.roleId}
+                                    currentFacilityId={0}
+                                    onUpdated={handleEdit}
+                                    onCancel={() => setEditingUser(null)}
+                                />
+                            ) : (
+                                <EditUser
+                                    userId={editingUser.id}
+                                    currentEmail={editingUser.email}
+                                    currentName={''}
+                                    currentSurname={''}
+                                    currentPhoneNumber={''}
+                                    currentRoleId={editingUser.roleId}
+                                    currentFacilityId={(editingUser as Admin).facilityId}
+                                    onUpdated={handleEdit}
+                                    onCancel={() => setEditingUser(null)}
+                                />
+                            )}
                         </>
                     )}
                 </>
             )}
         </div>
-    )
+    );
 }
 
 export default UserManagement;
