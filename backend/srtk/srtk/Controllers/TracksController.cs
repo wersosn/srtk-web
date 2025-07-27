@@ -28,11 +28,34 @@ namespace srtk.Controllers
         }
 
         // Pobieranie wszystkich torów należących do konkretnego obiektu:
-        [HttpGet("facilities/{facilityId}/tracks")]
-        public async Task<ActionResult<List<Track>>> GetAllTracksInFacility(int facilityId)
+        [HttpGet("inFacility")]
+        public async Task<ActionResult<List<Track>>> GetAllTracksInFacility([FromQuery] int? facilityId)
         {
-            var tracks = await service.GetAllInFacility(facilityId);
-            return tracks;
+            List<Track> tracks;
+
+            if (facilityId.HasValue)
+            {
+                tracks = await service.GetAllInFacility(facilityId.Value);
+            }
+            else
+            {
+                var facilityIdClaim = User.Claims.FirstOrDefault(c => c.Type == "FacilityId");
+
+                if (facilityIdClaim == null || string.IsNullOrEmpty(facilityIdClaim.Value))
+                {
+                    tracks = await service.GetAll();
+                }
+                else if (int.TryParse(facilityIdClaim.Value, out int actualFacilityId))
+                {
+                    Console.WriteLine($"FacilityId z tokena: {actualFacilityId}");
+                    tracks = await service.GetAllInFacility(actualFacilityId);
+                }
+                else
+                {
+                    return BadRequest("Nieprawidłowy FacilityId w tokenie");
+                }
+            }
+            return Ok(tracks);
         }
 
         // Pobranie konkretnego toru po Id:

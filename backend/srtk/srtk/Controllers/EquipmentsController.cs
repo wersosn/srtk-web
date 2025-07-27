@@ -28,11 +28,34 @@ namespace srtk.Controllers
         }
 
         // Pobieranie wszystkich sprzętów należących do konkretnego obiektu:
-        [HttpGet("facilities/{facilityId}/equipment")]
-        public async Task<ActionResult<List<Equipment>>> GetAllEquipmentsInFacility(int facilityId)
+        [HttpGet("inFacility")]
+        public async Task<ActionResult<List<Equipment>>> GetAllEquipmentsInFacility([FromQuery] int? facilityId)
         {
-            var equipments = await service.GetAllInFacility(facilityId);
-            return equipments;
+            List<Equipment> equipments;
+
+            if (facilityId.HasValue)
+            {
+                equipments = await service.GetAllInFacility(facilityId.Value);
+            }
+            else
+            {
+                var facilityIdClaim = User.Claims.FirstOrDefault(c => c.Type == "FacilityId");
+
+                if (facilityIdClaim == null || string.IsNullOrEmpty(facilityIdClaim.Value))
+                {
+                    equipments = await service.GetAll();
+                }
+                else if (int.TryParse(facilityIdClaim.Value, out int actualFacilityId))
+                {
+                    Console.WriteLine($"FacilityId z tokena: {actualFacilityId}");
+                    equipments = await service.GetAllInFacility(actualFacilityId);
+                }
+                else
+                {
+                    return BadRequest("Nieprawidłowy FacilityId w tokenie");
+                }
+            }
+            return Ok(equipments);
         }
 
         // Pobranie konkretnego sprzętu:

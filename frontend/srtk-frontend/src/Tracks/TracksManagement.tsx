@@ -3,6 +3,7 @@ import editIcon from '../assets/edit.png';
 import AddTrack from './AddTrack';
 import EditTrack from './EditTrack';
 import DeleteTrack from './DeleteTrack';
+import { jwtDecode } from 'jwt-decode';
 
 type Track = {
     id: number;
@@ -21,16 +22,36 @@ function TrackManagement() {
 
     // Pobieranie wszystkich torów z bazy:
     useEffect(() => {
-        const fetchAllTracks = async () => {
+        const fetchAllEqs = async () => {
+            setLoading(true);
+            setError(null);
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch('/api/tracks', {
+                let facilityId: number | undefined;
+
+                if (token) {
+                    const decoded: any = jwtDecode(token);
+                    if (decoded && decoded.FacilityId) {
+                        facilityId = parseInt(decoded.FacilityId, 10);
+                    }
+                }
+                console.log(facilityId);
+                let url: string;
+
+                if (!facilityId || facilityId === 0) {
+                    url = '/api/tracks';  // Wszystkie tory
+                } else {
+                    url = `/api/tracks/inFacility?facilityId=${facilityId}`;  // Tory w danym obiekcie
+                }
+
+                const res = await fetch(url, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
                 if (!res.ok) {
-                    throw new Error('Błąd podczas pobierania obiektów');
+                    throw new Error('Błąd podczas pobierania torów');
                 }
                 const data = await res.json();
                 setTracks(data);
@@ -40,9 +61,7 @@ function TrackManagement() {
                 setLoading(false);
             }
         };
-        fetchAllTracks();
-
-        // TODO: Dodać pobieranie torów należących jedynie do obiektu, którego adminiem jest użytkownik
+        fetchAllEqs();
     }, []);
 
     // Obsługa dodawania toru:
@@ -89,7 +108,7 @@ function TrackManagement() {
 
                                 {showDetails?.id === track.id && (
                                     <div className="mt-2 ps-2 details">
-                                        <div><strong>Rodzaj nawierzchni:</strong> {track.typeOfSurface} <br/> <strong>Długość:</strong> {track.length} <br/> <strong>Obiekt:</strong> {track.facilityId}</div>
+                                        <div><strong>Rodzaj nawierzchni:</strong> {track.typeOfSurface} <br /> <strong>Długość:</strong> {track.length} <br /> <strong>Obiekt:</strong> {track.facilityId}</div>
                                     </div>
                                 )}
                             </li>
