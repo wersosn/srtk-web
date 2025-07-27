@@ -22,7 +22,7 @@ namespace srtk.tests.Tests
 
         // Test - pobranie wszystkich użytkowników:
         [Fact]
-        public async Task Getting_All_Facilities()
+        public async Task Getting_All_Users()
         {
             var context = DbContextHelper.GetDbContext();
             var service = new UserService(context);
@@ -47,6 +47,68 @@ namespace srtk.tests.Tests
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             output.WriteLine("Wynik (ilość użytkowników): " + result.Count);
+        }
+
+        // Test - pobranie wszystkich klientów:
+        [Fact]
+        public async Task Getting_All_Clients()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+            var user = new Client
+            {
+                Email = "test@test.pl",
+                Password = "abc123",
+                Name = "Test",
+                Surname = "Test",
+                RoleId = 1
+            };
+            await service.Add(user);
+
+            var user2 = new User
+            {
+                Email = "ania@nowak.pl",
+                Password = "321cba",
+                RoleId = 2
+            };
+            await service.Add(user2);
+
+            var result = await service.GetAllClients();
+
+            Assert.NotNull(result);
+            Assert.Single(result);
+            output.WriteLine("Wynik (ilość klientów): " + result.Count);
+        }
+
+        // Test - pobranie wszystkich adminów:
+        [Fact]
+        public async Task Getting_All_Admins()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+            var user = new Admin
+            {
+                Email = "test@test.pl",
+                Password = "abc123",
+                FacilityId = 1,
+                RoleId = 2
+            };
+            await service.Add(user);
+
+            var user2 = new Admin
+            {
+                Email = "ania@nowak.pl",
+                Password = "321cba",
+                FacilityId = 1,
+                RoleId = 2
+            };
+            await service.Add(user2);
+
+            var result = await service.GetAllAdmins();
+
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            output.WriteLine("Wynik (ilość adminów): " + result.Count);
         }
 
         // Test - pobranie użytkowników z rolą "Klient":
@@ -142,26 +204,27 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new UserService(context);
-            var user = new User
+
+            var client = new Client
             {
                 Email = "test@test.pl",
                 Password = "abc123",
-                RoleId = 1
+                RoleId = 1,
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789"
             };
-            await service.Add(user);
+            await service.Add(client);
 
-            var updatedUser = new UserDto
+            var updatedUserDto = new UserDto
             {
                 Email = "testNowy@test.pl",
-                RoleId = 2
             };
 
-            var updated = await service.Update(user.Id, updatedUser);
+            var updated = await service.Update(client.Id, updatedUserDto);
 
             Assert.NotNull(updated);
             Assert.Equal("testNowy@test.pl", updated.Email);
-            Assert.Equal(2, updated.RoleId);
-            Assert.Single(context.Users);
             output.WriteLine("Wynik: Zmodyfikowano użytkownika");
         }
 
