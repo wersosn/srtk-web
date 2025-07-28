@@ -1,4 +1,5 @@
 import React, { useState, useEffect, type FormEvent } from "react";
+import { jwtDecode } from 'jwt-decode';
 
 type Track = {
     id: number;
@@ -25,8 +26,20 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [message, setMessage] = useState<string>("");
     const token = localStorage.getItem('token');
+    const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
 
     useEffect(() => {
+        if (token) {
+            const decoded: any = jwtDecode(token);
+            const id = parseInt(decoded.FacilityId);
+            if (!isNaN(id)) {
+                setAdminInFacility(id);
+                if (id !== 0) {
+                    setFacilityId(id);
+                }
+            }
+        }
+
         const fetchFacilities = async () => {
             try {
                 const res = await fetch('/api/facilities', {
@@ -86,6 +99,20 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
         <>
             <form onSubmit={handleSubmit}>
                 <div>
+                    {adminInFacility === 0 && (
+                        <>
+                            <label>Obiekt</label><br />
+                            <select value={facilityID} onChange={e => setFacilityId(Number(e.target.value))} required className="info-input">
+                                <option value="">Wybierz obiekt</option>
+                                {facilities.map(facility => (
+                                    <option key={facility.id} value={facility.id}>
+                                        {facility.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </>
+                    )}
+
                     <label>Nazwa</label>
                     <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
 
@@ -94,16 +121,6 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
 
                     <label>Długość</label>
                     <input type="number" value={length} onChange={e => setLength(Number(e.target.value))} required maxLength={50} className="info-input" />
-
-                    <label>Obiekt</label><br />
-                    <select value={facilityID} onChange={e => setFacilityId(Number(e.target.value))} required className="info-input">
-                        <option value="">Wybierz obiekt</option>
-                        {facilities.map(facility => (
-                            <option key={facility.id} value={facility.id}>
-                                {facility.name}
-                            </option>
-                        ))}
-                    </select>
                 </div>
                 <button type="submit">Dodaj nowy tor</button>
                 <div>{message}</div>

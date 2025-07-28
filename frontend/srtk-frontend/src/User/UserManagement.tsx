@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
 import EditUser from './EditUser';
 import DeleteUser from './DeleteUser';
+import { jwtDecode } from 'jwt-decode';
 
 type Client = {
     id: number;
@@ -28,8 +29,20 @@ function UserManagement() {
     const [showDetails, setShowDetails] = useState<Client | Admin | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [facilityId, setFacilityId] = useState<number | null>(null);
 
     // Pobieranie wszystkich użytkowników z bazy:
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded: any = jwtDecode(token);
+            const id = parseInt(decoded.FacilityId);
+            if (!isNaN(id)) {
+                setFacilityId(id);
+            }
+        }
+    }, []);
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         setLoading(true);
@@ -60,7 +73,12 @@ function UserManagement() {
         Promise.all([fetchClients(), fetchAdmins()])
             .then(([clientsData, adminsData]) => {
                 setClients(clientsData);
-                setAdmins(adminsData);
+                if (facilityId === 0 || facilityId === null) { // Gdy Admin ma facilityId == 0 - wyświetl wszystkich adminów:
+                    setAdmins(adminsData);
+                } else { // W przeciwnym wypadku wyświetl tylko Adminów należących do tego samego obiektu:
+                    const filteredAdmins = adminsData.filter(admin => admin.facilityId === facilityId);
+                    setAdmins(filteredAdmins);
+                }
             })
             .catch(err => setError(err.message || 'Wystąpił błąd'))
             .finally(() => setLoading(false));
@@ -114,7 +132,6 @@ function UserManagement() {
                 <p className="text-danger">{error}</p>
             ) : (
                 <>
-                    {/* Lista klientów */}
                     <h5 className="mt-4">Klienci</h5>
                     <ul className="list-group mb-4">
                         {clients.map(client => (
@@ -143,7 +160,6 @@ function UserManagement() {
                         ))}
                     </ul>
 
-                    {/* Lista adminów */}
                     <h5>Administratorzy</h5>
                     <ul className="list-group">
                         {admins.map(admin => (

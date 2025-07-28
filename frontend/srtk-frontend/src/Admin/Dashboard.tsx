@@ -2,7 +2,7 @@ function Dashboard() {
   return (
   <>
     <h1>Dashboard</h1>
-    <p>Witamy w panelu admina.</p>
+    <p>Witaj w panelu admina.</p>
   </>
   )
 }
