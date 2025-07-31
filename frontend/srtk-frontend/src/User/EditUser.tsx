@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 interface Role {
     id: number;
@@ -31,10 +32,22 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
     const [facilityId, setFacilityId] = useState(currentFacilityId);
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
+    const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
 
     useEffect(() => {
+        if (token) {
+            const decoded: any = jwtDecode(token);
+            const id = parseInt(decoded.FacilityId);
+            if (!isNaN(id)) {
+                setAdminInFacility(id);
+                if (id !== 0) {
+                    setFacilityId(id);
+                }
+            }
+        }
+
         const fetchFacilities = async () => {
             try {
                 const res = await fetch('/api/facilities', {
@@ -65,11 +78,17 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
         fetchRoles();
     }, [token]);
 
+    useEffect(() => {
+        if (roleId === 2 && adminInFacility && adminInFacility !== 0) {
+            setFacilityId(adminInFacility);
+        }
+    }, [roleId, adminInFacility]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const bodyData: any = { email, roleId,};
-        
-        if(roleId === 1) {
+        const bodyData: any = { email, roleId, };
+
+        if (roleId === 1) {
             bodyData.name = name;
             bodyData.surname = surname;
             bodyData.phoneNumber = phoneNumber;
@@ -121,31 +140,38 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                         <>
                             <div>
                                 <label>Imię</label>
-                                <input value={name} onChange={(e) => setName(e.target.value)} required className="info-input"/>
+                                <input value={name} onChange={(e) => setName(e.target.value)} required className="info-input" />
                             </div>
                             <div>
                                 <label>Nazwisko</label>
-                                <input value={surname} onChange={(e) => setSurname(e.target.value)} required className="info-input"/>
+                                <input value={surname} onChange={(e) => setSurname(e.target.value)} required className="info-input" />
                             </div>
                             <div>
                                 <label>Numer telefonu</label>
-                                <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="info-input"/>
+                                <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="info-input" />
                             </div>
                         </>
                     )}
 
                     {roleId === 2 && (
-                        <div>
-                            <label>Obiekt (facility)</label>
-                            <select value={facilityId} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
-                                <option value="">Wybierz obiekt</option>
-                                {facilities.map((f) => (
-                                    <option key={f.id} value={f.id}>
-                                        {f.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        adminInFacility === 0 ? (
+                            <div>
+                                <label>Obiekt</label>
+                                <select value={facilityId} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
+                                    <option value="">Wybierz obiekt</option>
+                                    {facilities.map((f) => (
+                                        <option key={f.id} value={f.id}>
+                                            {f.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ) : (
+                            <div>
+                                <label>Obiekt</label>
+                                <input type="text" className="info-input" disabled value={facilities.find(f => f.id === facilityId)?.name || 'Twój obiekt'} />
+                            </div>
+                        )
                     )}
                 </div>
 

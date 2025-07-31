@@ -90,6 +90,7 @@ label {
   display: inline-flex;
   align-items: center;
   justify-content: right;
+  box-shadow: none;
 }
 
 .info-input {
