@@ -19,26 +19,27 @@ function FacilitiesManagement() {
     const [error, setError] = useState<string | null>(null);
 
     // Pobieranie wszystkich obiektów z bazy:
-    useEffect(() => {
-        const fetchFacilities = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch('/api/facilities', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!res.ok) {
-                    throw new Error('Błąd podczas pobierania obiektów');
-                }
-                const data = await res.json();
-                setFacilities(data);
-            } catch (err: any) {
-                setError(err.message || 'Wystąpił błąd');
-            } finally {
-                setLoading(false);
+    const fetchFacilities = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/facilities', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                throw new Error('Błąd podczas pobierania obiektów');
             }
-        };
+            const data = await res.json();
+            setFacilities(data);
+        } catch (err: any) {
+            setError(err.message || 'Wystąpił błąd');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchFacilities();
     }, []);
 
@@ -52,11 +53,6 @@ function FacilitiesManagement() {
         const updatedFacility = facilities.map(r => r.id === updated.id ? updated : r);
         setFacilities(updatedFacility);
         setEditingFacility(null);
-    };
-
-    // Obsługa usuwania obiektu:
-    const handleDelete = (id: number) => {
-        setFacilities(prevFacility => prevFacility.filter(facility => facility.id !== id));
     };
 
     return (
@@ -80,7 +76,7 @@ function FacilitiesManagement() {
                                         <button onClick={() => setEditingFacility(facility)} disabled={loading} className="icon-button">
                                             <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                         </button>
-                                        <DeleteFacility facilityId={facility.id} onDeleted={() => handleDelete(facility.id)} />
+                                        <DeleteFacility facilityId={facility.id} onDeleted={fetchFacilities} />
                                     </div>
                                 </div>
 

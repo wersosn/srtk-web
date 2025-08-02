@@ -47,16 +47,16 @@ const EditTrack: React.FC<EditTrackProps> = ({ trackId, currentName, currentType
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Nazwa</label>
-                    <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+                    <label htmlFor="trackName">Nazwa</label>
+                    <input id="trackName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div>
-                    <label>Typ nawierzchi</label>
-                    <input value={typeofsurface} onChange={e => setTypeofsurface(e.target.value)} required className="info-input" />
+                    <label htmlFor="trackType">Typ nawierzchi</label>
+                    <input id="trackType" value={typeofsurface} onChange={e => setTypeofsurface(e.target.value)} required className="info-input" />
                 </div>
                 <div>
-                    <label>Długość</label>
-                    <input value={length} onChange={e => setLength(Number(e.target.value))} required className="info-input" />
+                    <label htmlFor="trackLength">Długość</label>
+                    <input id="trackLength" value={length} onChange={e => setLength(Number(e.target.value))} required className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
                     <button type="submit">Zapisz zmiany</button>

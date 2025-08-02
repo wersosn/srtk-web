@@ -102,7 +102,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                     {adminInFacility === 0 && (
                         <>
                             <label>Obiekt</label><br />
-                            <select value={facilityID} onChange={e => setFacilityId(Number(e.target.value))} required className="info-input">
+                            <select id="facilitySelect" value={facilityID} onChange={e => setFacilityId(Number(e.target.value))} required className="info-input">
                                 <option value="">Wybierz obiekt</option>
                                 {facilities.map(facility => (
                                     <option key={facility.id} value={facility.id}>
@@ -113,14 +113,14 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                         </>
                     )}
 
-                    <label>Nazwa</label>
-                    <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+                    <label htmlFor="trackName">Nazwa</label>
+                    <input id="trackName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
 
-                    <label>Typ nawierzchni</label>
-                    <input value={typeofsurface} onChange={e => setTypeofsurface(e.target.value)} required maxLength={50} className="info-input" />
+                    <label htmlFor="trackType">Typ nawierzchni</label>
+                    <input id="trackType" value={typeofsurface} onChange={e => setTypeofsurface(e.target.value)} required maxLength={50} className="info-input" />
 
-                    <label>Długość</label>
-                    <input type="number" value={length} onChange={e => setLength(Number(e.target.value))} required maxLength={50} className="info-input" />
+                    <label htmlFor="trackLength">Długość</label>
+                    <input id="trackLength" type="number" value={length} onChange={e => setLength(Number(e.target.value))} required maxLength={50} className="info-input" />
                 </div>
                 <button type="submit">Dodaj nowy tor</button>
                 <div>{message}</div>

@@ -123,11 +123,11 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Email</label>
-                    <input value={email} onChange={e => setEmail(e.target.value)} required className="info-input" />
+                    <label htmlFor="userEmail">Email</label>
+                    <input id="userEmail" value={email} onChange={e => setEmail(e.target.value)} required className="info-input" />
 
                     <label>Rola</label>
-                    <select value={roleId} onChange={(e) => setRoleId(Number(e.target.value))} className="info-input">
+                    <select id="roleSelect" value={roleId} onChange={(e) => setRoleId(Number(e.target.value))} className="info-input">
                         <option value="">Wybierz rolę</option>
                         {roles.map((role) => (
                             <option key={role.id} value={role.id}>
@@ -139,16 +139,16 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                     {roleId === 1 && (
                         <>
                             <div>
-                                <label>Imię</label>
-                                <input value={name} onChange={(e) => setName(e.target.value)} required className="info-input" />
+                                <label htmlFor="userName">Imię</label>
+                                <input id="userName" value={name} onChange={(e) => setName(e.target.value)} required className="info-input" />
                             </div>
                             <div>
-                                <label>Nazwisko</label>
-                                <input value={surname} onChange={(e) => setSurname(e.target.value)} required className="info-input" />
+                                <label htmlFor="userSurname">Nazwisko</label>
+                                <input id="userSurname" value={surname} onChange={(e) => setSurname(e.target.value)} required className="info-input" />
                             </div>
                             <div>
-                                <label>Numer telefonu</label>
-                                <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="info-input" />
+                                <label htmlFor="userPhone">Numer telefonu</label>
+                                <input id="userPhone" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="info-input" />
                             </div>
                         </>
                     )}
@@ -157,7 +157,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                         adminInFacility === 0 ? (
                             <div>
                                 <label>Obiekt</label>
-                                <select value={facilityId} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
+                                <select id="facilitySelect" value={facilityId} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
                                     <option value="">Wybierz obiekt</option>
                                     {facilities.map((f) => (
                                         <option key={f.id} value={f.id}>
@@ -169,7 +169,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                         ) : (
                             <div>
                                 <label>Obiekt</label>
-                                <input type="text" className="info-input" disabled value={facilities.find(f => f.id === facilityId)?.name || 'Twój obiekt'} />
+                                <input id="facilitySet" type="text" className="info-input" disabled value={facilities.find(f => f.id === facilityId)?.name || 'Twój obiekt'} />
                             </div>
                         )
                     )}

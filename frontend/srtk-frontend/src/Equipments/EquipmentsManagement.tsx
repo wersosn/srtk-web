@@ -21,46 +21,47 @@ function EquipmentsManagement() {
     const [error, setError] = useState<string | null>(null);
 
     // Pobieranie wszystkich torów z bazy:
-    useEffect(() => {
-        const fetchAllEqs = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const token = localStorage.getItem('token');
-                let facilityId: number | undefined;
+    const fetchAllEqs = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const token = localStorage.getItem('token');
+            let facilityId: number | undefined;
 
-                if (token) {
-                    const decoded: any = jwtDecode(token);
-                    if (decoded && decoded.FacilityId) {
-                        facilityId = parseInt(decoded.FacilityId, 10);
-                    }
+            if (token) {
+                const decoded: any = jwtDecode(token);
+                if (decoded && decoded.FacilityId) {
+                    facilityId = parseInt(decoded.FacilityId, 10);
                 }
-                console.log(facilityId);
-                let url: string;
-
-                if (!facilityId || facilityId === 0) {
-                    url = '/api/equipments';  // Wszystkie sprzęty
-                } else {
-                    url = `/api/equipments/inFacility?facilityId=${facilityId}`;  // Sprzęty dla danego obiektu
-                }
-
-                const res = await fetch(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (!res.ok) {
-                    throw new Error('Błąd podczas pobierania sprzętów');
-                }
-                const data = await res.json();
-                setEqs(data);
-            } catch (err: any) {
-                setError(err.message || 'Wystąpił błąd');
-            } finally {
-                setLoading(false);
             }
-        };
+            console.log(facilityId);
+            let url: string;
+
+            if (!facilityId || facilityId === 0) {
+                url = '/api/equipments';  // Wszystkie sprzęty
+            } else {
+                url = `/api/equipments/inFacility?facilityId=${facilityId}`;  // Sprzęty dla danego obiektu
+            }
+
+            const res = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error('Błąd podczas pobierania sprzętów');
+            }
+            const data = await res.json();
+            setEqs(data);
+        } catch (err: any) {
+            setError(err.message || 'Wystąpił błąd');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchAllEqs();
     }, []);
 
@@ -74,11 +75,6 @@ function EquipmentsManagement() {
         const updatedEquipment = eqs.map(r => r.id === updated.id ? updated : r);
         setEqs(updatedEquipment);
         setEditingEquipment(null);
-    };
-
-    // Obsługa usuwania sprzętu:
-    const handleDelete = (id: number) => {
-        setEqs(prevEquipment => prevEquipment.filter(Equipment => Equipment.id !== id));
     };
 
     return (
@@ -102,7 +98,7 @@ function EquipmentsManagement() {
                                         <button onClick={() => setEditingEquipment(Equipment)} disabled={loading} className="icon-button">
                                             <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                         </button>
-                                        <DeleteEquipment equipmentId={Equipment.id} onDeleted={() => handleDelete(Equipment.id)} />
+                                        <DeleteEquipment equipmentId={Equipment.id} onDeleted={fetchAllEqs} />
                                     </div>
                                 </div>
 

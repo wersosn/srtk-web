@@ -52,11 +52,6 @@ function RoleManagement() {
         setEditingRole(null);
     };
 
-    // Obsługa usuwania roli:
-    const handleDelete = (id: number) => {
-        setRoles(prevRoles => prevRoles.filter(role => role.id !== id));
-    };
-
     return (
         <div className="admin-content p-4">
             <h2 className="mb-3">Zarządzanie rolami</h2>

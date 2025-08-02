@@ -58,14 +58,14 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
     <>
           <form onSubmit={handleSubmit}>
               <div>
-                  <label>Nazwa</label>
-                  <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+                  <label htmlFor="facilityName">Nazwa</label>
+                  <input id="facilityName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
 
-                  <label>Miasto</label>
-                  <input value={city} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
+                  <label htmlFor="facilityCity">Miasto</label>
+                  <input id="facilityCity" value={city} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
 
-                  <label>Adres</label>
-                  <input value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
+                  <label htmlFor="facilityAddress">Adres</label>
+                  <input id="facilityAddress" value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
               </div>
               <button type="submit">Dodaj nowy obiekt</button>
               <div>{message}</div>

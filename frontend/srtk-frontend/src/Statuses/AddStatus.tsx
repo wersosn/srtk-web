@@ -50,8 +50,8 @@ const AddStatus: React.FC<AddStatusProps> = ({ onAddStatus }) => {
       <>
           <form onSubmit={handleSubmit}>
               <div>
-                  <label>Nazwa</label>
-                  <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+                  <label htmlFor="statusName">Nazwa</label>
+                  <input id="statusName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
               </div>
               <button type="submit">Dodaj nowy status</button>
               <div>{message}</div>

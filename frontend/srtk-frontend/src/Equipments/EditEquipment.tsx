@@ -47,16 +47,16 @@ const EditEquipment: React.FC<EditEquipmentProps> = ({ equipmentId, currentName,
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Nazwa</label>
-                    <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+                    <label htmlFor="eqName">Nazwa</label>
+                    <input id="eqName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div>
-                    <label>Rodzaj</label>
-                    <input value={type} onChange={e => setType(e.target.value)} required className="info-input" />
+                    <label htmlFor="eqType">Rodzaj</label>
+                    <input id="eqType" value={type} onChange={e => setType(e.target.value)} required className="info-input" />
                 </div>
                 <div>
-                    <label>Koszt</label>
-                    <input value={cost} onChange={e => setCost(Number(e.target.value))} className="info-input" />
+                    <label htmlFor="eqCost">Koszt</label>
+                    <input id="eqCost" value={cost} onChange={e => setCost(Number(e.target.value))} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
                     <button type="submit">Zapisz zmiany</button>

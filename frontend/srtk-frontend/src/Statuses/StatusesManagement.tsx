@@ -16,27 +16,28 @@ function StatusesManagement() {
     const [error, setError] = useState<string | null>(null);
 
     // Pobieranie wszystkich statusów z bazy:
-    useEffect(() => {
-        const fetchstatuses = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch('/api/statuses', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!res.ok) {
-                    throw new Error('Błąd podczas pobierania statusów');
-                }
-                const data = await res.json();
-                setStatuses(data);
-            } catch (err: any) {
-                setError(err.message || 'Wystąpił błąd');
-            } finally {
-                setLoading(false);
+    const fetchStatuses = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/statuses', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                throw new Error('Błąd podczas pobierania statusów');
             }
-        };
-        fetchstatuses();
+            const data = await res.json();
+            setStatuses(data);
+        } catch (err: any) {
+            setError(err.message || 'Wystąpił błąd');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchStatuses();
     }, []);
 
     // Obsługa dodawania statusu:
@@ -49,11 +50,6 @@ function StatusesManagement() {
         const updatedStatus = statuses.map(r => r.id === updated.id ? updated : r);
         setStatuses(updatedStatus);
         setEditingStatus(null);
-    };
-
-    // Obsługa usuwania statusu:
-    const handleDelete = (id: number) => {
-        setStatuses(prevStatuses => prevStatuses.filter(Status => Status.id !== id));
     };
 
     return (
@@ -76,7 +72,7 @@ function StatusesManagement() {
                                     <button onClick={() => setEditingStatus(status)} disabled={loading} className="icon-button">
                                         <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }}/>
                                     </button>
-                                    <DeleteStatus statusId={status.id} onDeleted={() => handleDelete(status.id)} />
+                                    <DeleteStatus statusId={status.id} onDeleted={fetchStatuses} />
                                 </div>
                             </li>
                         ))}

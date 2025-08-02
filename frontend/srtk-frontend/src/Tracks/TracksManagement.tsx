@@ -21,47 +21,48 @@ function TrackManagement() {
     const [error, setError] = useState<string | null>(null);
 
     // Pobieranie wszystkich torów z bazy:
-    useEffect(() => {
-        const fetchAllEqs = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const token = localStorage.getItem('token');
-                let facilityId: number | undefined;
+    const fetchAllTracks = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const token = localStorage.getItem('token');
+            let facilityId: number | undefined;
 
-                if (token) {
-                    const decoded: any = jwtDecode(token);
-                    if (decoded && decoded.FacilityId) {
-                        facilityId = parseInt(decoded.FacilityId, 10);
-                    }
+            if (token) {
+                const decoded: any = jwtDecode(token);
+                if (decoded && decoded.FacilityId) {
+                    facilityId = parseInt(decoded.FacilityId, 10);
                 }
-                console.log(facilityId);
-                let url: string;
-
-                if (!facilityId || facilityId === 0) {
-                    url = '/api/tracks';  // Wszystkie tory
-                } else {
-                    url = `/api/tracks/inFacility?facilityId=${facilityId}`;  // Tory w danym obiekcie
-                }
-
-                const res = await fetch(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (!res.ok) {
-                    throw new Error('Błąd podczas pobierania torów');
-                }
-                const data = await res.json();
-                setTracks(data);
-            } catch (err: any) {
-                setError(err.message || 'Wystąpił błąd');
-            } finally {
-                setLoading(false);
             }
-        };
-        fetchAllEqs();
+            console.log(facilityId);
+            let url: string;
+
+            if (!facilityId || facilityId === 0) {
+                url = '/api/tracks';  // Wszystkie tory
+            } else {
+                url = `/api/tracks/inFacility?facilityId=${facilityId}`;  // Tory w danym obiekcie
+            }
+
+            const res = await fetch(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error('Błąd podczas pobierania torów');
+            }
+            const data = await res.json();
+            setTracks(data);
+        } catch (err: any) {
+            setError(err.message || 'Wystąpił błąd');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAllTracks()
     }, []);
 
     // Obsługa dodawania toru:
@@ -74,11 +75,6 @@ function TrackManagement() {
         const updatedTrack = tracks.map(r => r.id === updated.id ? updated : r);
         setTracks(updatedTrack);
         setEditingTrack(null);
-    };
-
-    // Obsługa usuwania toru:
-    const handleDelete = (id: number) => {
-        setTracks(prevTrack => prevTrack.filter(track => track.id !== id));
     };
 
     return (
@@ -102,7 +98,7 @@ function TrackManagement() {
                                         <button onClick={() => setEditingTrack(track)} disabled={loading} className="icon-button">
                                             <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                         </button>
-                                        <DeleteTrack trackId={track.id} onDeleted={() => handleDelete(track.id)} />
+                                        <DeleteTrack trackId={track.id} onDeleted={fetchAllTracks} />
                                     </div>
                                 </div>
 
