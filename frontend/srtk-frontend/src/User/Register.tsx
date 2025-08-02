@@ -77,7 +77,7 @@ const Register = () => {
                             className="register-input"
                         />
                         <button type="submit">
-                            Zarejestruj
+                            Zarejestruj się
                         </button>
                         {info && <p className="register-info">{info}</p>}
                         <hr />

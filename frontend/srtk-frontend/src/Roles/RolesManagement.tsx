@@ -16,26 +16,27 @@ function RoleManagement() {
     const [error, setError] = useState<string | null>(null);
 
     // Pobieranie wszystkich ról z bazy:
-    useEffect(() => {
-        const fetchRoles = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch('/api/roles', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!res.ok) {
-                    throw new Error('Błąd podczas pobierania ról');
-                }
-                const data = await res.json();
-                setRoles(data);
-            } catch (err: any) {
-                setError(err.message || 'Wystąpił błąd');
-            } finally {
-                setLoading(false);
+    const fetchRoles = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/roles', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                throw new Error('Błąd podczas pobierania ról');
             }
-        };
+            const data = await res.json();
+            setRoles(data);
+        } catch (err: any) {
+            setError(err.message || 'Wystąpił błąd');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchRoles();
     }, []);
 
@@ -74,9 +75,9 @@ function RoleManagement() {
                                 {role.name}
                                 <div className="d-flex gap-2">
                                     <button onClick={() => setEditingRole(role)} disabled={loading} className="icon-button">
-                                        <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }}/>
+                                        <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                     </button>
-                                    <DeleteRole roleId={role.id} onDeleted={() => handleDelete(role.id)} />
+                                    <DeleteRole roleId={role.id} onDeleted={fetchRoles} />
                                 </div>
                             </li>
                         ))}
@@ -85,7 +86,7 @@ function RoleManagement() {
                     {editingRole ? (
                         <>
                             <h5 className="mt-4">Edycja roli</h5>
-                            <EditRole roleId={editingRole.id} currentName={editingRole.name} onUpdated={handleEdit} onCancel={() => setEditingRole(null)}/>
+                            <EditRole roleId={editingRole.id} currentName={editingRole.name} onUpdated={handleEdit} onCancel={() => setEditingRole(null)} />
                         </>
                     ) : (
                         <>

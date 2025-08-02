@@ -50,8 +50,8 @@ const AddRole: React.FC<AddRoleProps> = ({ onAddRole }) => {
       <>
           <form onSubmit={handleSubmit}>
               <div>
-                  <label>Nazwa</label>
-                  <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+                  <label htmlFor="roleName">Nazwa</label>
+                  <input id="roleName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
               </div>
               <button type="submit">Dodaj nową rolę</button>
               <div>{message}</div>

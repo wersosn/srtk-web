@@ -41,8 +41,8 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Nazwa</label>
-                    <input value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+                    <label htmlFor="roleName">Nazwa</label>
+                    <input id="roleName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
                     <button type="submit">Zapisz zmiany</button>
