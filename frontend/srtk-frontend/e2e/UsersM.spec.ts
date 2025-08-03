@@ -1,10 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { fakeJwtToken, fakeAdminJwtToken } from './Test-helper';
 
 // Ustawienie mockowego tokena:
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    const fakeJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-        'eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjExIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYWRtaW5AYWRtaW4ucGwiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImp0aSI6ImM1YjEwNjQzLTFjYWQtNDVhMi1hZjUxLWVhOTgyOGM1NjQxMSIsIkZhY2lsaXR5SWQiOiIwIiwiZXhwIjoxNzU0MTQ1MzgxLCJpc3MiOiJzcnRrLWJhY2tlbmQiLCJhdWQiOiJzcnRrLWNsaWVudHMifQ.signature-placeholder';
 
     await page.evaluate((token) => {
         localStorage.setItem('token', token);
@@ -44,12 +43,8 @@ test('Pomyślne pobranie listy wszystkich użytkowników', async ({ page }) => {
     await expect(page.locator('li.list-group-item >> text=anna@anna.pl')).toBeVisible();
 })
 
-
-
 test('Pomyślne pobranie listy adminów w danym obiekcie', async ({ page }) => {
     await page.goto('/');
-    const fakeAdminJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-        'eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhbm5hQGFubmEucGwiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImp0aSI6ImYyMTVlM2Q2LWExZTgtNDNmZi1iNjdhLTc1MzEyNWYwNWVhZiIsIkZhY2lsaXR5SWQiOiIxIiwiZXhwIjoxNzU0MTQ3Mjk4LCJpc3MiOiJzcnRrLWJhY2tlbmQiLCJhdWQiOiJzcnRrLWNsaWVudHMifQ.signature-placeholder';
 
     await page.evaluate((token) => {
         localStorage.setItem('token', token);
@@ -95,26 +90,38 @@ test('Pomyślna edycja danych klienta (bez zmiany roli)', async ({ page }) => {
                 body: JSON.stringify([{ id: 1, name: 'Client' }, { id: 2, name: 'Admin' }]),
             });
         } else {
-            route.continue();
+            route.abort();
         }
     });
+
+    const clientsData = [{ id: 5555, email: "ania@nowak.pl", name: "Anna", surname: "Nowak", phoneNumber: "12345" }]; // Pomocnicza tablica, gdyż po PUT nie odświeża się lista użytkowników
 
     await page.route('**/api/users/clients', async route => {
         if (route.request().method() === 'GET') {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify([{ id: 1, email: "ania@nowak.pl", name: 'Anna', surname: "Nowak", phoneNumber: "12345" }])
+                body: JSON.stringify(clientsData)
             });
-        } else if (route.request().method() === 'PUT') {
+        } else {
+            route.abort();
+        }
+    });
+
+    await page.route('**/api/users/*', async route => {
+        if (route.request().method() === 'PUT') {
             const body = await route.request().postDataJSON();
+            const userIndex = clientsData.findIndex(u => u.id === 5555);
+            if (userIndex !== -1) {
+                clientsData[userIndex] = { ...clientsData[userIndex], ...body };
+            }
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify({ id: 1, email: body.email, name: body.name, surname: body.surname, phoneNumber: body.phoneNumber })
+                body: JSON.stringify(clientsData[userIndex])
             });
         } else {
-            route.continue();
+            route.abort();
         }
     });
 
@@ -126,7 +133,7 @@ test('Pomyślna edycja danych klienta (bez zmiany roli)', async ({ page }) => {
                 body: JSON.stringify([{ id: 1, email: "admin@admin.pl", facilityId: 0 }, { id: 2, email: "anna@anna.pl", facilityId: 1 }]),
             });
         } else {
-            route.continue();
+            route.abort();
         }
     });
 

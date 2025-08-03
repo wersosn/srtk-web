@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { fakeJwtToken, fakeAdminJwtToken } from './Test-helper';
 
 // Ustawienie mockowego tokena:
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    const fakeJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-        'eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjExIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYWRtaW5AYWRtaW4ucGwiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImp0aSI6ImM1YjEwNjQzLTFjYWQtNDVhMi1hZjUxLWVhOTgyOGM1NjQxMSIsIkZhY2lsaXR5SWQiOiIwIiwiZXhwIjoxNzU0MTQ1MzgxLCJpc3MiOiJzcnRrLWJhY2tlbmQiLCJhdWQiOiJzcnRrLWNsaWVudHMifQ.signature-placeholder';
-
+   
     await page.evaluate((token) => {
         localStorage.setItem('token', token);
     }, fakeJwtToken);
@@ -32,8 +31,6 @@ test('Pomyślne pobranie listy wszystkich torów', async ({ page }) => {
 
 test('Pomyślne pobranie listy torów w danym obiekcie', async ({ page }) => {
     await page.goto('/');
-    const fakeAdminJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-        'eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJhbm5hQGFubmEucGwiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImp0aSI6ImYyMTVlM2Q2LWExZTgtNDNmZi1iNjdhLTc1MzEyNWYwNWVhZiIsIkZhY2lsaXR5SWQiOiIxIiwiZXhwIjoxNzU0MTQ3Mjk4LCJpc3MiOiJzcnRrLWJhY2tlbmQiLCJhdWQiOiJzcnRrLWNsaWVudHMifQ.signature-placeholder';
 
     await page.evaluate((token) => {
         localStorage.setItem('token', token);
@@ -116,18 +113,24 @@ test('Pomyślna edycja toru', async ({ page }) => {
     });
 
     await page.route('**/api/tracks', async route => {
+        if (route.request().method() === 'GET') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([{ id: 123, name: 'Tor', typeOfSurface: 'Żwir', length: 5000, facilityId: 1 }]),
+            });
+        } else {
+            await route.abort();
+        }
+    });
+
+    await page.route('**/api/tracks/*', async route => {
         if (route.request().method() === 'PUT') {
             const body = await route.request().postDataJSON();
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify([{ id: 123, name: body.name, typeOfSurface: body.typeOfSurface, length: body.length, facilityId: 1 }]),
-            });
-        } else if (route.request().method() === 'GET') {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify([{ id: 123, name: 'Tor', typeOfSurface: 'Żwir', length: 5000, facilityId: 1 }]),
+                body: JSON.stringify({ id: 123, name: body.name, typeOfSurface: body.typeOfSurface, length: body.length, facilityId: 1 }),
             });
         } else {
             await route.abort();
@@ -141,6 +144,7 @@ test('Pomyślna edycja toru', async ({ page }) => {
     await page.fill('input#trackName', 'Tor kolarski');
     await page.fill('input#trackType', 'Żwir');
     await page.fill('input#trackLength', '7000');
+
     await page.click('button:has-text("Zapisz zmiany")');
 
     await expect(page.locator('text=Tor kolarski')).toBeVisible();

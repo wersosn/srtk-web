@@ -1,15 +1,16 @@
 import { test, expect } from '@playwright/test'
+import { fakeJwtToken } from './Test-helper';
 
-// Ustawienie mockowego tokena i listy ról:
+// Ustawienie mockowego tokena:
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    const fakeJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
-        'eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjExIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYWRtaW5AYWRtaW4ucGwiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImp0aSI6ImM1YjEwNjQzLTFjYWQtNDVhMi1hZjUxLWVhOTgyOGM1NjQxMSIsIkZhY2lsaXR5SWQiOiIwIiwiZXhwIjoxNzU0MTQ1MzgxLCJpc3MiOiJzcnRrLWJhY2tlbmQiLCJhdWQiOiJzcnRrLWNsaWVudHMifQ.signature-placeholder';
-
+ 
     await page.evaluate((token) => {
         localStorage.setItem('token', token);
     }, fakeJwtToken);
+});
 
+test('Pomyślne pobranie listy ról', async ({ page }) => {
     await page.route('**/api/roles', async route => {
         if (route.request().method() === 'GET') {
             await route.fulfill({
@@ -21,9 +22,7 @@ test.beforeEach(async ({ page }) => {
             await route.abort();
         }
     });
-});
 
-test('Pomyślne pobranie listy ról', async ({ page }) => {
     await page.goto('/adminPanel/roleManagement');
     await expect(page.locator('li.list-group-item >> text=Client')).toBeVisible();
     await expect(page.locator('li.list-group-item >> text=Admin')).toBeVisible();
@@ -66,7 +65,13 @@ test('Pomyślna edycja roli', async ({ page }) => {
                 contentType: 'application/json',
                 body: JSON.stringify([{ id: 3, name: 'Moderator' }]),
             });
-        } else if (route.request().method() === 'PUT') {
+        } else {
+            await route.abort();
+        }
+    });
+
+    await page.route('**/api/roles/*', async route => {
+        if (route.request().method() === 'PUT') {
             const body = await route.request().postDataJSON();
             await route.fulfill({
                 status: 200,
