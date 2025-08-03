@@ -23,15 +23,17 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 - Swagger
 - JWT (do autentykacji)
 - CORS (dostęp do API dla frontendu)
+- xUnit (testy jednostkowe)
 
 *Frontend*:
 - React + Vite
-- JavaScript, TypeScript
+- TypeScript
 - HTML, CSS
 - Axios
-- Bootstrap
+- React Bootstrap
 - SignalR
 - FullCalendar
+- Playwright (testy e2e)
 
 ## Instrukcja użytkowania
 
