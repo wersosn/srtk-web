@@ -51,10 +51,10 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji, które trwają w określonym przedziale czasowym - do znajdywania kolizji:
-        public async Task<List<Reservation>> GetOverlapping(DateTime start, DateTime end)
+        public async Task<List<Reservation>> GetOverlapping(int trackId, DateTime start, DateTime end)
         {
             return await context.Reservations
-                .Where(r => r.Start < end && r.End > start) // Rezerwacje, które się nakładają
+                .Where(r => r.Start < end && r.End > start && r.TrackId == trackId) // Rezerwacje, które się nakładają
                 .ToListAsync();
         }
 
@@ -67,6 +67,9 @@ namespace srtk.Services
         // Dodanie nowej rezerwacji:
         public async Task<Reservation> Add(Reservation reservation)
         {
+            reservation.Start = reservation.Start.ToUniversalTime();
+            reservation.End = reservation.End.ToUniversalTime();
+
             context.Reservations.Add(reservation);
             await context.SaveChangesAsync();
             return reservation;
@@ -82,8 +85,8 @@ namespace srtk.Services
             }
 
             // Aktualizacja głównych parametrów:
-            reservation.Start = dto.Start;
-            reservation.End = dto.End;
+            reservation.Start = dto.Start.ToUniversalTime();
+            reservation.End = dto.End.ToUniversalTime();
             reservation.TrackId = dto.TrackId;
 
             // Aktualizacja sprzętu oraz kosztów:

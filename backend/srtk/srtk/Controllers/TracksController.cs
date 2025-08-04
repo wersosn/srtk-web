@@ -47,7 +47,6 @@ namespace srtk.Controllers
                 }
                 else if (int.TryParse(facilityIdClaim.Value, out int actualFacilityId))
                 {
-                    Console.WriteLine($"FacilityId z tokena: {actualFacilityId}");
                     tracks = await service.GetAllInFacility(actualFacilityId);
                 }
                 else

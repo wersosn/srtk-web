@@ -5,6 +5,7 @@ import Navb from "./Navbar/Navb";
 import Footer from "./Footer/Footer";
 import Home from "./Home/Home";
 import RequireAdmin from "./Admin/RequireAdmin";
+import RequireUser from "./Reservations/RequireUser";
 import AdminPanel from "./Admin/AdminPanel";
 import Dashboard from "./Admin/Dashboard";
 import EquipmentsManagement from "./Equipments/EquipmentsManagement";
@@ -14,6 +15,8 @@ import StatusesManagement from "./Statuses/StatusesManagement";
 import TrackManagement from "./Tracks/TracksManagement";
 import UserManagement from "./User/UserManagement";
 import BlobBackground from "./BlobBackground";
+import MakeReservation from "./Reservations/MakeReservation";
+import MyReservations from "./Reservations/MyReservations";
 
 function App() {
   return (
@@ -25,6 +28,17 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/makeReservation" element={
+            <RequireUser>
+              <MakeReservation />
+            </RequireUser>
+          }/>
+
+           <Route path="/myReservations" element={
+            <RequireUser>
+              <MyReservations />
+            </RequireUser>
+          }/>
 
           <Route path="/adminPanel" element={
             <RequireAdmin>

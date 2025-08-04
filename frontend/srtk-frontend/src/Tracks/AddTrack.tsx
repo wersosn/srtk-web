@@ -6,6 +6,9 @@ type Track = {
     name: string;
     typeOfSurface: string;
     length: number;
+    openingHour: string;
+    closingHour: string;
+    availableDays: string;
     facilityId: number;
 };
 
@@ -22,6 +25,10 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const [name, setName] = useState<string>("");
     const [typeofsurface, setTypeofsurface] = useState<string>("");
     const [length, setLength] = useState<number | "">("");
+    const [openingHour, setOpeningHour] = useState<string>("");
+    const [closingHour, setClosingHour] = useState<string>("");
+    const [availableDays, setAvailableDays] = useState<string[]>([]);
+    const allDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];
     const [facilityID, setFacilityId] = useState<number | "">("");
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [message, setMessage] = useState<string>("");
@@ -61,7 +68,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        const newTrack = { name, typeofsurface, length, facilityId: facilityID };
+        const newTrack = { name, typeofsurface, length, openingHour, closingHour, availableDays: availableDays.join(","), facilityId: facilityID };
 
         try {
             const response = await fetch("/api/tracks", {
@@ -79,6 +86,9 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                 setName("");
                 setTypeofsurface("");
                 setLength(0);
+                setOpeningHour("");
+                setClosingHour("");
+                setAvailableDays([]);
                 setFacilityId("");
                 onAddTrack(createdTrack);
             } else {
@@ -121,6 +131,34 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
 
                     <label htmlFor="trackLength">Długość</label>
                     <input id="trackLength" type="number" value={length} onChange={e => setLength(Number(e.target.value))} required maxLength={50} className="info-input" />
+
+                    <label htmlFor="trackOpeningHour">Godzina otwarcia</label>
+                    <input id="trackOpeningHour" type="time" value={openingHour} onChange={e => setOpeningHour(e.target.value)} required className="info-input" />
+
+                    <label htmlFor="trackClosingHour">Godzina zamknięcia</label>
+                    <input id="trackClosingHour" type="time" value={closingHour} onChange={e => setClosingHour(e.target.value)} required className="info-input" />
+
+                    <div className="mb-2">
+                        <label>Dni otwarcia</label>
+                        <div className="d-flex flex-wrap gap-2 mt-1">
+                            {allDays.map(day => (
+                                <label key={day} className="form-check">
+                                    <input
+                                        type="checkbox"
+                                        checked={availableDays.includes(day)}
+                                        onChange={() =>
+                                            setAvailableDays(prev =>
+                                                prev.includes(day)
+                                                    ? prev.filter(d => d !== day)
+                                                    : [...prev, day]
+                                            )
+                                        }
+                                    />
+                                    <span style={{ marginLeft: "8px" }}>{day}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
                 </div>
                 <button type="submit">Dodaj nowy tor</button>
                 <div>{message}</div>

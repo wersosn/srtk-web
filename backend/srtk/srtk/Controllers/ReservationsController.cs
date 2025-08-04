@@ -26,7 +26,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie rezerwacji konkretnego toru:
-        [HttpGet("tracks/{trackId}/reservations")]
+        [HttpGet("inTrack")]
         public async Task<ActionResult<List<Reservation>>> GetAllReservationsInTrack(int trackId)
         {
             var reservations = await service.GetAllInTrack(trackId);
@@ -34,7 +34,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie rezerwacji z konkretnym statusem rezerwacji:
-        [HttpGet("statuses/{statusId}/reservations")]
+        [HttpGet("withStatus")]
         public async Task<ActionResult<List<Reservation>>> GetAllReservationsWithStatus(int statusId)
         {
             var reservations = await service.GetAllWithStatus(statusId);
@@ -42,7 +42,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie rezerwacji konkretnego użytkownika:
-        [HttpGet("users/{userId}/reservations")]
+        [HttpGet("user")]
         public async Task<ActionResult<List<Reservation>>> GetAllUserReservations(int userId)
         {
             var reservations = await service.GetAllWithUser(userId);
@@ -67,10 +67,11 @@ namespace srtk.Controllers
 
         // Pobieranie rezerwacji, które trwają w określonym przedziale czasowym - do znajdywania kolizji:
         [HttpGet("overlapping")]
-        public async Task<ActionResult<List<Reservation>>> GetReservationsOverlapping(DateTime start, DateTime end)
+        public async Task<ActionResult<List<Reservation>>> GetReservationsOverlapping(int trackId, DateTime start, DateTime end)
         {
-            var reservations = await service.GetOverlapping(start, end);
-            return reservations;
+            var reservations = await service.GetOverlapping(trackId, start, end);
+            bool available = !reservations.Any();
+            return Ok(new { available });
         }
 
         // Pobranie konkretnej rezerwacji:

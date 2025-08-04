@@ -30,7 +30,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota"
             };
             await service.Add(track);
 
@@ -38,7 +41,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor 2",               
                 TypeOfSurface = "Asfalt",
-                Length = 200
+                Length = 200,
+                OpeningHour = new TimeSpan(9, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota"
             };
             await service.Add(track2);
 
@@ -69,6 +75,9 @@ namespace srtk.tests.Tests
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
                 Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota",
                 FacilityId = facility.Id
             };
             await service.Add(track);
@@ -78,6 +87,9 @@ namespace srtk.tests.Tests
                 Name = "Tor 2",
                 TypeOfSurface = "Asfalt",
                 Length = 200,
+                OpeningHour = new TimeSpan(9, 0, 0),
+                ClosingHour = new TimeSpan(18, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota",
                 FacilityId = facility.Id
             };
             await service.Add(track2);
@@ -99,7 +111,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota",
             };
             await service.Add(track);
 
@@ -107,7 +122,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor 2",
                 TypeOfSurface = "Asfalt",
-                Length = 200
+                Length = 200,
+                OpeningHour = new TimeSpan(9, 0, 0),
+                ClosingHour = new TimeSpan(16, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Sobota",
             };
             await service.Add(track2);
 
@@ -127,7 +145,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota",
             };
 
             var result = await service.Add(track);
@@ -136,6 +157,9 @@ namespace srtk.tests.Tests
             Assert.Equal("Tor kolarski", result.Name);
             Assert.Equal("Gładka", result.TypeOfSurface);
             Assert.Equal(1000, result.Length);
+            Assert.Equal(new TimeSpan(8, 0, 0), result.OpeningHour);
+            Assert.Equal(new TimeSpan(20, 0, 0), result.ClosingHour);
+            Assert.Equal("Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota", result.AvailableDays);
             Assert.Single(context.Tracks);
             output.WriteLine("Wynik: Dodano nowy tor");
         }
@@ -150,7 +174,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota",
             };
             await service.Add(track);
 
@@ -158,7 +185,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Fajny tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 2000
+                Length = 2000,
+                OpeningHour = new TimeSpan(9, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Piątek,Sobota",
             };
 
             var updated = await service.Update(track.Id, updatedTrack);
@@ -167,6 +197,7 @@ namespace srtk.tests.Tests
             Assert.Equal("Fajny tor kolarski", updated.Name);
             Assert.Equal("Gładka", updated.TypeOfSurface);
             Assert.Equal(2000, updated.Length);
+            Assert.Equal("Poniedziałek,Wtorek,Piątek,Sobota", updated.AvailableDays);
             Assert.Single(context.Tracks);
             output.WriteLine("Wynik: Zmodyfikowano tor");
         }
@@ -181,7 +212,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota"
             };
             await service.Add(track);
 

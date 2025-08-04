@@ -10,6 +10,9 @@ type Track = {
     name: string;
     typeOfSurface: string;
     length: number;
+    openingHour: string;
+    closingHour: string;
+    availableDays: string;
     facilityId: number;
 };
 
@@ -104,7 +107,14 @@ function TrackManagement() {
 
                                 {showDetails?.id === track.id && (
                                     <div className="mt-2 ps-2 details">
-                                        <div><strong>Rodzaj nawierzchni:</strong> {track.typeOfSurface} <br /> <strong>Długość:</strong> {track.length} <br /> <strong>Obiekt:</strong> {track.facilityId}</div>
+                                        <div>
+                                            <strong>Rodzaj nawierzchni:</strong> {track.typeOfSurface} 
+                                            <br /> <strong>Długość:</strong> {track.length} 
+                                            <br /> <strong>Godzina otwarcia:</strong> {track.openingHour}
+                                            <br /> <strong>Godzina zamknięcia:</strong> {track.closingHour}
+                                            <br /> <strong>Dni, gdy tor jest otwarty:</strong> {track.availableDays}
+                                            <br /> <strong>Obiekt:</strong> {track.facilityId}
+                                        </div>
                                     </div>
                                 )}
                             </li>
@@ -114,7 +124,16 @@ function TrackManagement() {
                     {editingTrack ? (
                         <>
                             <h5 className="mt-4">Edycja toru</h5>
-                            <EditTrack trackId={editingTrack.id} currentName={editingTrack.name} currentTypeOfSurface={editingTrack.typeOfSurface} currentLength={editingTrack.length} currentFacilityId={editingTrack.facilityId} onUpdated={handleEdit} onCancel={() => setEditingTrack(null)} />
+                            <EditTrack trackId={editingTrack.id} 
+                                currentName={editingTrack.name} 
+                                currentTypeOfSurface={editingTrack.typeOfSurface} 
+                                currentLength={editingTrack.length} 
+                                currentOpeningHour={editingTrack.openingHour}
+                                currentClosingHour={editingTrack.closingHour}
+                                currentAvailableDays={editingTrack.availableDays}
+                                currentFacilityId={editingTrack.facilityId}
+                                onUpdated={handleEdit} 
+                                onCancel={() => setEditingTrack(null)} />
                         </>
                     ) : (
                         <>

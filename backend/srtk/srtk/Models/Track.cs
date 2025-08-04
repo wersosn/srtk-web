@@ -15,7 +15,17 @@ namespace srtk.Models
         [Required]
         public string TypeOfSurface { get; set; }
 
+        [Required]
         public double Length { get; set; }
+
+        [Required]
+        public TimeSpan OpeningHour { get; set; }
+
+        [Required]
+        public TimeSpan ClosingHour { get; set; }
+
+        [Required]
+        public string AvailableDays { get; set; }
 
         [ForeignKey(nameof(Facility))]
         public int FacilityId { get; set; }

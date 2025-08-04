@@ -52,6 +52,9 @@ namespace srtk.Services
             track.Name = dto.Name;
             track.TypeOfSurface = dto.TypeOfSurface;
             track.Length = dto.Length;
+            track.OpeningHour = dto.OpeningHour;
+            track.ClosingHour = dto.ClosingHour;
+            track.AvailableDays = dto.AvailableDays;
             track.FacilityId = dto.FacilityId;
             await context.SaveChangesAsync();
             return track;

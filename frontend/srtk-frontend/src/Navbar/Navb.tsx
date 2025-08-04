@@ -34,6 +34,7 @@ const Navb: React.FC = () => {
             </>
           ) : isLoggedIn && userRole === 'Client' ? (
             <>
+              <Nav.Link href="/myReservations" className="text-dark no-wrap">Moje rezerwacje</Nav.Link>
               <Nav.Link href="/profile" className="text-dark">Profil</Nav.Link>
               <button onClick={handleLogout}>Wyloguj</button>
             </>

@@ -31,10 +31,10 @@ const Home: React.FC = () => {
             {!isLoggedIn ? (
             <div className="d-flex gap-2">
                 <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/login')}>Zaloguj się</button>
-                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/reserve')}>Zarezerwuj tor</button>
+                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/makeReservation')}>Zarezerwuj tor</button>
             </div>
             ) : ( 
-              <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/reserve')}>Zarezerwuj tor</button>
+              <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/makeReservation')}>Zarezerwuj tor</button>
             )}
           </div>
 
@@ -47,7 +47,6 @@ const Home: React.FC = () => {
             />
           </div>
         </div>
-
         <div className="calendar-section">
           <ReservationCalendar />
         </div>
