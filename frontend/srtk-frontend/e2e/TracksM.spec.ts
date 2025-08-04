@@ -131,7 +131,7 @@ test('Pomyślna edycja toru', async ({ page }) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify([{ id: 123, name: 'Tor', typeOfSurface: 'Żwir', length: 5000, openingHour: "08:00", closingHour: "20:00", availableDays: ['Wtorek', 'Środa', 'Piątek'], facilityId: 1 }]),
+                body: JSON.stringify([{ id: 123, name: 'Tor', typeOfSurface: 'Żwir', length: 5000, facilityId: 1 }]),
             });
         } else {
             await route.abort();
