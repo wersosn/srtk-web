@@ -60,12 +60,13 @@
 
 .res-main {
   flex: 1;
-  padding: 2rem 2rem 2rem 6rem;
+  padding: 2rem 2rem 2rem 4rem;
   background-color: #f5f5f5;
 }
 
 .calendar-section {
   width: 100%;
-  max-width: 1000px;
+  max-width: 500px;
+  padding: 2rem 4rem 2rem 2rem;
 }
 

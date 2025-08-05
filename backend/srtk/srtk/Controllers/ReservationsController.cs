@@ -49,6 +49,14 @@ namespace srtk.Controllers
             return reservations;
         }
 
+        // Pobieranie sprzętów z konkretnej rezerwacji:
+        [HttpGet("equipments")]
+        public async Task<ActionResult<List<Equipment?>>> GetEquipmentsInReservation(int reservationId)
+        {
+            var reservations = await service.GetEquipments(reservationId);
+            return reservations;
+        }
+
         // Pobieranie rezerwacji rozpoczynających się w określonym dniu i/lub godzinie:
         [HttpGet("startDateTime")]
         public async Task<ActionResult<List<Reservation>>> GetReservationsByStartDateAndHour(DateTime date, TimeSpan hour)

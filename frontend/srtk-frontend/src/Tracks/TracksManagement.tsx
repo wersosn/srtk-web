@@ -4,17 +4,7 @@ import AddTrack from './AddTrack';
 import EditTrack from './EditTrack';
 import DeleteTrack from './DeleteTrack';
 import { jwtDecode } from 'jwt-decode';
-
-type Track = {
-    id: number;
-    name: string;
-    typeOfSurface: string;
-    length: number;
-    openingHour: string;
-    closingHour: string;
-    availableDays: string;
-    facilityId: number;
-};
+import type { Track } from '../Types/Types';
 
 function TrackManagement() {
     const [tracks, setTracks] = useState<Track[]>([]);

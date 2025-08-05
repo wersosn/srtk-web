@@ -4,14 +4,7 @@ import AddEquipment from './AddEquipment';
 import EditEquipment from './EditEquipment';
 import DeleteEquipment from './DeleteEquipment';
 import { jwtDecode } from 'jwt-decode';
-
-type Equipment = {
-    id: number;
-    name: string;
-    type: string;
-    cost: number;
-    facilityId: number;
-};
+import type { Equipment } from '../Types/Types';
 
 function EquipmentsManagement() {
     const [eqs, setEqs] = useState<Equipment[]>([]);

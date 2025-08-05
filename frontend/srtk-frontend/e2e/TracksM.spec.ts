@@ -112,7 +112,6 @@ test('Pomyślne dodanie nowego toru', async ({ page }) => {
     await page.uncheck('text=Piątek');
 });
 
-// DO POPRAWY:
 test('Pomyślna edycja toru', async ({ page }) => {
     await page.route('**/api/facilities', async route => {
         if (route.request().method() === 'GET') {

@@ -1,18 +1,6 @@
 import React, { useState, useEffect, type FormEvent } from "react";
 import { jwtDecode } from 'jwt-decode';
-
-type Equipment = {
-    id: number;
-    name: string;
-    type: string;
-    cost: number;
-    facilityId: number;
-};
-
-type Facility = {
-    id: number;
-    name: string;
-};
+import type { Equipment, Facility } from '../Types/Types';
 
 interface AddEquipmentProps {
     onAddEquipment: (newEquipment: Equipment) => void;

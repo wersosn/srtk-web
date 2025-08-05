@@ -2,27 +2,9 @@ import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { parseAvailableDays, isValidDateTime, checkAvailability } from './DateHelper';
+import type { Equipment, Track } from '../Types/Types';
 import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
-
-type Track = {
-    id: number;
-    name: string;
-    typeOfSurface: string;
-    length: number;
-    openingHour: string;
-    closingHour: string;
-    availableDays: string;
-    facilityId: number;
-};
-
-type Equipment = {
-    id: number;
-    name: string;
-    type: string;
-    cost: number;
-    facilityId: number;
-};
 
 function MakeReservation() {
     const [tracks, setTracks] = useState<Track[]>([]);
@@ -31,7 +13,7 @@ function MakeReservation() {
     const [endDate, setEndDate] = useState('');
     const [rentEquipment, setRentEquipment] = useState(false);
     const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
-    const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<number[]>([]);
+    const [equipmentQuantities, setEquipmentQuantities] = useState<Record<number, number>>({});
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const [isAvailable, setIsAvailable] = useState<boolean | null>(null); // TODO: Sprawdzanie dostępności
 
@@ -93,9 +75,12 @@ function MakeReservation() {
             baseCost = 0; // Tu można ustawić, żeby rezerwacje coś kosztowały, póki co będą free
         }
 
-        const equipmentCost = equipmentList
-            .filter(e => selectedEquipmentIds.includes(e.id))
-            .reduce((sum, e) => sum + e.cost, 0);
+        const equipmentCost = Object.entries(equipmentQuantities)
+            .map(([id, qty]) => {
+                const equipment = equipmentList.find(e => e.id === parseInt(id));
+                return (equipment?.cost || 0) * qty;
+            })
+            .reduce((sum, val) => sum + val, 0);
 
         setCost(baseCost + equipmentCost);
     };
@@ -121,14 +106,14 @@ function MakeReservation() {
 
     useEffect(() => {
         calculateCost();
-    }, [startDate, endDate, selectedEquipmentIds, equipmentList]);
+    }, [startDate, endDate, equipmentQuantities, equipmentList]);
 
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
     const openingHour = track?.openingHour || '00:00';
     const closingHour = track?.closingHour || '23:59';
 
-    // Handler walidujący startDate:
+    // Handler sprawdzający, czy data rozpoczęcia jest zgodna z godzinami funkcjonowania toru:
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
@@ -139,7 +124,7 @@ function MakeReservation() {
         }
     };
 
-    // Handler walidujący endDate:
+    // Handler sprawdzający, czy data zakończenia jest zgodna z godzinami funkcjonowania toru:
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
@@ -157,14 +142,25 @@ function MakeReservation() {
             return;
         }
 
+        const equipmentReservations = rentEquipment
+            ? Object.entries(equipmentQuantities)
+                .filter(([_, quantity]) => quantity > 0)
+                .map(([equipmentId, quantity]) => ({
+                    EquipmentId: parseInt(equipmentId),
+                    Quantity: quantity
+                }))
+            : [];
+
+        console.log(equipmentReservations);
+
         const reservationBody = {
-            start: startDate,
-            end: endDate,
-            cost: cost,
-            userId: userId,
-            trackId: selectedTrackId,
-            statusId: 1,
-            equipmentIds: rentEquipment ? selectedEquipmentIds : [],
+            Start: new Date(startDate).toISOString(),
+            End: new Date(endDate).toISOString(),
+            Cost: cost,
+            UserId: userId,
+            TrackId: selectedTrackId,
+            StatusId: 1,
+            EquipmentReservations: equipmentReservations
         };
 
         try {
@@ -176,7 +172,7 @@ function MakeReservation() {
                 },
                 body: JSON.stringify(reservationBody),
             });
-
+            console.log(reservationBody);
             if (!res.ok) throw new Error('Nie udało się utworzyć rezerwacji');
             alert('Rezerwacja utworzona pomyślnie');
             navigate('/');
@@ -227,19 +223,21 @@ function MakeReservation() {
                                         <label>Sprzęt do wyboru:</label>
                                         {equipmentList.map(eq => (
                                             <div key={eq.id} className="flex items-center mb-1">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedEquipmentIds.includes(eq.id)}
-                                                    onChange={() => {
-                                                        setSelectedEquipmentIds(prev =>
-                                                            prev.includes(eq.id)
-                                                                ? prev.filter(id => id !== eq.id)
-                                                                : [...prev, eq.id]
-                                                        );
-                                                    }}
-                                                    className="mr-2"
-                                                />
                                                 <label style={{ marginLeft: "8px" }}>{eq.name} ({eq.cost} zł)</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={equipmentQuantities[eq.id] || 0}
+                                                    onChange={(e) => {
+                                                        const qty = parseInt(e.target.value, 10);
+                                                        setEquipmentQuantities(prev => ({
+                                                            ...prev,
+                                                            [eq.id]: isNaN(qty) || qty < 0 ? 0 : qty
+                                                        }));
+                                                    }}
+                                                    className="info-input"
+                                                    style={{ width: "80px" }}
+                                                />
                                             </div>
                                         ))}
                                     </div>

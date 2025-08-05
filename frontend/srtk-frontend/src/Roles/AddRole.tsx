@@ -1,9 +1,5 @@
 import React, { useState, type FormEvent } from "react";
-
-type Role = {
-  id: number;
-  name: string;
-};
+import type { Role } from '../Types/Types';
 
 interface AddRoleProps {
   onAddRole: (newRole: Role) => void;

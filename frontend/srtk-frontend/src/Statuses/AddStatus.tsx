@@ -1,10 +1,5 @@
 import React, { useState, type FormEvent } from "react";
-
-type Status = {
-  id: number;
-  name: string;
-};
-
+import type { Status } from '../Types/Types';
 interface AddStatusProps {
   onAddStatus: (newStatus: Status) => void;
 }

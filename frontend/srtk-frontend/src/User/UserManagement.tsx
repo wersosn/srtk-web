@@ -3,24 +3,7 @@ import editIcon from '../assets/edit.png';
 import EditUser from './EditUser';
 import DeleteUser from './DeleteUser';
 import { jwtDecode } from 'jwt-decode';
-
-type Client = {
-    id: number;
-    email: string;
-    password: string;
-    roleId: number;
-    name: string;
-    surname: string;
-    phoneNumber: string;
-};
-
-type Admin = {
-    id: number;
-    email: string;
-    password: string;
-    roleId: number;
-    facilityId: number;
-};
+import type { Client, Admin } from '../Types/Types';
 
 function UserManagement() {
     const [clients, setClients] = useState<Client[]>([]);

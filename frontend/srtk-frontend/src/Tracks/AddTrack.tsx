@@ -1,21 +1,6 @@
 import React, { useState, useEffect, type FormEvent } from "react";
 import { jwtDecode } from 'jwt-decode';
-
-type Track = {
-    id: number;
-    name: string;
-    typeOfSurface: string;
-    length: number;
-    openingHour: string;
-    closingHour: string;
-    availableDays: string;
-    facilityId: number;
-};
-
-type Facility = {
-    id: number;
-    name: string;
-};
+import type { Track, Facility } from '../Types/Types';
 
 interface AddTrackProps {
     onAddTrack: (newTrack: Track) => void;

@@ -1,11 +1,5 @@
 import React, { useState, type FormEvent } from "react";
-
-type Facility = {
-    id: number;
-    name: string;
-    city: string;
-    address: string;
-};
+import type { Facility } from '../Types/Types';
 
 interface AddFacilityProps {
   onAddFacility: (newFacility: Facility) => void;

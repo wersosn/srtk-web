@@ -2,22 +2,17 @@ import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import editIcon from '../assets/edit.png';
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
-
-type Reservation = {
-    id: number;
-    start: string;
-    end: string;
-    cost: number;
-    userId: number;
-    trackId: number;
-    statusId: number;
-};
+import EditReservation from './EditReservation';
+import DeleteReservation from './DeleteReservation';
+import type { Reservation, Equipment } from '../Types/Types';
+import { formatToDatetimeLocal } from './DateHelper';
 
 function MyReservations() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [userId, setUserId] = useState<number | undefined>(undefined);
+    const [equipmentList, setEquipmentList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
@@ -63,6 +58,13 @@ function MyReservations() {
         }
     }, [userId]);
 
+    // Obsługa edycji rezerwacji:
+    const handleEdit = (updated: Reservation) => {
+        const updatedReservation = reservations.map(r => r.id === updated.id ? updated : r);
+        setReservations(updatedReservation);
+        setEditingReservation(null);
+    };
+
     return (
         <div className="res-container">
             <div className="res-card-wrapper">
@@ -81,19 +83,22 @@ function MyReservations() {
                                 {reservations.map((Reservation) => (
                                     <li key={Reservation.id} className="list-group-item p-0">
                                         <div onClick={() => setShowDetails(prev => (prev?.id === Reservation.id ? null : Reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
-                                            Rezerwacja: {Reservation.start}-{Reservation.end}
+                                            Rezerwacja: {formatToDatetimeLocal(Reservation.start)}-{formatToDatetimeLocal(Reservation.end)}
                                             <div className="d-flex gap-2" onClick={(e) => e.stopPropagation()}>
                                                 <button onClick={() => setEditingReservation(Reservation)} disabled={loading} className="icon-button">
                                                     <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                                 </button>
+                                                <DeleteReservation reservationId={Reservation.id} onDeleted={fetchReservations} />
                                             </div>
                                         </div>
 
                                         {showDetails?.id === Reservation.id && (
                                             <div className="mt-2 ps-2 details">
                                                 <div>
-                                                    <strong>Id toru:</strong> {Reservation.trackId}
-                                                    <br />
+                                                    <strong>Id toru:</strong> {Reservation.trackId}<br />
+                                                    <strong>Start:</strong> {formatToDatetimeLocal(Reservation.start)}<br />
+                                                    <strong>Koniec:</strong> {formatToDatetimeLocal(Reservation.end)}<br />
+                                                    <strong>Koszt:</strong> {Reservation.cost}<br />
                                                 </div>
                                             </div>
                                         )}
@@ -103,8 +108,19 @@ function MyReservations() {
                             <hr />
                             {editingReservation ? (
                                 <>
+                                    {console.log('Edytowana rezerwacja:', editingReservation)}
                                     <h5 className="mt-4">Modyfikacja rezerwacji</h5>
-
+                                    <EditReservation 
+                                        key={editingReservation.id}
+                                        reservationId={editingReservation.id}
+                                        currentStart={editingReservation.start}
+                                        currentEnd={editingReservation.end}
+                                        currentCost={editingReservation.cost}
+                                        currentStatusId={editingReservation.statusId}
+                                        currentEquipmentIds={editingReservation.equipmentIds || []}
+                                        trackId={editingReservation.trackId}
+                                        onUpdated={handleEdit}
+                                        onCancel={() => setEditingReservation(null)} />
                                 </>
                             ) : (
                                 <>
@@ -112,11 +128,10 @@ function MyReservations() {
                             )}
                         </>
                     )}
-
-                    <div className="calendar-section">
-                        <MyReservationCalendar />
-                    </div>
                 </main>
+                <div className="calendar-section">
+                    <MyReservationCalendar />
+                </div>
             </div>
         </div>
     );

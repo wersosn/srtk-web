@@ -5,27 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
-
-type Track = {
-  id: number;
-  name: string;
-  typeOfSurface: string;
-  length: number;
-  openingHour: string;
-  closingHour: string;
-  availableDays: string;
-  facilityId: number;
-};
-
-type Reservation = {
-  id: number;
-  start: string;
-  end: string;
-  cost: number;
-  userId: number;
-  trackId: number;
-  statusId: number;
-};
+import type { Reservation, Track } from '../Types/Types';
 
 export default function ReservationCalendar() {
     const [tracks, setTracks] = useState<Track[]>([]);

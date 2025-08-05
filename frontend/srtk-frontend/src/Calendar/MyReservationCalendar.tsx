@@ -6,16 +6,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
-
-type Reservation = {
-    id: number;
-    start: string;
-    end: string;
-    cost: number;
-    userId: number;
-    trackId: number;
-    statusId: number;
-};
+import type { Reservation } from '../Types/Types';
 
 export default function MyReservationCalendar() {
     const [reservationList, setReservationList] = useState<Reservation[]>([]);

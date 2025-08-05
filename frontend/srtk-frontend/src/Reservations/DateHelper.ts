@@ -33,6 +33,13 @@ export function isValidDateTime(dateStr: string, openingHour: string, closingHou
     }
 }
 
+export function formatToDatetimeLocal(isoString: string): string {
+  const date = new Date(isoString);
+  const offset = date.getTimezoneOffset();
+  date.setMinutes(date.getMinutes() - offset);
+  return date.toISOString().slice(0, 16);
+}
+
 export const checkAvailability = async (trackId: number, start: string, end: string): Promise<boolean> => {
   const token = localStorage.getItem('token');
   const params = new URLSearchParams({ trackId: String(trackId), start, end });

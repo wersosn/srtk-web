@@ -3,11 +3,7 @@ import editIcon from '../assets/edit.png';
 import AddStatus from './AddStatus';
 import EditStatus from './EditStatus';
 import DeleteStatus from './DeleteStatus';
-
-type Status = {
-    id: number;
-    name: string;
-};
+import type { Status } from '../Types/Types';
 
 function StatusesManagement() {
     const [statuses, setStatuses] = useState<Status[]>([]);

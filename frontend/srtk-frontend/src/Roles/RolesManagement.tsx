@@ -3,11 +3,7 @@ import AddRole from './AddRole';
 import EditRole from './EditRole';
 import DeleteRole from './DeleteRole';
 import editIcon from '../assets/edit.png';
-
-type Role = {
-    id: number;
-    name: string;
-};
+import type { Role } from '../Types/Types';
 
 function RoleManagement() {
     const [roles, setRoles] = useState<Role[]>([]);

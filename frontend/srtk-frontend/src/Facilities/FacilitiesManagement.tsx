@@ -3,13 +3,7 @@ import editIcon from '../assets/edit.png';
 import AddFacility from './AddFacility';
 import EditFacility from './EditFacility';
 import DeleteFacility from './DeleteFacility';
-
-type Facility = {
-    id: number;
-    name: string;
-    city: string;
-    address: string;
-};
+import type { Facility } from '../Types/Types';
 
 function FacilitiesManagement() {
     const [facilities, setFacilities] = useState<Facility[]>([]);

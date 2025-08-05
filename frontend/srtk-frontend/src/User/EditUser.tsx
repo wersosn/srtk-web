@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-
-interface Role {
-    id: number;
-    name: string;
-}
-
-interface Facility {
-    id: number;
-    name: string;
-}
-
+import type { Facility, Role } from '../Types/Types';
 interface EditUserProps {
     userId: number;
     currentEmail: string;

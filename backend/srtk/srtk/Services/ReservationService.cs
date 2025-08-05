@@ -38,6 +38,15 @@ namespace srtk.Services
             return await context.Reservations.Where(r => r.UserId == userId).ToListAsync();
         }
 
+        // Pobieranie sprzętów z konkretnej rezerwacji:
+        public async Task<List<Equipment?>> GetEquipments(int reservationId)
+        {
+            return await context.EquipmentReservations
+                .Where(er => er.ReservationId == reservationId)
+                .Select(er => er.Equipment)
+                .ToListAsync();
+        }
+
         // Pobieranie rezerwacji rozpoczynających się w określonym dniu i/lub godzinie:
         public async Task<List<Reservation>> GetByStartDateAndHour(DateTime date, TimeSpan hour)
         {
@@ -70,8 +79,23 @@ namespace srtk.Services
             reservation.Start = reservation.Start.ToUniversalTime();
             reservation.End = reservation.End.ToUniversalTime();
 
+            var equipmentReservations = reservation.EquipmentReservations.ToList();
+            reservation.EquipmentReservations.Clear();
+
             context.Reservations.Add(reservation);
             await context.SaveChangesAsync();
+
+            foreach (var eqRes in equipmentReservations)
+            {
+                eqRes.ReservationId = reservation.Id;
+                context.EquipmentReservations.Add(eqRes);
+            }
+            await context.SaveChangesAsync();
+
+            reservation.EquipmentReservations = await context.EquipmentReservations
+                .Where(er => er.ReservationId == reservation.Id)
+                .ToListAsync();
+
             return reservation;
         }
 
