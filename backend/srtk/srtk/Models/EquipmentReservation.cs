@@ -17,6 +17,7 @@ namespace srtk.Models
 
         [ForeignKey(nameof(Equipment))]
         public int EquipmentId { get; set; }
+        [JsonIgnore]
         public Equipment? Equipment { get; set; }
 
         public int Quantity { get; set; }

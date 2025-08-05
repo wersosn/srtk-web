@@ -7,7 +7,7 @@ export type Reservation = {
     userId: number;
     trackId: number;
     statusId: number;
-    equipmentIds?: number[];
+    equipmentReservations: EquipmentWithQuantity[];
 };
 
 // Tor
@@ -37,6 +37,12 @@ export type Equipment = {
     type: string;
     cost: number;
     facilityId: number;
+};
+
+// Sprzęt z ilością:
+export type EquipmentWithQuantity = {
+  equipmentId: number;
+  quantity: number;
 };
 
 // Status rezerwacji:

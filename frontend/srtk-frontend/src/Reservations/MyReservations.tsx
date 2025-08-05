@@ -30,6 +30,7 @@ function MyReservations() {
                 throw new Error('Błąd podczas pobierania rezerwacji');
             }
             const data = await res.json();
+            console.log(data);
             setReservations(data);
         } catch (err: any) {
             setError(err.message || 'Wystąpił błąd');
@@ -116,8 +117,6 @@ function MyReservations() {
                                         currentStart={editingReservation.start}
                                         currentEnd={editingReservation.end}
                                         currentCost={editingReservation.cost}
-                                        currentStatusId={editingReservation.statusId}
-                                        currentEquipmentIds={editingReservation.equipmentIds || []}
                                         trackId={editingReservation.trackId}
                                         onUpdated={handleEdit}
                                         onCancel={() => setEditingReservation(null)} />

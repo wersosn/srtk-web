@@ -33,17 +33,43 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji konkretnego użytkownika:
-        public async Task<List<Reservation>> GetAllWithUser(int userId)
+        public async Task<List<ReservationDto>> GetUserReservations(int userId)
         {
-            return await context.Reservations.Where(r => r.UserId == userId).ToListAsync();
+            return await context.Reservations
+                .Where(r => r.UserId == userId)
+                .Include(r => r.Track)
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .Select(r => new ReservationDto
+                {
+                    Id = r.Id,
+                    Start = r.Start,
+                    End = r.End,
+                    Cost = r.Cost,
+                    TrackId = r.TrackId,
+                    TrackName = r.Track.Name,
+                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
+                    {
+                        EquipmentId = er.EquipmentId,
+                        Name = er.Equipment.Name,
+                        Quantity = er.Quantity
+                    }).ToList()
+                }).ToListAsync();
         }
 
         // Pobieranie sprzętów z konkretnej rezerwacji:
-        public async Task<List<Equipment?>> GetEquipments(int reservationId)
+        public async Task<List<EquipmentReservationDto>> GetEquipments(int reservationId)
         {
             return await context.EquipmentReservations
                 .Where(er => er.ReservationId == reservationId)
-                .Select(er => er.Equipment)
+                .Select(er => new EquipmentReservationDto
+                {
+                    EquipmentId = er.EquipmentId,
+                    Name = er.Equipment!.Name,
+                    Type = er.Equipment!.Type,
+                    Cost = er.Equipment.Cost,
+                    Quantity = er.Quantity
+                })
                 .ToListAsync();
         }
 
@@ -70,7 +96,10 @@ namespace srtk.Services
         // Pobranie konkretnej rezerwacji:
         public async Task<Reservation?> GetById(int id)
         {
-            return await context.Reservations.FindAsync(id);
+            return await context.Reservations
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         // Dodanie nowej rezerwacji:
@@ -87,6 +116,12 @@ namespace srtk.Services
 
             foreach (var eqRes in equipmentReservations)
             {
+                var equipmentExists = await context.Equipments.AnyAsync(e => e.Id == eqRes.EquipmentId);
+                if (!equipmentExists)
+                {
+                    throw new Exception($"Sprzęt nie istnieje");
+                }
+
                 eqRes.ReservationId = reservation.Id;
                 context.EquipmentReservations.Add(eqRes);
             }
@@ -102,40 +137,64 @@ namespace srtk.Services
         // Edycja istniejącej rezerwacji:
         public async Task<Reservation?> Update(int id, [FromBody] ReservationDto dto)
         {
-            var reservation = await context.Reservations.Include(r => r.EquipmentReservations).FirstOrDefaultAsync(r => r.Id == id);
+            var reservation = await context.Reservations
+                .Include(r => r.EquipmentReservations)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (reservation == null)
             {
                 return null;
             }
 
+            var existingEquipmentReservations = await context.EquipmentReservations
+                    .Where(er => er.ReservationId == reservation.Id)
+                    .ToListAsync();
+
+            // Aktualizacja istniejących sprzętów:
+            var dtoEquipmentDict = dto.EquipmentReservations.ToDictionary(e => e.EquipmentId);
+            foreach (var existing in existingEquipmentReservations)
+            {
+                if (!dtoEquipmentDict.ContainsKey(existing.EquipmentId))
+                {
+                    context.EquipmentReservations.Remove(existing);
+                }
+                else
+                {
+                    var dtoItem = dtoEquipmentDict[existing.EquipmentId];
+                    if (dtoItem.Quantity <= 0)
+                    {
+                        context.EquipmentReservations.Remove(existing);
+                    }
+                    else if (existing.Quantity != dtoItem.Quantity)
+                    {
+                        existing.Quantity = dtoItem.Quantity;
+                        context.Entry(existing).State = EntityState.Modified;
+                    }
+                }
+            }
+
+            // Dodawanie nowych sprzętów:
+            foreach (var dtoItem in dto.EquipmentReservations)
+            {
+                var alreadyExists = existingEquipmentReservations.Any(er => er.EquipmentId == dtoItem.EquipmentId);
+                if (!alreadyExists && dtoItem.Quantity > 0)
+                {
+                    var newReservation = new EquipmentReservation
+                    {
+                        ReservationId = reservation.Id,
+                        EquipmentId = dtoItem.EquipmentId,
+                        Quantity = dtoItem.Quantity
+                    };
+                    await context.EquipmentReservations.AddAsync(newReservation);
+                }
+            }
+
             // Aktualizacja głównych parametrów:
             reservation.Start = dto.Start.ToUniversalTime();
             reservation.End = dto.End.ToUniversalTime();
+            reservation.Cost = dto.Cost;
             reservation.TrackId = dto.TrackId;
 
-            // Aktualizacja sprzętu oraz kosztów:
-            if (dto.Equipment != null && dto.Equipment.Count != 0)
-            {
-                context.EquipmentReservations.RemoveRange(reservation.EquipmentReservations);
-                double totalCost = 0;
-                foreach (var equipmentDto in dto.Equipment)
-                {
-                    var equipment = await context.Equipments.FindAsync(equipmentDto.EquipmentId);
-                    if (equipment == null)
-                    {
-                        throw new Exception($"Sprzęt o ID {equipmentDto.EquipmentId} nie istnieje");
-                    }
-
-                    reservation.EquipmentReservations.Add(new EquipmentReservation
-                    {
-                        ReservationId = reservation.Id,
-                        EquipmentId = equipmentDto.EquipmentId,
-                        Quantity = equipmentDto.Quantity
-                    });
-                    totalCost += equipment.Cost * equipmentDto.Quantity;
-                }
-                reservation.Cost = totalCost;
-            }
             await context.SaveChangesAsync();
             return reservation;
         }

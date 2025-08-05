@@ -43,15 +43,15 @@ namespace srtk.Controllers
 
         // Pobieranie rezerwacji konkretnego użytkownika:
         [HttpGet("user")]
-        public async Task<ActionResult<List<Reservation>>> GetAllUserReservations(int userId)
+        public async Task<ActionResult<List<ReservationDto>>> GetAllUserReservations(int userId)
         {
-            var reservations = await service.GetAllWithUser(userId);
+            var reservations = await service.GetUserReservations(userId);
             return reservations;
         }
 
         // Pobieranie sprzętów z konkretnej rezerwacji:
         [HttpGet("equipments")]
-        public async Task<ActionResult<List<Equipment?>>> GetEquipmentsInReservation(int reservationId)
+        public async Task<ActionResult<List<EquipmentReservationDto>>> GetEquipmentsInReservation([FromQuery] int reservationId)
         {
             var reservations = await service.GetEquipments(reservationId);
             return reservations;

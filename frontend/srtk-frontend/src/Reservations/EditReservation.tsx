@@ -1,28 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { parseAvailableDays, isValidDateTime, checkAvailability, formatToDatetimeLocal } from './DateHelper';
-import type { Equipment, Track } from '../Types/Types';
+import type { Equipment, EquipmentWithQuantity, Track } from '../Types/Types';
 
 interface EditReservationProps {
     reservationId: number;
     currentStart: string;
     currentEnd: string;
     currentCost: number;
-    currentStatusId: number;
-    currentEquipmentIds: number[];
     trackId: number;
     onUpdated: (updatedReservation: any) => void;
     onCancel: () => void;
 }
 
-const EditReservation: React.FC<EditReservationProps> = ({ reservationId, currentStart, currentEnd, currentCost, currentStatusId, currentEquipmentIds, trackId, onUpdated, onCancel }) => {
+const EditReservation: React.FC<EditReservationProps> = ({ reservationId, currentStart, currentEnd, currentCost, trackId, onUpdated, onCancel }) => {
     const [startDate, setStartDate] = useState(formatToDatetimeLocal(currentStart));
     const [endDate, setEndDate] = useState(formatToDatetimeLocal(currentEnd));
     const [cost, setCost] = useState(currentCost);
-    const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<number[]>(currentEquipmentIds);
     const [rentEquipment, setRentEquipment] = useState(false);
     const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const [equipmentQuantities, setEquipmentQuantities] = useState<Record<string, number>>({});
+    const [t, setTrack] = useState<Track | null>(null);
     const [available, setAvailable] = useState(true);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -31,38 +29,31 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
     // Pobieranie wszystkich torów z bazy:
     useEffect(() => {
-        const fetchAllTracks = async () => {
-            setLoading(true);
-            setError(null);
+        const fetchTrack = async () => {
             try {
-                const res = await fetch('/api/tracks', {
+                const res = await fetch(`/api/tracks/${trackId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) throw new Error('Błąd podczas pobierania torów');
+                if (!res.ok) throw new Error('Błąd pobierania toru');
                 const data = await res.json();
-                setTracks(data);
-            } catch (err: any) {
-                setError(err.message || 'Wystąpił błąd');
-            } finally {
-                setLoading(false);
-            };
-        }
-        fetchAllTracks();
-    }, []);
+                setTrack(data);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetchTrack();
+    }, [trackId, token]);
 
     // Pobieranie sprzętów należących do odpowiedniego obiektu (w zależności od toru):
     useEffect(() => {
         const fetchEquipment = async () => {
-            if (!rentEquipment || tracks.length === 0) {
+            if (!rentEquipment) {
                 setEquipmentList([]);
                 return;
             }
-
-            const track = tracks.find(t => t.id === trackId);
-            if (!track) return;
-
+            if (!t) return;
             try {
-                const res = await fetch(`/api/equipments/inFacility?facilityId=${track.facilityId}`, {
+                const res = await fetch(`/api/equipments/inFacility?facilityId=${t.facilityId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error('Błąd podczas pobierania sprzętu');
@@ -73,48 +64,63 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             }
         };
         fetchEquipment();
-    }, [rentEquipment, tracks, trackId]);
+    }, [rentEquipment, t, trackId]);
 
     // Pobieranie sprzętów przypisanych do edytowanej rezerwacji:
     useEffect(() => {
-        const fetchReservationEquipment = async () => {
+        if (!reservationId) return;
+
+        const fetchReservationEquipments = async () => {
             try {
                 const res = await fetch(`/api/reservations/equipments?reservationId=${reservationId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) throw new Error('Błąd podczas pobierania sprzętu rezerwacji');
-                const data: Equipment[] = await res.json();
-                if (data.length > 0) {
+                if (!res.ok) throw new Error('Błąd pobierania sprzętu rezerwacji');
+                const data: EquipmentWithQuantity[] = await res.json();
+
+                const quantities: Record<number, number> = {};
+                data.forEach((er) => {
+                    quantities[er.equipmentId] = er.quantity;
+                });
+                setEquipmentQuantities(quantities);
+                if (Object.keys(quantities).length > 0) {
                     setRentEquipment(true);
-                    setSelectedEquipmentIds(data.map(e => e.id));
-                } else {
-                    setRentEquipment(false);
-                    setSelectedEquipmentIds([]);
                 }
-            } catch (err) {
-                console.error(err);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchReservationEquipment();
+        fetchReservationEquipments();
     }, [reservationId, token]);
 
     // Obliczanie kosztów:
     useEffect(() => {
-        const calculate = async () => {
+        const calculateCostAndCheckAvailability = async () => {
+            if (!equipmentList.length) return;
+
             const start = new Date(startDate);
             const end = new Date(endDate);
-            const timeDiff = end.getTime() - start.getTime();
-            if (timeDiff <= 0) return;
+            const durationInDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
 
-            const equipmentCost = selectedEquipmentIds
-                .map(id => equipmentList.find(e => e.id === id)?.cost || 0)
-                .reduce((a, b) => a + b, 0);
+            if (isNaN(start.getTime()) || isNaN(end.getTime()) || durationInDays <= 0) {
+                return;
+            }
 
             const baseCost = 0;
+            const equipmentCost = Object.entries(equipmentQuantities)
+                .map(([id, qty]) => {
+                    const equipment = equipmentList.find(e => e.id === Number(id));
+                    const parsedQty = Number(qty);
+                    return (equipment?.cost || 0) * (isNaN(parsedQty) ? 0 : parsedQty);
+                })
+                .reduce((sum, val) => sum + val, 0);
+
             setCost(baseCost + equipmentCost);
 
-            // Sprawdzenie kolizji:
+            // Sprawdź dostępność terminu
             /*try {
                 const res = await fetch(`/api/reservations/overlapping?trackId=${trackId}&start=${start.toISOString()}&end=${end.toISOString()}`);
                 const data = await res.json();
@@ -124,16 +130,12 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             }*/
         };
 
-        calculate();
-    }, [startDate, endDate, selectedEquipmentIds]);
+        calculateCostAndCheckAvailability();
+    }, [startDate, endDate, equipmentQuantities, equipmentList, t]);
 
-    const track = useMemo(() => tracks.find(t => t.id === trackId), [tracks, trackId]);
-    const allowedDays = useMemo(() => {
-        return track ? parseAvailableDays(track.availableDays) : [];
-    }, [track]);
-
-    const openingHour = track?.openingHour || '00:00';
-    const closingHour = track?.closingHour || '23:59';
+    const allowedDays = t ? parseAvailableDays(t.availableDays) : [];
+    const openingHour = t?.openingHour || '00:00';
+    const closingHour = t?.closingHour || '23:59';
 
     // Handler sprawdzający, czy data rozpoczęcia jest zgodna z godzinami funkcjonowania toru:
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,8 +159,33 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         }
     };
 
+    // Handler do obsługi zmiany ilości:
+    const handleQuantityChange = (equipmentId: number, value: string) => {
+        const qty = parseInt(value, 10);
+        setEquipmentQuantities((prev) => ({
+            ...prev,
+            [equipmentId]: isNaN(qty) || qty < 0 ? 0 : qty,
+        }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const equipmentReservations = Object.entries(equipmentQuantities)
+            .filter(([, qty]) => qty > 0)
+            .map(([equipmentId, quantity]) => ({
+                EquipmentId: parseInt(equipmentId),
+                Quantity: quantity,
+            }));
+
+        const reservationBody = {
+            Start: new Date(startDate).toISOString(),
+            End: new Date(endDate).toISOString(),
+            Cost: cost,
+            TrackId: trackId,
+            EquipmentReservations: equipmentReservations
+        };
+        console.log("Wysyłane dane:", reservationBody);
 
         try {
             const response = await fetch(`/api/reservations/${reservationId}`, {
@@ -167,7 +194,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ start: startDate, end: endDate, cost, equipmentIds: selectedEquipmentIds, trackId })
+                body: JSON.stringify(reservationBody)
             });
             if (response.ok) {
                 const updatedReservation = await response.json();
@@ -182,6 +209,8 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             setMessage('Błąd: ' + err.message);
         }
     };
+
+    if (loading) return <p>Ładowanie...</p>;
 
     return (
         <>
@@ -204,19 +233,16 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                             <label>Sprzęt do wyboru:</label>
                             {equipmentList.map(eq => (
                                 <div key={eq.id} className="flex items-center mb-1">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedEquipmentIds.includes(eq.id)}
-                                        onChange={() => {
-                                            setSelectedEquipmentIds(prev =>
-                                                prev.includes(eq.id)
-                                                    ? prev.filter(id => id !== eq.id)
-                                                    : [...prev, eq.id]
-                                            );
-                                        }}
-                                        className="mr-2"
-                                    />
-                                    <label style={{ marginLeft: "8px" }}>{eq.name} ({eq.cost} zł)</label>
+                                    <label>
+                                        {eq.name} ({eq.cost} zł)
+                                        <input
+                                            type="number"
+                                            min={0}
+                                            value={equipmentQuantities[eq.id] || 0}
+                                            onChange={(e) => handleQuantityChange(eq.id, e.target.value)}
+                                            style={{ width: '80px', marginLeft: '8px' }}
+                                        />
+                                    </label>
                                 </div>
                             ))}
                         </div>

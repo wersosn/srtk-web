@@ -2,9 +2,12 @@
 {
     public class ReservationDto
     {
+        public int Id { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
-        public List<EquipmentReservationDto> Equipment { get; set; } = new();
+        public double Cost { get; set; }
+        public List<EquipmentReservationDto> EquipmentReservations { get; set; } = new();
         public int TrackId { get; set; }
+        public string TrackName { get; set; } = string.Empty;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace srtk.Models
 {
@@ -18,7 +19,9 @@ namespace srtk.Models
         public int RoleId { get; set; }
         public Role? Role { get; set; }
 
+        [JsonIgnore]
         public ICollection<Reservation> ReservationList { get; set; } = new List<Reservation>();
+        [JsonIgnore]
         public ICollection<Notification> NotificationList { get; set; } = new List<Notification>();
     }
 }

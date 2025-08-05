@@ -151,8 +151,6 @@ function MakeReservation() {
                 }))
             : [];
 
-        console.log(equipmentReservations);
-
         const reservationBody = {
             Start: new Date(startDate).toISOString(),
             End: new Date(endDate).toISOString(),
