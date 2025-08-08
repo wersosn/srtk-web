@@ -11,7 +11,7 @@ namespace srtk.Services
 {
     public class ReservationService
     {
-        private readonly AppDbContext context;
+        protected readonly AppDbContext context;
 
         public ReservationService(AppDbContext context)
         {
@@ -37,7 +37,7 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji konkretnego użytkownika:
-        public async Task<List<ReservationDto>> GetUserReservations(int userId)
+        public async virtual Task<List<ReservationDto>> GetUserReservations(int userId)
         {
             return await context.Reservations
                 .Where(r => r.UserId == userId)
@@ -90,7 +90,7 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji, które trwają w określonym przedziale czasowym - do znajdywania kolizji:
-        public async Task<bool> IsTrackAvailable(int trackId, DateTime start, DateTime end, int? reservationId = null)
+        public async virtual Task<bool> IsTrackAvailable(int trackId, DateTime start, DateTime end, int? reservationId = null)
         {
             return !await context.Reservations
                 .AnyAsync(r =>
@@ -102,16 +102,18 @@ namespace srtk.Services
         }
 
         // Pobranie konkretnej rezerwacji:
-        public async Task<Reservation?> GetById(int id)
+        public async virtual Task<Reservation?> GetById(int id)
         {
             return await context.Reservations
                 .Include(r => r.EquipmentReservations)
                 .ThenInclude(er => er.Equipment)
+                .Include(r => r.Track)
+                .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         // Dodanie nowej rezerwacji:
-        public async Task<Reservation> Add(Reservation reservation)
+        public async virtual Task<Reservation> Add(Reservation reservation)
         {
             reservation.Start = reservation.Start.ToUniversalTime();
             reservation.End = reservation.End.ToUniversalTime();

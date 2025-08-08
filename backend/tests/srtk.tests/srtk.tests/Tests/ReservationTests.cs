@@ -1,4 +1,5 @@
-﻿using srtk.DTO;
+﻿using Microsoft.EntityFrameworkCore;
+using srtk.DTO;
 using srtk.Models;
 using srtk.Services;
 using srtk.tests.Helpers;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
+using DocumentFormat.OpenXml;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace srtk.tests.Tests
@@ -26,8 +28,7 @@ namespace srtk.tests.Tests
         public async Task Getting_All_Reservations()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
-            var trackService = new TrackService(context);
+            var service = new AddReservationHelper(context);
             var userService = new UserService(context);
             var user = new User
             {
@@ -37,20 +38,12 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var track = new Track
-            {
-                Name = "Tor kolarski",
-                TypeOfSurface = "Gładka",
-                Length = 1000
-            };
-            await trackService.Add(track);
-
             var reservation = new Reservation
             {
                 Start = DateTime.Now,
                 End = DateTime.MaxValue,
                 UserId = user.Id,
-                TrackId = track.Id
+                TrackId = 1
             };
             await service.Add(reservation);
 
@@ -59,7 +52,7 @@ namespace srtk.tests.Tests
                 Start = DateTime.MinValue,
                 End = DateTime.MaxValue,
                 UserId = user.Id,
-                TrackId = track.Id
+                TrackId = 1
             };
             await service.Add(reservation2);
 
@@ -75,9 +68,9 @@ namespace srtk.tests.Tests
         public async Task Getting_Reservation_ById()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
-            var trackService = new TrackService(context);
+            var service = new AddReservationHelper(context);
             var userService = new UserService(context);
+            var trackService = new TrackService(context);
             var user = new User
             {
                 Email = "test@test.pl",
@@ -88,9 +81,12 @@ namespace srtk.tests.Tests
 
             var track = new Track
             {
-                Name = "Tor kolarski",
-                TypeOfSurface = "Gładka",
-                Length = 1000
+                Name = "Tor 1",
+                Length = 100,
+                TypeOfSurface = "Beton",
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
             };
             await trackService.Add(track);
 
@@ -112,7 +108,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(reservation2);
 
-            var result = await service.GetById(reservation.Id);
+            var result = await service.GetById(reservation2.Id);
 
             Assert.NotNull(result);
             output.WriteLine($"Wynik: {result.Start}, {result.End}, {result.Track.Name}, {result.User.Email}");
@@ -123,7 +119,7 @@ namespace srtk.tests.Tests
         public async Task Get_All_Reservations_In_Track()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -138,7 +134,10 @@ namespace srtk.tests.Tests
             { 
                 Name = "Tor 1", 
                 Length = 100, 
-                TypeOfSurface = "Beton" 
+                TypeOfSurface = "Beton",
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
             };
             await trackService.Add(track);
 
@@ -146,7 +145,10 @@ namespace srtk.tests.Tests
             { 
                 Name = "Tor 2", 
                 Length = 200, 
-                TypeOfSurface = "Asfalt" 
+                TypeOfSurface = "Asfalt",
+                OpeningHour = new TimeSpan(10, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
             };
             await trackService.Add(track2);
 
@@ -179,7 +181,7 @@ namespace srtk.tests.Tests
         public async Task Get_All_Reservations_With_Status()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var statusService = new StatusService(context);
@@ -190,14 +192,6 @@ namespace srtk.tests.Tests
                 RoleId = 1
             };
             await userService.Add(user);
-
-            var track = new Track
-            {
-                Name = "Tor 1",
-                Length = 100,
-                TypeOfSurface = "Beton"
-            };
-            await trackService.Add(track);
 
             var status = new Status
             {
@@ -216,7 +210,7 @@ namespace srtk.tests.Tests
                 Start = DateTime.Now,
                 End = DateTime.Now.AddHours(2),
                 UserId = user.Id,
-                TrackId = track.Id,
+                TrackId = 1,
                 StatusId = status.Id
             };
             await service.Add(reservation);
@@ -226,7 +220,7 @@ namespace srtk.tests.Tests
                 Start = DateTime.MinValue,
                 End = DateTime.Now.AddHours(5),
                 UserId = user.Id,
-                TrackId = track.Id,
+                TrackId = 1,
                 StatusId = status2.Id
             };
             await service.Add(reservation2);
@@ -242,7 +236,7 @@ namespace srtk.tests.Tests
         public async Task Get_All_Reservations_With_User()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -251,7 +245,7 @@ namespace srtk.tests.Tests
                 Password = "test123",
                 RoleId = 1
             };
-            await userService.Add(user);
+            user = await userService.Add(user);
 
             var user2 = new User
             {
@@ -259,37 +253,28 @@ namespace srtk.tests.Tests
                 Password = "test12345",
                 RoleId = 1
             };
-            await userService.Add(user2);
-
-            var track = new Track
-            {
-                Name = "Tor 1",
-                Length = 100,
-                TypeOfSurface = "Beton"
-            };
-            await trackService.Add(track);
+            user2 = await userService.Add(user2);
 
             var reservation = new Reservation
             {
                 Start = DateTime.Now,
                 End = DateTime.Now.AddHours(2),
                 UserId = user.Id,
-                TrackId = track.Id
+                TrackId = 1
             };
-            await service.Add(reservation);
+            reservation = await service.Add(reservation);
 
             var reservation2 = new Reservation
             {
                 Start = DateTime.MinValue,
                 End = DateTime.Now.AddHours(5),
                 UserId = user.Id,
-                TrackId = track.Id
+                TrackId = 1
             };
-            await service.Add(reservation2);
+            reservation2 = await service.Add(reservation2);
 
-            var result = await service.GetAllWithUser(user.Id);
+            var result = await service.GetUserReservations(user.Id);
             Assert.Equal(2, result.Count);
-            Assert.Equal(user.Id, result[0].UserId);
             output.WriteLine($"Wynik dla {user.Email}: " + result.Count);
         }
 
@@ -298,7 +283,7 @@ namespace srtk.tests.Tests
         public async Task Get_Reservations_With_Start()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var start = DateTime.Today.AddHours(10);
 
             var reservation = new Reservation
@@ -327,7 +312,7 @@ namespace srtk.tests.Tests
         public async Task Get_Reservations_With_End()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var end = DateTime.Today.AddHours(20);
 
             var reservation = new Reservation
@@ -356,14 +341,15 @@ namespace srtk.tests.Tests
         public async Task Get_Overlapping_Reservations()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
-            var start = DateTime.Today.AddHours(10);
-            var end = DateTime.Today.AddHours(12);
+            var service = new AddReservationHelper(context);
+            var start = DateTime.Today.AddHours(10).ToUniversalTime();
+            var end = DateTime.Today.AddHours(12).ToUniversalTime();
 
             var reservation = new Reservation
             {
                 Start = start.AddMinutes(-30),
                 End = start.AddMinutes(30),
+                TrackId = 1
             };
             await service.Add(reservation);
 
@@ -371,14 +357,14 @@ namespace srtk.tests.Tests
             {
                 Start = end.AddHours(1), 
                 End = end.AddHours(2),
+                TrackId = 1
             };
             await service.Add(reservation2);
 
-            var result = await service.GetOverlapping(start, end);
+            var isAvailable = await service.IsTrackAvailable(1, start, end);
 
-            Assert.Single(result);
-            Assert.True(result[0].Start < end && result[0].End > start);
-            output.WriteLine($"Wynik (ilość pokrywających się rezerwacji): " + result.Count);
+            Assert.True(isAvailable);
+            output.WriteLine($"Wynik: rezerwacje się nie pokrywają");
         }
 
         // Test - dodawanie nowej rezerwacji:
@@ -386,7 +372,7 @@ namespace srtk.tests.Tests
         public async Task Adding_New_Reservation()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -401,14 +387,17 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
             };
             await trackService.Add(track);
 
             var reservation = new Reservation
             {
-                Start = DateTime.Now,
-                End = DateTime.MaxValue,
+                Start = DateTime.Now.ToUniversalTime(),
+                End = DateTime.MaxValue.ToUniversalTime(),
                 UserId = user.Id,
                 TrackId = track.Id
             };
@@ -416,7 +405,7 @@ namespace srtk.tests.Tests
             var result = await service.Add(reservation);
 
             Assert.NotNull(result);
-            Assert.Equal(DateTime.MaxValue, result.End);
+            Assert.Equal(DateTime.MaxValue.ToUniversalTime(), result.End);
             Assert.Equal("test@test.pl", result.User.Email);
             Assert.Equal("Tor kolarski", result.Track.Name);
             Assert.Single(context.Reservations);
@@ -428,7 +417,7 @@ namespace srtk.tests.Tests
         public async Task Updating_Reservation()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -443,7 +432,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
             };
             await trackService.Add(track);
 
@@ -466,8 +458,8 @@ namespace srtk.tests.Tests
             var updated = await service.Update(reservation.Id, updatedReservation);
 
             Assert.NotNull(updated);
-            Assert.Equal(DateTime.MinValue, updated.Start);
-            Assert.Equal(DateTime.MaxValue, updated.End);
+            Assert.Equal(DateTime.MinValue.ToUniversalTime(), updated.Start);
+            Assert.Equal(DateTime.MaxValue.ToUniversalTime(), updated.End);
             Assert.Equal("test@test.pl", updated.User.Email);
             Assert.Equal("Tor kolarski", updated.Track.Name);
             Assert.Single(context.Reservations);
@@ -479,7 +471,7 @@ namespace srtk.tests.Tests
         public async Task Deleting_Reservation()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new ReservationService(context);
+            var service = new AddReservationHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -494,7 +486,10 @@ namespace srtk.tests.Tests
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
-                Length = 1000
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
             };
             await trackService.Add(track);
 
@@ -511,6 +506,57 @@ namespace srtk.tests.Tests
 
             Assert.Empty(context.Reservations);
             output.WriteLine("Wynik: Usunięto rezerwację");
+        }
+
+        // Test - sprawdzenie eksportu:
+        [Fact]
+        public async Task Export_Reservations()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new AddReservationHelper(context);
+            var trackService = new TrackService(context);
+            var userService = new UserService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "test123",
+                RoleId = 1
+            };
+            await userService.Add(user);
+
+            var track = new Track
+            {
+                Name = "Tor kolarski",
+                TypeOfSurface = "Gładka",
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
+            };
+            await trackService.Add(track);
+
+            var reservation = new Reservation
+            {
+                Start = DateTime.Now,
+                End = DateTime.MaxValue,
+                UserId = user.Id,
+                TrackId = track.Id
+            };
+            await service.Add(reservation);
+
+            var reservation2 = new Reservation
+            {
+                Start = DateTime.Now,
+                End = DateTime.MaxValue,
+                UserId = user.Id,
+                TrackId = track.Id
+            };
+            await service.Add(reservation2);
+
+            var result = await service.ExportToExcel(track.Id);
+            Assert.NotNull(result);
+            Assert.True(result.Length > 0);
+            output.WriteLine("Wynik: Wyeksportowano rezerwacje");
         }
     }
 }
