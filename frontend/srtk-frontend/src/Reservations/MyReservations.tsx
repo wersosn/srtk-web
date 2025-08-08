@@ -4,7 +4,7 @@ import editIcon from '../assets/edit.png';
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
-import type { Reservation, Equipment } from '../Types/Types';
+import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
 
 function MyReservations() {
@@ -12,9 +12,9 @@ function MyReservations() {
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [userId, setUserId] = useState<number | undefined>(undefined);
-    const [equipmentList, setEquipmentList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
     const token = localStorage.getItem('token');
 
     // Pobieranie rezerwacji użytkownika:
@@ -38,7 +38,7 @@ function MyReservations() {
             setLoading(false);
         }
     };
-
+    
     useEffect(() => {
         if (token) {
             try {
@@ -64,6 +64,7 @@ function MyReservations() {
         const updatedReservation = reservations.map(r => r.id === updated.id ? updated : r);
         setReservations(updatedReservation);
         setEditingReservation(null);
+        setRefreshCalendarCounter(prev => prev + 1);
     };
 
     return (
@@ -84,7 +85,7 @@ function MyReservations() {
                                 {reservations.map((Reservation) => (
                                     <li key={Reservation.id} className="list-group-item p-0">
                                         <div onClick={() => setShowDetails(prev => (prev?.id === Reservation.id ? null : Reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
-                                            Rezerwacja: {formatToDatetimeLocal(Reservation.start)}-{formatToDatetimeLocal(Reservation.end)}
+                                            Rezerwacja: {formatToDatetimeLocal(Reservation.start)} - {formatToDatetimeLocal(Reservation.end)}
                                             <div className="d-flex gap-2" onClick={(e) => e.stopPropagation()}>
                                                 <button onClick={() => setEditingReservation(Reservation)} disabled={loading} className="icon-button">
                                                     <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
@@ -111,7 +112,7 @@ function MyReservations() {
                                 <>
                                     {console.log('Edytowana rezerwacja:', editingReservation)}
                                     <h5 className="mt-4">Modyfikacja rezerwacji</h5>
-                                    <EditReservation 
+                                    <EditReservation
                                         key={editingReservation.id}
                                         reservationId={editingReservation.id}
                                         currentStart={editingReservation.start}
@@ -129,7 +130,7 @@ function MyReservations() {
                     )}
                 </main>
                 <div className="calendar-section">
-                    <MyReservationCalendar />
+                    <MyReservationCalendar refreshTrigger={refreshCalendarCounter}/>
                 </div>
             </div>
         </div>

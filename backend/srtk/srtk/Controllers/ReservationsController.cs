@@ -74,12 +74,11 @@ namespace srtk.Controllers
         }
 
         // Pobieranie rezerwacji, które trwają w określonym przedziale czasowym - do znajdywania kolizji:
-        [HttpGet("overlapping")]
-        public async Task<ActionResult<List<Reservation>>> GetReservationsOverlapping(int trackId, DateTime start, DateTime end)
+        [HttpGet("isAvailable")]
+        public async Task<IActionResult> CheckAvailability(int trackId, DateTime start, DateTime end, int? reservationId = null)
         {
-            var reservations = await service.GetOverlapping(trackId, start, end);
-            bool available = !reservations.Any();
-            return Ok(new { available });
+            var isAvailable = await service.IsTrackAvailable(trackId, start.ToUniversalTime(), end.ToUniversalTime(), reservationId);
+            return Ok(new { isAvailable });
         }
 
         // Pobranie konkretnej rezerwacji:

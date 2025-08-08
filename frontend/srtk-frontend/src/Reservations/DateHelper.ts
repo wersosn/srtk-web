@@ -37,25 +37,6 @@ export function formatToDatetimeLocal(isoString: string): string {
   const date = new Date(isoString);
   const offset = date.getTimezoneOffset();
   date.setMinutes(date.getMinutes() - offset);
-  return date.toISOString().slice(0, 16);
+  return date.toISOString().slice(0, 16).replace('T', ' ');
 }
-
-export const checkAvailability = async (trackId: number, start: string, end: string): Promise<boolean> => {
-  const token = localStorage.getItem('token');
-  const params = new URLSearchParams({ trackId: String(trackId), start, end });
-
-  try {
-    const res = await fetch(`/api/reservations/overlapping?${params.toString()}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) throw new Error('Błąd podczas sprawdzania dostępności');
-
-    const data = await res.json();
-    return data.available;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
 

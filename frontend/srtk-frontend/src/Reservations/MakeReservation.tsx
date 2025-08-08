@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
-import { parseAvailableDays, isValidDateTime, checkAvailability } from './DateHelper';
+import { parseAvailableDays, isValidDateTime } from './DateHelper';
 import type { Equipment, Track } from '../Types/Types';
 import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
@@ -15,7 +15,7 @@ function MakeReservation() {
     const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
     const [equipmentQuantities, setEquipmentQuantities] = useState<Record<number, number>>({});
     const [userId, setUserId] = useState<number | undefined>(undefined);
-    const [isAvailable, setIsAvailable] = useState<boolean | null>(null); // TODO: Sprawdzanie dostępności
+    const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -85,6 +85,28 @@ function MakeReservation() {
         setCost(baseCost + equipmentCost);
     };
 
+    // Sprawdzenie, czy tor jest dostępny do zarezerwowania (tzn. nie ma innej rezerwacji w wybranym czasie):
+    const checkTrackAvailability = async () => {
+        if (!selectedTrackId || !startDate || !endDate) {
+            setIsAvailable(null);
+            return null;
+        }
+
+        try {
+            const res = await fetch(`/api/reservations/isAvailable?trackId=${selectedTrackId}&start=${new Date(startDate).toISOString()}&end=${new Date(endDate).toISOString()}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (!res.ok) throw new Error('Błąd sprawdzania dostępności');
+            const data = await res.json();
+            setIsAvailable(data.isAvailable);
+            return data.isAvailable;
+        } catch (err) {
+            console.error(err);
+            setIsAvailable(null);
+            return null;
+        }
+    };
+
     useEffect(() => {
         if (token) {
             try {
@@ -108,6 +130,10 @@ function MakeReservation() {
         calculateCost();
     }, [startDate, endDate, equipmentQuantities, equipmentList]);
 
+    useEffect(() => {
+        checkTrackAvailability();
+    }, [selectedTrackId, startDate, endDate]);
+
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
     const openingHour = track?.openingHour || '00:00';
@@ -120,18 +146,17 @@ function MakeReservation() {
             setStartDate(val);
         } else {
             alert('Wybrana data i godzina rozpoczęcia nie są dostępne dla tego toru.');
-            setStartDate('');
         }
     };
 
     // Handler sprawdzający, czy data zakończenia jest zgodna z godzinami funkcjonowania toru:
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
+        
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
             setEndDate(val);
         } else {
             alert('Wybrana data i godzina zakończenia nie są dostępne dla tego toru.');
-            setEndDate('');
         }
     };
 
@@ -139,6 +164,16 @@ function MakeReservation() {
     const handleReservation = async () => {
         if (!selectedTrackId || !startDate || !endDate || !userId) {
             alert('Uzupełnij wszystkie pola');
+            return;
+        }
+
+        if (new Date(startDate) >= new Date(endDate)) {
+            alert('Data rozpoczęcia musi być wcześniejsza niż data zakończenia.');
+            return;
+        }
+
+        if (isAvailable === false) {
+            alert('Tor jest zajęty w tym terminie, wybierz inny czas!');
             return;
         }
 
@@ -208,6 +243,13 @@ function MakeReservation() {
 
                             <label>Data zakończenia</label>
                             <input type="datetime-local" className="info-input" value={endDate} onChange={handleEndDateChange} />
+
+                            {isAvailable === false && (
+                                <p className="text-danger">Ten tor jest już zajęty w wybranym terminie.</p>
+                            )}
+                            {isAvailable === true && (
+                                <p className="text-success">Tor jest dostępny w tym terminie.</p>
+                            )}
 
                             <div className="flex items-center mb-4">
                                 <input type="checkbox" id="rentEquipment" checked={rentEquipment} onChange={() => setRentEquipment(!rentEquipment)} className="mr-2" />

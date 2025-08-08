@@ -22,8 +22,8 @@ const Home: React.FC = () => {
   return (
     <>
       <div className="home-container">
-        <div className="hero-section">
-          <div className="hero-text">
+        <div className="home-section">
+          <div className="home-text">
             <h1>System rezerwacji toru kolarskiego</h1>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -38,7 +38,7 @@ const Home: React.FC = () => {
             )}
           </div>
 
-          <div className="hero-image">
+          <div className="home-image">
             <img
               src={CyclistsSvg}
               alt="Kolarze na torze"

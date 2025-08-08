@@ -42,6 +42,12 @@ function Sidebar() {
                         Zarządzanie sprzętem
                     </NavLink>
                 </li>
+                <li className="nav-item">
+                    <NavLink to="reservationsManagement" className={getClassName}>
+                        Zarządzanie rezerwacjami
+                    </NavLink>
+                </li>
+
                 {showMore && (
                 <>
                     <li className="nav-item">

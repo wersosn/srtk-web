@@ -86,11 +86,15 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji, które trwają w określonym przedziale czasowym - do znajdywania kolizji:
-        public async Task<List<Reservation>> GetOverlapping(int trackId, DateTime start, DateTime end)
+        public async Task<bool> IsTrackAvailable(int trackId, DateTime start, DateTime end, int? reservationId = null)
         {
-            return await context.Reservations
-                .Where(r => r.Start < end && r.End > start && r.TrackId == trackId) // Rezerwacje, które się nakładają
-                .ToListAsync();
+            return !await context.Reservations
+                .AnyAsync(r =>
+                    r.TrackId == trackId &&
+                    (reservationId == null || r.Id != reservationId) &&
+                    r.Start < end &&
+                    r.End > start
+                );
         }
 
         // Pobranie konkretnej rezerwacji:
@@ -108,6 +112,11 @@ namespace srtk.Services
             reservation.Start = reservation.Start.ToUniversalTime();
             reservation.End = reservation.End.ToUniversalTime();
 
+            if (!await IsTrackAvailable(reservation.TrackId, reservation.Start, reservation.End, null))
+            {
+                throw new Exception("Tor jest już zarezerwowany w tym czasie.");
+            }
+
             var equipmentReservations = reservation.EquipmentReservations.ToList();
             reservation.EquipmentReservations.Clear();
 
@@ -119,7 +128,7 @@ namespace srtk.Services
                 var equipmentExists = await context.Equipments.AnyAsync(e => e.Id == eqRes.EquipmentId);
                 if (!equipmentExists)
                 {
-                    throw new Exception($"Sprzęt nie istnieje");
+                    throw new Exception("Sprzęt nie istnieje");
                 }
 
                 eqRes.ReservationId = reservation.Id;
@@ -144,6 +153,11 @@ namespace srtk.Services
             if (reservation == null)
             {
                 return null;
+            }
+
+            if (!await IsTrackAvailable(dto.TrackId, dto.Start.ToUniversalTime(), dto.End.ToUniversalTime(), id))
+            {
+                throw new Exception("Tor jest już zarezerwowany w tym czasie!");
             }
 
             var existingEquipmentReservations = await context.EquipmentReservations

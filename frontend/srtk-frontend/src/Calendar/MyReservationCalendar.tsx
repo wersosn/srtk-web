@@ -4,11 +4,13 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import plLocale from '@fullcalendar/core/locales/pl';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation } from '../Types/Types';
+import { formatToDatetimeLocal } from '../Reservations/DateHelper';
 
-export default function MyReservationCalendar() {
+export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const [events, setEvents] = useState<any[]>([]);
@@ -55,7 +57,7 @@ export default function MyReservationCalendar() {
         if (userId) {
             fetchReservations();
         }
-    }, [userId]);
+    }, [userId, refreshTrigger]);
 
     useEffect(() => {
         const mappedEvents = reservationList.map(r => {
@@ -77,17 +79,22 @@ export default function MyReservationCalendar() {
     }, [reservationList]);
 
     function handleEventClick(clickInfo: any) {
-        alert(`Kliknięto wydarzenie ID: ${clickInfo.event.id}`);
+        const id = parseInt(clickInfo.event.id, 10);
+        const r = reservationList.find(r => r.id === id) || null;
+        if (r) {
+            alert(`Rezerwacja nr ${r.id}\nData: ${formatToDatetimeLocal(r.start)} - ${formatToDatetimeLocal(r.end)}`);
+        }
     }
 
     return (
         <>
-            <div className="calendar-container">
+            <div className="my-calendar-container">
                 {loading && <p>Ładowanie...</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 <FullCalendar
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                    locale={plLocale} // Ustawienie na język Polski, potem należy to dostosować do wybranego przez użytkownika języka
                     initialView="timeGridDay"
                     selectable={false}
                     events={events}

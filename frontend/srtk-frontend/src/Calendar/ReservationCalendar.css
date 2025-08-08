@@ -1,5 +1,22 @@
-.calendar-container {
+.my-calendar-container {
   max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cldr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
+  text-align: center;
+}
+
+.calendar-container {     
+  min-width: 1000px;
   margin: 2rem auto;
   padding: 1rem;
   background-color: #fff;
@@ -9,13 +26,5 @@
 
 .fc {
   font-size: 0.95rem;
-}
-
-.center-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; 
-  text-align: center;
 }
 

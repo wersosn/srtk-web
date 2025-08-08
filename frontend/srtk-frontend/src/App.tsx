@@ -17,6 +17,7 @@ import UserManagement from "./User/UserManagement";
 import BlobBackground from "./BlobBackground";
 import MakeReservation from "./Reservations/MakeReservation";
 import MyReservations from "./Reservations/MyReservations";
+import ReservationManagement from "./Reservations/ReservationManagement";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="equipmentsManagement" element={<EquipmentsManagement />} />
             <Route path="facilitiesManagement" element={<FacilitiesManagement />} />
+            <Route path="reservationsManagement" element={<ReservationManagement />} />
             <Route path="roleManagement" element={<RoleManagement />} />
             <Route path="statusesManagement" element={<StatusesManagement />} />
             <Route path="tracksManagement" element={<TrackManagement />}/>

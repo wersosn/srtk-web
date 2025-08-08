@@ -1,3 +1,7 @@
+p {
+  text-align: center;
+}
+
 .res-container {
   min-height: calc(100vh - 60px);
   display: flex;

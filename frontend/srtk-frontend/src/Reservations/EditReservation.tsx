@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import { parseAvailableDays, isValidDateTime, checkAvailability, formatToDatetimeLocal } from './DateHelper';
+import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
 import type { Equipment, EquipmentWithQuantity, Track } from '../Types/Types';
 
 interface EditReservationProps {
@@ -21,10 +21,10 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
     const [equipmentQuantities, setEquipmentQuantities] = useState<Record<string, number>>({});
     const [t, setTrack] = useState<Track | null>(null);
-    const [available, setAvailable] = useState(true);
+    const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+    const [datesChanged, setDatesChanged] = useState(false);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
 
     // Pobieranie wszystkich torów z bazy:
@@ -119,19 +119,46 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 .reduce((sum, val) => sum + val, 0);
 
             setCost(baseCost + equipmentCost);
-
-            // Sprawdź dostępność terminu
-            /*try {
-                const res = await fetch(`/api/reservations/overlapping?trackId=${trackId}&start=${start.toISOString()}&end=${end.toISOString()}`);
-                const data = await res.json();
-                setAvailable(data.available || false);
-            } catch (err) {
-                setAvailable(false);
-            }*/
         };
 
         calculateCostAndCheckAvailability();
     }, [startDate, endDate, equipmentQuantities, equipmentList, t]);
+
+    // Sprawdzenie, czy tor jest dostępny do zarezerwowania (tzn. nie ma innej rezerwacji w wybranym czasie):
+    useEffect(() => {
+        const checkTrackAvailability = async () => {
+            if (!trackId || !startDate || !endDate) {
+                setIsAvailable(null);
+                return null;
+            }
+
+            const params = new URLSearchParams({
+                trackId: trackId.toString(),
+                start: new Date(startDate).toISOString(),
+                end: new Date(endDate).toISOString(),
+            });
+
+            if (reservationId) {
+                params.append('reservationId', reservationId.toString());
+            }
+
+            try {
+                const res = await fetch(`/api/reservations/isAvailable?${params.toString()}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                if (!res.ok) throw new Error('Błąd sprawdzania dostępności');
+                const data = await res.json();
+                setIsAvailable(data.isAvailable);
+                return data.isAvailable;
+            } catch (err) {
+                console.error(err);
+                setIsAvailable(null);
+                return null;
+            }
+        };
+        checkTrackAvailability();
+    }, [trackId, startDate, endDate]);
 
     const allowedDays = t ? parseAvailableDays(t.availableDays) : [];
     const openingHour = t?.openingHour || '00:00';
@@ -142,9 +169,9 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         const val = e.target.value;
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
             setStartDate(val);
+            setDatesChanged(true);
         } else {
             alert('Wybrana data i godzina rozpoczęcia nie są dostępne dla tego toru.');
-            setStartDate('');
         }
     };
 
@@ -153,9 +180,9 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         const val = e.target.value;
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
             setEndDate(val);
+            setDatesChanged(true);
         } else {
             alert('Wybrana data i godzina zakończenia nie są dostępne dla tego toru.');
-            setEndDate('');
         }
     };
 
@@ -170,6 +197,16 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (isAvailable === false) {
+            alert('Tor jest zajęty w tym terminie, wybierz inny czas!');
+            return;
+        }
+
+        if (new Date(startDate) >= new Date(endDate)) {
+            alert('Data rozpoczęcia musi być wcześniejsza niż data zakończenia.');
+            return;
+        }
 
         const equipmentReservations = Object.entries(equipmentQuantities)
             .filter(([, qty]) => qty > 0)
@@ -220,6 +257,13 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
                 <label>Data zakończenia</label>
                 <input type="datetime-local" className="info-input" value={endDate} onChange={handleEndDateChange} />
+
+                {datesChanged && isAvailable === false && (
+                    <p className="text-danger">Ten tor jest już zajęty w wybranym terminie.</p>
+                )}
+                {datesChanged && isAvailable === true && (
+                    <p className="text-success">Tor jest dostępny w tym terminie.</p>
+                )}
 
                 <div className="flex items-center mb-4">
                     <input type="checkbox" id="rentEquipment" checked={rentEquipment} onChange={() => setRentEquipment(!rentEquipment)} className="mr-2" />
