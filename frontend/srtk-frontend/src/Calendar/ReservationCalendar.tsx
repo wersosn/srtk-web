@@ -118,7 +118,7 @@ export default function ReservationCalendar() {
         <div className="cldr">
             <div>
                 <h2>Wybierz tor, którego obłożenie chcesz sprawdzić:</h2>
-                <select id="track-select" className="input-text" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
+                <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
                     <option value="">Wybierz tor</option>
                     {tracks.map(track => (
                         <option key={track.id} value={track.id}>

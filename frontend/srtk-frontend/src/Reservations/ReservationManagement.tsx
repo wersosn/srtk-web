@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
+import downloadIcon from '../assets/download.png';
 import { jwtDecode } from 'jwt-decode';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
@@ -9,6 +10,7 @@ import { formatToDatetimeLocal } from './DateHelper';
 function ReservationManagement() {
     const [facilityId, setFacilityId] = useState<number | null>(null);
     const [tracks, setTracks] = useState<Track[]>([]);
+    const [trackName, setTrackName] = useState<string | null>(null);
     const [reservationsByTrack, setReservationsByTrack] = useState<Record<number, Reservation[]>>({});
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
@@ -96,7 +98,7 @@ function ReservationManagement() {
 
     useEffect(() => {
         fetchReservations();
-    }, [token]);
+    }, [token, tracks]);
 
     useEffect(() => {
         if (token) {
@@ -117,7 +119,14 @@ function ReservationManagement() {
         const updatedReservation = reservations.map(r => r.id === updated.id ? updated : r);
         setReservations(updatedReservation);
         setEditingReservation(null);
+        // TODO: Wysyłanie powiadomień o zmianach do użytkownika
     };
+
+    // Obsługa eksportu:
+    const handleExport = (trackId: Number) => {
+        window.location.href = `/api/reservations/export?trackId=${trackId}`;
+    };
+
 
     return (
         <>
@@ -136,7 +145,16 @@ function ReservationManagement() {
                             const track = tracks.find(t => t.id === Number(trackId));
                             return (
                                 <div key={trackId} style={{ marginBottom: '2rem' }}>
-                                    <h6><em>{track?.name || `ID: ${trackId}`}</em>:</h6>
+                                    <div className="d-flex flex-nowrap justify-content-between align-items-center mb-2">
+                                        <h6 className="mb-0" style={{ whiteSpace: 'nowrap' }}>
+                                            <em>{track?.name || `ID: ${trackId}`}</em>:
+                                        </h6>
+                                        {reservations.length !== 0 && (
+                                            <button onClick={() => handleExport(Number(trackId))} className="icon-button" title="Eksport do .xlsx">
+                                                <img src={downloadIcon} alt="Edytuj" style={{ width: '20px', height: '20px' }} />
+                                            </button>
+                                        )}
+                                    </div>
                                     <ul className="list-group">
                                         {reservations.length === 0 ? (
                                             <li className="list-group-item">Brak rezerwacji</li>
@@ -149,7 +167,7 @@ function ReservationManagement() {
                                                             <button onClick={() => setEditingReservation(reservation)} disabled={loading} className="icon-button">
                                                                 <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                                             </button>
-                                                            <DeleteReservation reservationId={reservation.id} onDeleted={() => {fetchReservations();}}/>
+                                                            <DeleteReservation reservationId={reservation.id} onDeleted={() => { fetchReservations(); }} />
                                                         </div>
                                                     </div>
 
@@ -171,7 +189,7 @@ function ReservationManagement() {
                             );
                         })}
                         <hr />
-                        {editingReservation ? (
+                        {editingReservation && (
                             <>
                                 {console.log('Edytowana rezerwacja:', editingReservation)}
                                 <h5 className="mt-4">Modyfikacja rezerwacji</h5>
@@ -184,10 +202,6 @@ function ReservationManagement() {
                                     trackId={editingReservation.trackId}
                                     onUpdated={handleEdit}
                                     onCancel={() => setEditingReservation(null)} />
-                            </>
-                        ) : (
-                            <>
-                            <h6><em>Eksport rezerwacji w formcie .xlsx:</em></h6>
                             </>
                         )}
                     </>

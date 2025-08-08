@@ -2,6 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using ClosedXML.Excel;
+using System.IO;
+using System.Text;
+using DocumentFormat.OpenXml.InkML;
 
 namespace srtk.Services
 {
@@ -224,6 +228,57 @@ namespace srtk.Services
             context.Reservations.Remove(reservation);
             await context.SaveChangesAsync();
             return true;
+        }
+
+        // Eksport danych w formacie .xlsx:
+        public async Task<byte[]> ExportToExcel(int trackId)
+        {
+            var reservations = await context.Reservations
+                .Include(r => r.Track)
+                .Include(r => r.User)
+                .Include(r => r.Status)
+                .Where(r => r.TrackId == trackId)
+                .ToListAsync();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.AddWorksheet("Rezerwacje");
+
+                // Nagłówek tabeli:
+                var trackName = reservations.FirstOrDefault()?.Track?.Name ?? $"Tor {trackId}";
+                worksheet.Cell(1, 1).Value = $"Rezerwacje dla toru: {trackName}";
+                worksheet.Range(1, 1, 1, 6).Merge();
+                worksheet.Range(1, 1, 1, 6).Style.Font.SetBold();
+                worksheet.Range(1, 1, 1, 6).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+                // Informacje:
+                worksheet.Cell(2, 1).Value = "Id rezerwacji";
+                worksheet.Cell(2, 2).Value = "Start";
+                worksheet.Cell(2, 3).Value = "Koniec";
+                worksheet.Cell(2, 4).Value = "Koszt";
+                worksheet.Cell(2, 5).Value = "Email użytkownika";
+                worksheet.Cell(2, 6).Value = "Status";
+
+                // Wpisywanie danych:
+                int row = 3;
+                foreach (var r in reservations)
+                {
+                    worksheet.Cell(row, 1).Value = r.Id;
+                    worksheet.Cell(row, 2).Value = r.Start;
+                    worksheet.Cell(row, 3).Value = r.End;
+                    worksheet.Cell(row, 4).Value = r.Cost;
+                    worksheet.Cell(row, 5).Value = r.User?.Email ?? "-";
+                    worksheet.Cell(row, 6).Value = r.Status?.Name ?? "-";
+                    row++;
+                }
+
+                worksheet.Columns().AdjustToContents();
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    return stream.ToArray();
+                }
+            }
         }
     }
 }

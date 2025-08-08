@@ -4,7 +4,7 @@ import editIcon from '../assets/edit.png';
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
-import type { Reservation } from '../Types/Types';
+import type { Reservation, Track } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
 
 function MyReservations() {
@@ -12,6 +12,7 @@ function MyReservations() {
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [userId, setUserId] = useState<number | undefined>(undefined);
+    const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
@@ -38,7 +39,25 @@ function MyReservations() {
             setLoading(false);
         }
     };
-    
+
+    // Pobranie torów (do wyświetlenia nazwy):
+    useEffect(() => {
+        const fetchTracks = async () => {
+            try {
+                const res = await fetch('/api/tracks', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Błąd podczas pobierania torów');
+                const data = await res.json();
+                setTracks(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchTracks();
+    }, [token]);
+
     useEffect(() => {
         if (token) {
             try {
@@ -65,6 +84,12 @@ function MyReservations() {
         setReservations(updatedReservation);
         setEditingReservation(null);
         setRefreshCalendarCounter(prev => prev + 1);
+    };
+
+    // Ustawienie nazwy toru:
+    const getTrackName = (trackId: number) => {
+        const track = tracks.find(t => t.id === trackId);
+        return track ? track.name : 'Nieznany tor';
     };
 
     return (
@@ -97,7 +122,7 @@ function MyReservations() {
                                         {showDetails?.id === Reservation.id && (
                                             <div className="mt-2 ps-2 details">
                                                 <div>
-                                                    <strong>Id toru:</strong> {Reservation.trackId}<br />
+                                                    <strong>Tor:</strong> {getTrackName(Reservation.trackId)}<br />
                                                     <strong>Start:</strong> {formatToDatetimeLocal(Reservation.start)}<br />
                                                     <strong>Koniec:</strong> {formatToDatetimeLocal(Reservation.end)}<br />
                                                     <strong>Koszt:</strong> {Reservation.cost}<br />
@@ -108,7 +133,7 @@ function MyReservations() {
                                 ))}
                             </ul>
                             <hr />
-                            {editingReservation ? (
+                            {editingReservation && (
                                 <>
                                     {console.log('Edytowana rezerwacja:', editingReservation)}
                                     <h5 className="mt-4">Modyfikacja rezerwacji</h5>
@@ -122,15 +147,12 @@ function MyReservations() {
                                         onUpdated={handleEdit}
                                         onCancel={() => setEditingReservation(null)} />
                                 </>
-                            ) : (
-                                <>
-                                </>
                             )}
                         </>
                     )}
                 </main>
                 <div className="calendar-section">
-                    <MyReservationCalendar refreshTrigger={refreshCalendarCounter}/>
+                    <MyReservationCalendar refreshTrigger={refreshCalendarCounter} />
                 </div>
             </div>
         </div>

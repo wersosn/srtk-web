@@ -11,10 +11,12 @@ namespace srtk.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly ReservationService service;
+        private readonly TrackService trackService;
 
-        public ReservationsController(ReservationService service)
+        public ReservationsController(ReservationService service, TrackService trackService)
         {
             this.service = service;
+            this.trackService = trackService;
         }
 
         // Pobranie wszystkich rezerwacji (ogółem):
@@ -123,6 +125,22 @@ namespace srtk.Controllers
                 return NotFound();
             }
             return Ok(new { message = "Rezerwacja została usunięta" });
+        }
+
+        // Eksport danych w formacie .xlsx:
+        [HttpGet("export")]
+        public async Task<ActionResult<byte[]>> ExportReservationsToExcel(int trackId)
+        {
+            var track = await trackService.GetById(trackId);
+            if (track == null)
+            {
+                return NotFound("Tor nie istnieje");
+            }
+
+            var fileBytes = await service.ExportToExcel(trackId);
+            var fileName = $"Rezerwacje_{track.Name}.xlsx";
+
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }
