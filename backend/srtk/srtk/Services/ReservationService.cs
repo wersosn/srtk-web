@@ -6,6 +6,11 @@ using ClosedXML.Excel;
 using System.IO;
 using System.Text;
 using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Office2019.Presentation;
+using PdfSharp.Pdf;
+using PdfSharp.Drawing;
+using System.Globalization;
+using System.Linq;
 
 namespace srtk.Services
 {
@@ -281,6 +286,83 @@ namespace srtk.Services
                     return stream.ToArray();
                 }
             }
+        }
+
+        // Eksport danych w formacie .pdf (DO POPRAWY!):
+        public async Task<byte[]> ExportToPdf(int reservationId)
+        {
+            var reservation = await context.Reservations
+                .Include(r => r.Track)
+                .Include(r => r.User)
+                .Include(r => r.Status)
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .FirstOrDefaultAsync(r => r.Id == reservationId);
+
+            if (reservation == null)
+            {
+                throw new Exception("Nie znaleziono rezerwacji");
+            }
+
+            var document = new PdfDocument();
+            document.Info.Title = $"Rezerwacja toru {reservation.Track?.Name}";
+
+            var page = document.AddPage();
+            var gfx = XGraphics.FromPdfPage(page);
+
+            var font = new XFont("Verdana", 14);
+
+            int yPoint = 40;
+
+            // Nagłówek
+            gfx.DrawString($"Rezerwacja ID: {reservation.Id}", font, XBrushes.Black,
+                new XRect(20, yPoint, page.Width, page.Height),
+                XStringFormats.TopLeft);
+            yPoint += 25;
+
+            // Daty i koszt
+            gfx.DrawString($"Start: {reservation.Start.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)}", font, XBrushes.Black,
+                new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            yPoint += 20;
+
+            gfx.DrawString($"Koniec: {reservation.End.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)}", font, XBrushes.Black,
+                new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            yPoint += 20;
+
+            gfx.DrawString($"Koszt: {reservation.Cost} zł", font, XBrushes.Black,
+                new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            yPoint += 30;
+
+            // Tor
+            gfx.DrawString($"Tor: {reservation.Track?.Name ?? "Brak danych"}", font, XBrushes.Black,
+                new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            yPoint += 30;
+
+            // Sprzęt
+            gfx.DrawString("Wynajęty sprzęt:", font, XBrushes.Black,
+                new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            yPoint += 20;
+
+            if (reservation.EquipmentReservations != null && reservation.EquipmentReservations.Any())
+            {
+                foreach (var eqRes in reservation.EquipmentReservations)
+                {
+                    var eqName = eqRes.Equipment?.Name ?? "Brak nazwy";
+                    gfx.DrawString($"- {eqName}: {eqRes.Quantity} szt.", font, XBrushes.Black,
+                        new XRect(40, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+                    yPoint += 20;
+                }
+            }
+            else
+            {
+                gfx.DrawString("Brak wynajętego sprzętu.", font, XBrushes.Black,
+                    new XRect(40, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+                yPoint += 20;
+            }
+
+            using var stream = new MemoryStream();
+            document.Save(stream, false);
+            return stream.ToArray();
         }
     }
 }

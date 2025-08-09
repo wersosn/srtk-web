@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import editIcon from '../assets/edit.png';
+import downloadIcon from '../assets/download.png';
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
@@ -92,6 +93,11 @@ function MyReservations() {
         return track ? track.name : 'Nieznany tor';
     };
 
+    // Obsługa eksportu:
+    const handleExport = (reservationId: Number) => {
+        window.location.href = `/api/reservations/exportPdf?reservationId=${reservationId}`;
+    };
+
     return (
         <div className="res-container">
             <div className="res-card-wrapper">
@@ -112,6 +118,9 @@ function MyReservations() {
                                         <div onClick={() => setShowDetails(prev => (prev?.id === Reservation.id ? null : Reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                             Rezerwacja: {formatToDatetimeLocal(Reservation.start)} - {formatToDatetimeLocal(Reservation.end)}
                                             <div className="d-flex gap-2" onClick={(e) => e.stopPropagation()}>
+                                                <button onClick={() => handleExport(Number(Reservation.id))} className="icon-button" title="Eksport do .pdf">
+                                                    <img src={downloadIcon} alt="Eksport" style={{ width: '16px', height: '16px' }} />
+                                                </button>
                                                 <button onClick={() => setEditingReservation(Reservation)} disabled={loading} className="icon-button">
                                                     <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                                 </button>

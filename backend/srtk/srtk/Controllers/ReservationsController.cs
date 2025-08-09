@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -127,8 +128,9 @@ namespace srtk.Controllers
             return Ok(new { message = "Rezerwacja została usunięta" });
         }
 
-        // Eksport danych w formacie .xlsx:
+        // Eksport danych w formacie .xlsx (dla administratora):
         [HttpGet("export")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<byte[]>> ExportReservationsToExcel(int trackId)
         {
             var track = await trackService.GetById(trackId);
@@ -141,6 +143,23 @@ namespace srtk.Controllers
             var fileName = $"Rezerwacje_{track.Name}.xlsx";
 
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        // Eksport danych w formacie .pdf (dla użytkownika):
+        [HttpGet("exportPdf")]
+        public async Task<ActionResult<byte[]>> ExportReservationToPdf(int reservationId)
+        {
+            var reservation = await service.GetById(reservationId);
+            if (reservation == null)
+            {
+                return NotFound("Rezerwacja nie istnieje");
+            }
+
+            var fileBytes = await service.ExportToPdf(reservationId);
+            //var safeTrackName = string.IsNullOrWhiteSpace(reservation.Track?.Name) ? "Rezerwacja" : reservation.Track.Name.Replace(" ", "_");
+            var fileName = $"Rezerwacja_toru_{reservation.Track?.Name}.pdf";
+
+            return File(fileBytes, "application/pdf", fileName);
         }
     }
 }

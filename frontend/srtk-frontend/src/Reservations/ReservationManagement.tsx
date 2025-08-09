@@ -10,7 +10,6 @@ import { formatToDatetimeLocal } from './DateHelper';
 function ReservationManagement() {
     const [facilityId, setFacilityId] = useState<number | null>(null);
     const [tracks, setTracks] = useState<Track[]>([]);
-    const [trackName, setTrackName] = useState<string | null>(null);
     const [reservationsByTrack, setReservationsByTrack] = useState<Record<number, Reservation[]>>({});
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
@@ -54,7 +53,9 @@ function ReservationManagement() {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                if (!res.ok) throw new Error('Błąd podczas pobierania torów');
+                if (!res.ok) {
+                    throw new Error('Błąd podczas pobierania torów');
+                }
                 const data = await res.json();
                 setTracks(data);
             } catch (err: any) {
@@ -77,8 +78,11 @@ function ReservationManagement() {
                 const res = await fetch(`/api/reservations/inTrack?trackId=${track.id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) throw new Error(`Błąd pobierania rezerwacji dla toru ${track.name}`);
+                if (!res.ok) {
+                    throw new Error(`Błąd pobierania rezerwacji dla toru ${track.name}`);
+                }
                 const data = await res.json();
+                console.log(data);
                 return { trackId: track.id, reservations: data };
             });
 
@@ -116,8 +120,14 @@ function ReservationManagement() {
 
     // Obsługa edycji rezerwacji:
     const handleEdit = (updated: Reservation) => {
-        const updatedReservation = reservations.map(r => r.id === updated.id ? updated : r);
-        setReservations(updatedReservation);
+        setReservationsByTrack(prev => {
+            const trackReservations = prev[updated.trackId];
+            const updatedReservation = trackReservations.map(r => r.id === updated.id ? updated : r);
+            return {
+                ...prev,
+                [updated.trackId]: updatedReservation,
+            };
+        });
         setEditingReservation(null);
         // TODO: Wysyłanie powiadomień o zmianach do użytkownika
     };
@@ -126,7 +136,6 @@ function ReservationManagement() {
     const handleExport = (trackId: Number) => {
         window.location.href = `/api/reservations/export?trackId=${trackId}`;
     };
-
 
     return (
         <>
@@ -151,7 +160,7 @@ function ReservationManagement() {
                                         </h6>
                                         {reservations.length !== 0 && (
                                             <button onClick={() => handleExport(Number(trackId))} className="icon-button" title="Eksport do .xlsx">
-                                                <img src={downloadIcon} alt="Edytuj" style={{ width: '20px', height: '20px' }} />
+                                                <img src={downloadIcon} alt="Eksport" style={{ width: '20px', height: '20px' }} />
                                             </button>
                                         )}
                                     </div>

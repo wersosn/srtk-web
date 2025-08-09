@@ -28,7 +28,7 @@ namespace srtk.tests.Tests
         public async Task Getting_All_Reservations()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var userService = new UserService(context);
             var user = new User
             {
@@ -68,7 +68,7 @@ namespace srtk.tests.Tests
         public async Task Getting_Reservation_ById()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var userService = new UserService(context);
             var trackService = new TrackService(context);
             var user = new User
@@ -119,7 +119,7 @@ namespace srtk.tests.Tests
         public async Task Get_All_Reservations_In_Track()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -181,7 +181,7 @@ namespace srtk.tests.Tests
         public async Task Get_All_Reservations_With_Status()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var statusService = new StatusService(context);
@@ -236,7 +236,7 @@ namespace srtk.tests.Tests
         public async Task Get_All_Reservations_With_User()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -283,7 +283,7 @@ namespace srtk.tests.Tests
         public async Task Get_Reservations_With_Start()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var start = DateTime.Today.AddHours(10);
 
             var reservation = new Reservation
@@ -312,7 +312,7 @@ namespace srtk.tests.Tests
         public async Task Get_Reservations_With_End()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var end = DateTime.Today.AddHours(20);
 
             var reservation = new Reservation
@@ -341,7 +341,7 @@ namespace srtk.tests.Tests
         public async Task Get_Overlapping_Reservations()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var start = DateTime.Today.AddHours(10).ToUniversalTime();
             var end = DateTime.Today.AddHours(12).ToUniversalTime();
 
@@ -372,7 +372,7 @@ namespace srtk.tests.Tests
         public async Task Adding_New_Reservation()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -417,7 +417,7 @@ namespace srtk.tests.Tests
         public async Task Updating_Reservation()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -471,7 +471,7 @@ namespace srtk.tests.Tests
         public async Task Deleting_Reservation()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User
@@ -513,7 +513,7 @@ namespace srtk.tests.Tests
         public async Task Export_Reservations()
         {
             var context = DbContextHelper.GetDbContext();
-            var service = new AddReservationHelper(context);
+            var service = new ReservationServiceHelper(context);
             var trackService = new TrackService(context);
             var userService = new UserService(context);
             var user = new User

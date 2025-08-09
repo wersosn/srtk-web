@@ -29,12 +29,12 @@ const Navb: React.FC = () => {
         <Nav className="ms-auto align-items-center">
           {isLoggedIn && userRole === 'Admin' ? (
             <>
-              <Nav.Link href="/adminPanel" className="text-dark no-wrap">Panel admina</Nav.Link>
+              <Nav.Link href="/adminPanel" className="text-dark">Panel admina</Nav.Link>
               <button onClick={handleLogout}>Wyloguj</button>
             </>
           ) : isLoggedIn && userRole === 'Client' ? (
             <>
-              <Nav.Link href="/myReservations" className="text-dark no-wrap">Moje rezerwacje</Nav.Link>
+              <Nav.Link href="/myReservations" className="text-dark">Moje rezerwacje</Nav.Link>
               <Nav.Link href="/profile" className="text-dark">Profil</Nav.Link>
               <button onClick={handleLogout}>Wyloguj</button>
             </>

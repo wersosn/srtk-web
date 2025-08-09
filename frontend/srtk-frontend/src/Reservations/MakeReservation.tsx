@@ -229,7 +229,7 @@ function MakeReservation() {
                         <>
                             <label style={{ textAlign: "center" }}>Tor</label>
                             <br />
-                            <select className="info-input" value={selectedTrackId ?? ''} onChange={(e) => setSelectedTrackId(Number(e.target.value))}>
+                            <select id="trackSelect" className="info-input" value={selectedTrackId ?? ''} onChange={(e) => setSelectedTrackId(Number(e.target.value))}>
                                 <option value="">Wybierz tor</option>
                                 {tracks.map(track => (
                                     <option key={track.id} value={track.id}>
@@ -238,11 +238,11 @@ function MakeReservation() {
                                 ))}
                             </select>
 
-                            <label>Data rozpoczęcia</label>
-                            <input type="datetime-local" className="info-input" value={startDate} onChange={handleStartDateChange} />
+                            <label htmlFor="resStart">Data rozpoczęcia</label>
+                            <input id="resStart" type="datetime-local" className="info-input" value={startDate} onChange={handleStartDateChange} />
 
-                            <label>Data zakończenia</label>
-                            <input type="datetime-local" className="info-input" value={endDate} onChange={handleEndDateChange} />
+                            <label htmlFor="resEnd">Data zakończenia</label>
+                            <input id="resEnd" type="datetime-local" className="info-input" value={endDate} onChange={handleEndDateChange} />
 
                             {isAvailable === false && (
                                 <p className="text-danger">Ten tor jest już zajęty w wybranym terminie.</p>

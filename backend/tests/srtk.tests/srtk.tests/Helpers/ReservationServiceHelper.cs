@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace srtk.tests.Helpers
 {
-    public class AddReservationHelper : ReservationService
+    public class ReservationServiceHelper : ReservationService
     {
-        public AddReservationHelper(AppDbContext context) : base(context) { }
+        public ReservationServiceHelper(AppDbContext context) : base(context) { }
 
         public override async Task<Reservation> Add(Reservation reservation)
         {

@@ -75,6 +75,7 @@ label {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
   font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 .no-wrap {
