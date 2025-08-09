@@ -98,6 +98,9 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
                     initialView="timeGridDay"
                     selectable={false}
                     events={events}
+                    eventBackgroundColor='#ED8A62'
+                    eventBorderColor='#030303'
+                    eventTextColor='#030303'
                     eventClick={handleEventClick}
                     height="auto" />
             </div>

@@ -4,14 +4,14 @@ import downloadIcon from '../assets/download.png';
 import { jwtDecode } from 'jwt-decode';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
-import type { Reservation, Track } from '../Types/Types';
+import type { Reservation, Track, Status } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
 
 function ReservationManagement() {
     const [facilityId, setFacilityId] = useState<number | null>(null);
     const [tracks, setTracks] = useState<Track[]>([]);
     const [reservationsByTrack, setReservationsByTrack] = useState<Record<number, Reservation[]>>({});
-    const [reservations, setReservations] = useState<Reservation[]>([]);
+    const [statuses, setStatuses] = useState<Status[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [userId, setUserId] = useState<number | undefined>(undefined);
@@ -67,6 +67,24 @@ function ReservationManagement() {
 
         fetchTracks();
     }, [facilityId, token]);
+
+    // Pobranie statusów rezerwacji (do wyświetlenia nazwy):
+    useEffect(() => {
+        const fetchStatuses = async () => {
+            try {
+                const res = await fetch('/api/statuses', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Błąd podczas pobierania statusów rezerwacji');
+                const data = await res.json();
+                setStatuses(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchStatuses();
+    }, [token]);
 
     // Pobieranie rezerwacji (wszystkich lub w danym obiekcie):
     const fetchReservations = async () => {
@@ -132,6 +150,12 @@ function ReservationManagement() {
         // TODO: Wysyłanie powiadomień o zmianach do użytkownika
     };
 
+    // Ustawienie nazwy statusu:
+    const getStatusName = (statusId: number) => {
+        const status = statuses.find(t => t.id === statusId);
+        return status ? status.name : 'Nieznany status';
+    };
+
     // Obsługa eksportu:
     const handleExport = (trackId: Number) => {
         window.location.href = `/api/reservations/export?trackId=${trackId}`;
@@ -187,6 +211,7 @@ function ReservationManagement() {
                                                                 <strong>Start:</strong> {formatToDatetimeLocal(reservation.start)}<br />
                                                                 <strong>Koniec:</strong> {formatToDatetimeLocal(reservation.end)}<br />
                                                                 <strong>Koszt:</strong> {reservation.cost}<br />
+                                                                <strong>Status:</strong> {getStatusName(reservation.statusId)}<br />
                                                             </div>
                                                         </div>
                                                     )}

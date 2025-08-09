@@ -156,7 +156,6 @@ namespace srtk.Controllers
             }
 
             var fileBytes = await service.ExportToPdf(reservationId);
-            //var safeTrackName = string.IsNullOrWhiteSpace(reservation.Track?.Name) ? "Rezerwacja" : reservation.Track.Name.Replace(" ", "_");
             var fileName = $"Rezerwacja_toru_{reservation.Track?.Name}.pdf";
 
             return File(fileBytes, "application/pdf", fileName);

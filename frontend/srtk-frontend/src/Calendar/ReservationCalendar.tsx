@@ -138,6 +138,9 @@ export default function ReservationCalendar() {
                     initialView="timeGridWeek"
                     selectable={false}
                     events={events}
+                    eventBackgroundColor='#ED8A62'
+                    eventBorderColor='#030303'
+                    eventTextColor='#030303'
                     eventClick={handleEventClick}
                     height="auto" />
             </div>

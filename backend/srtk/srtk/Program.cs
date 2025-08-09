@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using srtk.Services;
 using System.Security.Claims;
+using PdfSharp.Fonts;
+using srtk.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +77,9 @@ builder.Services.AddScoped<ReservationService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<StatusService>();
 builder.Services.AddScoped<TrackService>();
+
+// Rejestracja fontów do generowania pdf:
+GlobalFontSettings.FontResolver = new CustomFontResolver();
 
 var app = builder.Build();
 

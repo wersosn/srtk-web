@@ -5,7 +5,7 @@ import downloadIcon from '../assets/download.png';
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
-import type { Reservation, Track } from '../Types/Types';
+import type { Reservation, Track, Status } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
 
 function MyReservations() {
@@ -14,6 +14,7 @@ function MyReservations() {
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const [tracks, setTracks] = useState<Track[]>([]);
+    const [statuses, setStatuses] = useState<Status[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
@@ -59,6 +60,24 @@ function MyReservations() {
         fetchTracks();
     }, [token]);
 
+    // Pobranie statusów rezerwacji (do wyświetlenia nazwy):
+    useEffect(() => {
+        const fetchStatuses = async () => {
+            try {
+                const res = await fetch('/api/statuses', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Błąd podczas pobierania statusów rezerwacji');
+                const data = await res.json();
+                setStatuses(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchStatuses();
+    }, [token]);
+
     useEffect(() => {
         if (token) {
             try {
@@ -93,6 +112,12 @@ function MyReservations() {
         return track ? track.name : 'Nieznany tor';
     };
 
+    // Ustawienie nazwy statusu:
+    const getStatusName = (statusId: number) => {
+        const status = statuses.find(t => t.id === statusId);
+        return status ? status.name : 'Nieznany status';
+    };
+
     // Obsługa eksportu:
     const handleExport = (reservationId: Number) => {
         window.location.href = `/api/reservations/exportPdf?reservationId=${reservationId}`;
@@ -116,7 +141,12 @@ function MyReservations() {
                                 {reservations.map((Reservation) => (
                                     <li key={Reservation.id} className="list-group-item p-0">
                                         <div onClick={() => setShowDetails(prev => (prev?.id === Reservation.id ? null : Reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
-                                            Rezerwacja: {formatToDatetimeLocal(Reservation.start)} - {formatToDatetimeLocal(Reservation.end)}
+                                            <div className="d-flex align-items-center gap-1">
+                                                <em>{getTrackName(Reservation.trackId)}:</em>
+                                                <span>
+                                                    {formatToDatetimeLocal(Reservation.start)} - {formatToDatetimeLocal(Reservation.end)}
+                                                </span>
+                                            </div>
                                             <div className="d-flex gap-2" onClick={(e) => e.stopPropagation()}>
                                                 <button onClick={() => handleExport(Number(Reservation.id))} className="icon-button" title="Eksport do .pdf">
                                                     <img src={downloadIcon} alt="Eksport" style={{ width: '16px', height: '16px' }} />
@@ -135,6 +165,7 @@ function MyReservations() {
                                                     <strong>Start:</strong> {formatToDatetimeLocal(Reservation.start)}<br />
                                                     <strong>Koniec:</strong> {formatToDatetimeLocal(Reservation.end)}<br />
                                                     <strong>Koszt:</strong> {Reservation.cost}<br />
+                                                    <strong>Status:</strong> {getStatusName(Reservation.statusId)}<br />
                                                 </div>
                                             </div>
                                         )}

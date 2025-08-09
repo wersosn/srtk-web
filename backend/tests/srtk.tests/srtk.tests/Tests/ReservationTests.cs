@@ -508,7 +508,7 @@ namespace srtk.tests.Tests
             output.WriteLine("Wynik: Usunięto rezerwację");
         }
 
-        // Test - sprawdzenie eksportu:
+        // Test - sprawdzenie eksportu w formacie .xlsx:
         [Fact]
         public async Task Export_Reservations()
         {
@@ -556,7 +556,7 @@ namespace srtk.tests.Tests
             var result = await service.ExportToExcel(track.Id);
             Assert.NotNull(result);
             Assert.True(result.Length > 0);
-            output.WriteLine("Wynik: Wyeksportowano rezerwacje");
+            output.WriteLine("Wynik: Wyeksportowano rezerwacje w formacie .xlsx");
         }
     }
 }
