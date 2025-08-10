@@ -31,7 +31,6 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 - HTML, CSS
 - Axios
 - React Bootstrap
-- SignalR
 - FullCalendar
 - Playwright (testy e2e)
 
