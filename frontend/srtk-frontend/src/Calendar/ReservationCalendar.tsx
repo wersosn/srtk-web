@@ -116,34 +116,34 @@ export default function ReservationCalendar() {
     return (
         <>
         <div className="cldr">
-            <div>
-                <h2>Wybierz tor, którego obłożenie chcesz sprawdzić:</h2>
-                <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
-                    <option value="">Wybierz tor</option>
-                    {tracks.map(track => (
-                        <option key={track.id} value={track.id}>
-                            {track.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
+                <div>
+                    <h2>Wybierz tor, którego obłożenie chcesz sprawdzić:</h2>
+                    <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
+                        <option value="">Wybierz tor</option>
+                        {tracks.map(track => (
+                            <option key={track.id} value={track.id}>
+                                {track.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-            <div className="calendar-container">
-                {loading && <p>Ładowanie...</p>}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                <div className="calendar-container">
+                    {loading && <p>Ładowanie...</p>}
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
 
-                <FullCalendar
-                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                    locale={plLocale} // Ustawienie na język Polski, potem należy to dostosować do wybranego przez użytkownika języka
-                    initialView="timeGridWeek"
-                    selectable={false}
-                    events={events}
-                    eventBackgroundColor='#ED8A62'
-                    eventBorderColor='#030303'
-                    eventTextColor='#030303'
-                    eventClick={handleEventClick}
-                    height="auto" />
-            </div>
+                    <FullCalendar
+                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                        locale={plLocale} // Ustawienie na język Polski, potem należy to dostosować do wybranego przez użytkownika języka
+                        initialView="timeGridWeek"
+                        selectable={false}
+                        events={events}
+                        eventBackgroundColor='#ED8A62'
+                        eventBorderColor='#030303'
+                        eventTextColor='#030303'
+                        eventClick={handleEventClick}
+                        height="auto" />
+                </div>
             </div>
         </>
     );

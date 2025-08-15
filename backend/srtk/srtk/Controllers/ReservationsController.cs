@@ -30,7 +30,7 @@ namespace srtk.Controllers
 
         // Pobieranie rezerwacji konkretnego toru:
         [HttpGet("inTrack")]
-        public async Task<ActionResult<List<Reservation>>> GetAllReservationsInTrack(int trackId)
+        public async Task<ActionResult<List<ReservationDto>>> GetAllReservationsInTrack(int trackId)
         {
             var reservations = await service.GetAllInTrack(trackId);
             return reservations;

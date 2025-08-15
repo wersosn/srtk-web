@@ -30,9 +30,30 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji konkretnego toru:
-        public async Task<List<Reservation>> GetAllInTrack(int trackId)
+        public async Task<List<ReservationDto>> GetAllInTrack(int trackId)
         {
-            return await context.Reservations.Where(r => r.TrackId == trackId).ToListAsync();
+            return await context.Reservations
+                .Where(r => r.TrackId == trackId)
+                .Include(r => r.User)
+                .Include(r => r.Status)
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .Select(r => new ReservationDto
+                {
+                    Id = r.Id,
+                    Start = r.Start,
+                    End = r.End,
+                    Cost = r.Cost,
+                    TrackId = r.TrackId,
+                    TrackName = r.Track.Name,
+                    StatusId = r.StatusId,
+                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
+                    {
+                        EquipmentId = er.EquipmentId,
+                        Name = er.Equipment.Name,
+                        Quantity = er.Quantity
+                    }).ToList()
+                }).ToListAsync();
         }
 
         // Pobieranie rezerwacji z konkretnym statusem rezerwacji:
