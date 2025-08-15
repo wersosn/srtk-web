@@ -38,6 +38,12 @@ namespace srtk.Services
             return await context.Users.FindAsync(id);
         }
 
+        // Pobranie konkretnego klienta:
+        public async Task<Client?> GetClientById(int id)
+        {
+            return await context.Clients.FindAsync(id);
+        }
+
         // Pobranie użytkowników według roli:
         public async Task<List<User>> GetByRole(int roleId)
         {
@@ -129,6 +135,42 @@ namespace srtk.Services
                 user.Email = dto.Email;
             }
 
+            await context.SaveChangesAsync();
+            return user;
+        }
+
+        // Edycja istniejącego użytkownika:
+        public async Task<User?> UpdateMyself(int id, [FromBody] UserDto dto)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var currentClient = await context.Clients.FirstOrDefaultAsync(c => c.Id == user.Id);
+            if (currentClient != null)
+            {
+                if (dto.Email != null)
+                {
+                    user.Email = dto.Email;
+                }
+
+                if (dto.Name != null)
+                {
+                    currentClient.Name = dto.Name;
+                }
+
+                if (dto.Surname != null)
+                {
+                    currentClient.Surname = dto.Surname;
+                }
+
+                if (dto.PhoneNumber != null)
+                {
+                    currentClient.PhoneNumber = dto.PhoneNumber;
+                }
+            }
             await context.SaveChangesAsync();
             return user;
         }

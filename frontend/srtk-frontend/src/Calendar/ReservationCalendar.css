@@ -28,3 +28,7 @@
   font-size: 0.95rem;
 }
 
+.selectTrack {
+  color: light-dark(#1f2f40, #dde2e5);
+}
+

@@ -67,6 +67,18 @@ namespace srtk.Controllers
             return user;
         }
 
+        // Pobranie konkretnego klienta:
+        [HttpGet("clients/{id}")]
+        public async Task<ActionResult<Client>> GetClientById(int id)
+        {
+            var user = await service.GetClientById(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return user;
+        }
+
         // Dodanie nowego użytkownika:
         [HttpPost]
         public async Task<ActionResult<User>> AddUser(User user)
@@ -81,6 +93,25 @@ namespace srtk.Controllers
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto dto)
         {
             var user = await service.Update(id, dto);
+            if (user == null)
+            {
+                return NotFound("Użytkownik nie istnieje");
+            }
+            return Ok(user);
+        }
+
+        // Edycja samego użytkownika:
+        [HttpPut("clients/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateClient(int id, [FromBody] UserDto dto)
+        {
+            var currentUserId = int.Parse(User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+            if (currentUserId != id)
+            {
+                return Forbid("Nie możesz edytować danych innego użytkownika");
+            }
+
+            var user = await service.UpdateMyself(id, dto);
             if (user == null)
             {
                 return NotFound("Użytkownik nie istnieje");

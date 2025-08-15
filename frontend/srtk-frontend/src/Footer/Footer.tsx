@@ -13,7 +13,7 @@ const Footer = () => {
       <nav>
         <a href="/about" style={{ color: '#ED8A62', margin: '0 1rem', textDecoration: 'none' }}>O nas</a>
         <a href="/contact" style={{ color: '#ED8A62', margin: '0 1rem', textDecoration: 'none' }}>Kontakt</a>
-        <a href="https://storyset.com/people" style={{ color: '#ED8A62', margin: '0 1rem', textDecoration: 'none' }}>Illustrations by Storyset</a>
+        <a href="https://storyset.com" style={{ color: '#ED8A62', margin: '0 1rem', textDecoration: 'none' }}>Illustrations by Storyset</a>
       </nav>
     </footer>
   );
