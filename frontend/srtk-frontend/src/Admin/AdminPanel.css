@@ -4,6 +4,7 @@
   justify-content: center;
   align-items: center;
   padding: 2rem;
+  color: light-dark(#1f2f40, #dde2e5);
 }
 
 .admin-card-wrapper {
@@ -14,13 +15,13 @@
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  background-color: #f5f5f5;
+  background-color: light-dark(#f5f5f5, #1f2f40);
 }
 
 .admin-nav {
-  background-color: #1f2f40;
+  background-color: light-dark(#1f2f40, #f5f5f5);
   width: 300px;
-  padding: 1rem;
+  padding-top: 1rem;
   display: flex;
   flex-direction: column;
 }
@@ -30,7 +31,7 @@
 }
 
 .admin-nav .nav-link {
-  color: #dde2e5;
+  color: light-dark(#dde2e5,#1f2f40);
   text-decoration: none;
   padding: 0.5rem;
   border-radius: 8px;
@@ -39,12 +40,13 @@
 
 .admin-nav .nav-link:hover,
 .admin-nav .nav-link.active {
-  background-color: #101d26;
-  color: #afb1e4;
+  background-color: light-dark(#101d26, #dde2e5);
+  color: light-dark(#afb1e4, #101d26);
+  font-weight: 500;
 }
 
 .admin-main {
   flex: 1;
   padding: 2rem;
-  background-color: #f5f5f5;
+  background-color: light-dark(#f5f5f5, #1f2f40);
 }

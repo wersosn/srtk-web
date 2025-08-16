@@ -260,9 +260,9 @@ function MakeReservation() {
                                 <>
                                     <hr />
                                     <div className="mb-4">
-                                        <label>Sprzęt do wyboru:</label>
+                                        <h4>Sprzęt do wyboru:</h4>
                                         {equipmentList.map(eq => (
-                                            <div key={eq.id} className="flex items-center mb-1">
+                                            <div key={eq.id} className="flex items-center mb-1" style={{ paddingTop: '1rem' }}>
                                                 <label style={{ marginLeft: "8px" }}>{eq.name} ({eq.cost} zł)</label>
                                                 <input
                                                     type="number"
@@ -275,8 +275,7 @@ function MakeReservation() {
                                                             [eq.id]: isNaN(qty) || qty < 0 ? 0 : qty
                                                         }));
                                                     }}
-                                                    className="info-input"
-                                                    style={{ width: "80px" }}
+                                                    className="number-input"
                                                 />
                                             </div>
                                         ))}

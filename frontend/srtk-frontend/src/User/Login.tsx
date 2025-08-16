@@ -72,7 +72,7 @@ const Login = () => {
                 Zapamiętaj mnie
             </label>
 
-            <a href="/forgot-password" style={{ fontSize: '0.9rem', color: '#101d26' }}>Zapomniałeś/aś hasła?</a>
+            <a href="/forgot-password" className="link">Zapomniałeś/aś hasła?</a>
           </div>
 
           <button type="submit">Zaloguj się</button>
@@ -80,7 +80,7 @@ const Login = () => {
           {info && <p className="login-info">{info}</p>}
           {error && <p className="login-error">{error}</p>}
           <hr />
-          <a href="/register" style={{ fontSize: '0.9rem', color: '#101d26' }}>Nie masz jeszcze konta? Zarejestruj się</a>
+          <a href="/register" className="link">Nie masz jeszcze konta? Zarejestruj się</a>
         </form>
       </div>
       </div>

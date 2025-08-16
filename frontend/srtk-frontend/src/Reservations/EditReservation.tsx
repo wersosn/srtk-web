@@ -284,7 +284,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                                             min={0}
                                             value={equipmentQuantities[eq.id] || 0}
                                             onChange={(e) => handleQuantityChange(eq.id, e.target.value)}
-                                            style={{ width: '80px', marginLeft: '8px' }}
+                                            className="number-input"
                                         />
                                     </label>
                                 </div>

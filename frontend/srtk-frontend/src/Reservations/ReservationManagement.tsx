@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
+import downloadIconLight from '../assets/download-light.png';
 import { jwtDecode } from 'jwt-decode';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
@@ -18,6 +19,19 @@ function ReservationManagement() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
+
+    // Dynamiczne ustawianie odpowiedniej ikonki (w zależności od trybu (cielmy/jasny)):
+    const [isDark, setIsDark] = useState(false);
+    useEffect(() => {
+        const mq = window.matchMedia("(prefers-color-scheme: dark)");
+        setIsDark(mq.matches);
+
+        const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+        mq.addEventListener("change", handler);
+        
+        return () => mq.removeEventListener("change", handler);
+    }, []);
+    const icon = isDark ? downloadIconLight : downloadIcon;
 
     // Pobieranie facilityId z tokena
     useEffect(() => {
@@ -184,7 +198,7 @@ function ReservationManagement() {
                                         </h6>
                                         {reservations.length !== 0 && (
                                             <button onClick={() => handleExport(Number(trackId))} className="icon-button" title="Eksport do .xlsx">
-                                                <img src={downloadIcon} alt="Eksport" style={{ width: '20px', height: '20px' }} />
+                                                <img src={icon} alt="Eksport" style={{ width: '20px', height: '20px' }} />
                                             </button>
                                         )}
                                     </div>

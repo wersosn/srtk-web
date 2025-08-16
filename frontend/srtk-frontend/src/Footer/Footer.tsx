@@ -1,19 +1,14 @@
 import React from 'react';
+import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer style={{
-      backgroundColor: '#222',
-      color: '#eee',
-      padding: '1rem 2rem',
-      textAlign: 'center',
-      marginTop: '2rem'
-    }}>
+    <footer>
       <p>© 2025 System rezerwacji toru kolarskiego</p>
       <nav>
-        <a href="/about" style={{ color: '#ED8A62', margin: '0 1rem', textDecoration: 'none' }}>O nas</a>
-        <a href="/contact" style={{ color: '#ED8A62', margin: '0 1rem', textDecoration: 'none' }}>Kontakt</a>
-        <a href="https://storyset.com" style={{ color: '#ED8A62', margin: '0 1rem', textDecoration: 'none' }}>Illustrations by Storyset</a>
+        <a href="/about">O nas</a>
+        <a href="/contact">Kontakt</a>
+        <a href="https://storyset.com">Illustrations by Storyset</a>
       </nav>
     </footer>
   );

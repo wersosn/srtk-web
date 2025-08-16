@@ -81,7 +81,7 @@ const Register = () => {
                         </button>
                         {info && <p className="register-info">{info}</p>}
                         <hr />
-                        <a href="/login" style={{ fontSize: '0.9rem', color: '#101d26' }}>
+                        <a href="/login" className="link">
                             Masz już konto? Zaloguj się
                         </a>
                     </form>

@@ -21,11 +21,11 @@ function Profile() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/users/clients/${userId}`, {
+      const profile = await fetch(`/api/users/clients/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Błąd podczas pobierania danych użytkownika');
-      const data = await res.json();
+      if (!profile.ok) throw new Error('Błąd podczas pobierania danych użytkownika');
+      const data = await profile.json();
       setUser(data);
     } catch (err: any) {
       setError(err.message || 'Wystąpił błąd');
@@ -60,14 +60,14 @@ function Profile() {
 
   return (
     <>
-      <div className="res-container">
+      <div className="profile-container">
 
-        <div className="res-card-wrapper">
-          <div className="res-image-container">
-            <img src={profileImage} alt="Logowanie" className="res-image" />
+        <div className="profile-card-wrapper">
+          <div className="profile-image-container">
+            <img src={profileImage} alt="Logowanie" className="profile-image" />
           </div>
 
-          <main className="res-main">
+          <main className="profile-main">
             <h2 className="mt-4">Mój profil</h2>
             <hr />
 
