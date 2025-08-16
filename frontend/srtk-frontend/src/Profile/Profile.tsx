@@ -9,10 +9,8 @@ function Profile() {
   const [userId, setUserId] = useState<number>();
   const [user, setUser] = useState<Client>();
   const [language, setLanguage] = useState("PL");
-  const [uiMode, setUiMode] = useState("light");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const token = localStorage.getItem('token');
 
   // Pobieranie danych użytkownika:
@@ -21,11 +19,11 @@ function Profile() {
     setLoading(true);
     setError(null);
     try {
-      const profile = await fetch(`/api/users/clients/${userId}`, {
+      const res = await fetch(`/api/users/clients/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!profile.ok) throw new Error('Błąd podczas pobierania danych użytkownika');
-      const data = await profile.json();
+      if (!res.ok) throw new Error('Błąd podczas pobierania danych użytkownika');
+      const data = await res.json();
       setUser(data);
     } catch (err: any) {
       setError(err.message || 'Wystąpił błąd');
@@ -95,14 +93,6 @@ function Profile() {
                     <select id="language" name="language" value={language} onChange={(e) => setLanguage(e.target.value)} className="info-input">
                       <option value="PL">Polski</option>
                       <option value="EN">English</option>
-                    </select>
-                  </div>
-
-                  <div className="setting-item">
-                    <label htmlFor="uimode">Wygląd strony</label>
-                    <select id="uimode" name="uimode" value={uiMode} onChange={(e) => setUiMode(e.target.value)} className="info-input">
-                      <option value="light">Jasny</option>
-                      <option value="dark">Ciemny</option>
                     </select>
                   </div>
                 </>
