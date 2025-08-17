@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { useTranslation } from "react-i18next";
+import i18n from "../Locales/i18next";
 import type { Client } from '../Types/Types';
 import EditMyInfo from './EditMyInfo';
 import profileImage from '../assets/profile.svg';
@@ -8,7 +10,8 @@ import './Profile.css';
 function Profile() {
   const [userId, setUserId] = useState<number>();
   const [user, setUser] = useState<Client>();
-  const [language, setLanguage] = useState("PL");
+  const [language, setLanguage] = useState(i18n.language);
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const token = localStorage.getItem('token');
@@ -56,6 +59,19 @@ function Profile() {
     alert("Zaktualizowano dane");
   };
 
+  // Obsługa zmiany języka:
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+    i18n.changeLanguage(lang);
+    localStorage.setItem("language", lang);
+    if (lang == "en") {
+      alert("Changed language");
+    }
+    else {
+      alert("Zmieniono język");
+    }
+  };
+
   return (
     <>
       <div className="profile-container">
@@ -90,9 +106,9 @@ function Profile() {
                   <h5>Ustawienia</h5>
                   <div className="setting-item">
                     <label htmlFor="language">Język</label>
-                    <select id="language" name="language" value={language} onChange={(e) => setLanguage(e.target.value)} className="info-input">
-                      <option value="PL">Polski</option>
-                      <option value="EN">English</option>
+                    <select id="language" name="language" value={language} onChange={(e) => handleLanguageChange(e.target.value)} className="info-input">
+                      <option value="pl">Polski</option>
+                      <option value="en">English</option>
                     </select>
                   </div>
                 </>

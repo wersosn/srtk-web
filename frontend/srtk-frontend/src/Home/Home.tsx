@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
+import { useTranslation } from "react-i18next";
 import ReservationCalendar from "../Calendar/ReservationCalendar";
 import CyclistsSvg from "../assets/track-cycling.svg";
 import Spinner from 'react-bootstrap/Spinner';
@@ -9,6 +9,7 @@ import "./Home.css";
 const Home: React.FC = () => {
    const navigate = useNavigate();
    const { isLoggedIn, isAuthChecked } = useAuth();
+   const { t } = useTranslation();
 
    // Czekanie na poprawne załadowanie danych:
   if (!isAuthChecked) {
@@ -24,17 +25,17 @@ const Home: React.FC = () => {
       <div className="home-container">
         <div className="home-section">
           <div className="home-text">
-            <h1>System rezerwacji toru kolarskiego</h1>
+            <h1>{t("home.title")}</h1>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
             {!isLoggedIn ? (
             <div className="d-flex gap-2">
-                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/login')}>Zaloguj się</button>
-                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/makeReservation')}>Zarezerwuj tor</button>
+                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/login')}>{t("home.login")}</button>
+                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/makeReservation')}>{t("home.reserve")}</button>
             </div>
             ) : ( 
-              <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/makeReservation')}>Zarezerwuj tor</button>
+              <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/makeReservation')}>{t("home.reserve")}</button>
             )}
           </div>
 
