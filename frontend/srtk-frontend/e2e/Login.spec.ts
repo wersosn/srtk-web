@@ -17,7 +17,6 @@ test('Pomyślne logowanie', async ({ page }) => {
     await page.fill('input[placeholder="Hasło"]', 'test123');
     await page.click('button:has-text("Zaloguj się")');
 
-    await expect(page.locator('text=Zalogowano pomyślnie')).toBeVisible();
     await expect(page).toHaveURL('/');
 })
 

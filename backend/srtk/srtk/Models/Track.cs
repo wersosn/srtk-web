@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace srtk.Models
 {
@@ -31,6 +32,7 @@ namespace srtk.Models
         public int FacilityId { get; set; }
         public Facility? Facility { get; set; }
 
+        [JsonIgnore]
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

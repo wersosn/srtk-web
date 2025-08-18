@@ -78,6 +78,10 @@ builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<StatusService>();
 builder.Services.AddScoped<TrackService>();
 
+// Serwisy do wysy³ania maila:
+builder.Services.Configure<Email>(builder.Configuration.GetSection("Email"));
+builder.Services.AddTransient<EmailService>();
+
 // Rejestracja fontów do generowania pdf:
 GlobalFontSettings.FontResolver = new CustomFontResolver();
 

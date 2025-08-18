@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
 import { parseAvailableDays, isValidDateTime } from './DateHelper';
 import type { Equipment, Track } from '../Types/Types';
 import './Reservations.css';
@@ -23,6 +24,7 @@ function MakeReservation() {
 
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich torów z bazy:
     const fetchAllTracks = async () => {
@@ -32,7 +34,7 @@ function MakeReservation() {
             const res = await fetch('/api/tracks', {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            if (!res.ok) throw new Error('Błąd podczas pobierania torów');
+            if (!res.ok) throw new Error(t("api.tracksError"));
             const data = await res.json();
             setTracks(data);
         } catch (err: any) {
@@ -56,7 +58,7 @@ function MakeReservation() {
             const res = await fetch(`/api/equipments/inFacility?facilityId=${track.facilityId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            if (!res.ok) throw new Error('Błąd podczas pobierania sprzętu');
+            if (!res.ok) throw new Error(t("api.eqError"));
             const data = await res.json();
             setEquipmentList(data);
         } catch (err: any) {
@@ -96,7 +98,7 @@ function MakeReservation() {
             const res = await fetch(`/api/reservations/isAvailable?trackId=${selectedTrackId}&start=${new Date(startDate).toISOString()}&end=${new Date(endDate).toISOString()}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            if (!res.ok) throw new Error('Błąd sprawdzania dostępności');
+            if (!res.ok) throw new Error(t("api.availabilityError"));
             const data = await res.json();
             setIsAvailable(data.isAvailable);
             return data.isAvailable;
@@ -145,7 +147,7 @@ function MakeReservation() {
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
             setStartDate(val);
         } else {
-            alert('Wybrana data i godzina rozpoczęcia nie są dostępne dla tego toru.');
+            alert(t("makeReservations.startDateNotAvailable"));
         }
     };
 
@@ -156,24 +158,24 @@ function MakeReservation() {
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
             setEndDate(val);
         } else {
-            alert('Wybrana data i godzina zakończenia nie są dostępne dla tego toru.');
+            alert(t("makeReservations.endDateNotAvailable"));
         }
     };
 
     // Obsługa dodawania rezerwacji:
     const handleReservation = async () => {
         if (!selectedTrackId || !startDate || !endDate || !userId) {
-            alert('Uzupełnij wszystkie pola');
+            alert(t("makeReservations.allInfo"));
             return;
         }
 
         if (new Date(startDate) >= new Date(endDate)) {
-            alert('Data rozpoczęcia musi być wcześniejsza niż data zakończenia.');
+            alert(t("makeReservations.datesError"));
             return;
         }
 
         if (isAvailable === false) {
-            alert('Tor jest zajęty w tym terminie, wybierz inny czas!');
+            alert(t("makeReservations.availabilityFalse"));
             return;
         }
 
@@ -206,8 +208,8 @@ function MakeReservation() {
                 body: JSON.stringify(reservationBody),
             });
             console.log(reservationBody);
-            if (!res.ok) throw new Error('Nie udało się utworzyć rezerwacji');
-            alert('Rezerwacja utworzona pomyślnie');
+            if (!res.ok) throw new Error(t("makeReservations.reservationError"));
+            alert(t("makeReservations.reservationPositive"));
             navigate('/');
         } catch (err: any) {
             alert(err.message);
@@ -218,49 +220,49 @@ function MakeReservation() {
         <div className="res-container">
             <div className="res-card-wrapper">
                 <main className="res-main">
-                    <h2 className="mt-4">Nowa rezerwacja</h2>
+                    <h2 className="mt-4">{t("makeReservations.newReservation")}</h2>
                     <hr />
 
                     {loading ? (
-                        <p>Ładowanie formularza do dokonania rezerwacji...</p>
+                        <p>{t("makeReservations.loading")}</p>
                     ) : error ? (
                         <p className="text-danger">{error}</p>
                     ) : (
                         <>
-                            <label style={{ textAlign: "center" }}>Tor</label>
+                            <label style={{ textAlign: "center" }}>{t("makeReservations.track")}</label>
                             <br />
                             <select id="trackSelect" className="info-input" value={selectedTrackId ?? ''} onChange={(e) => setSelectedTrackId(Number(e.target.value))}>
-                                <option value="">Wybierz tor</option>
+                                <option value="">{t("makeReservations.selectTrack")}</option>
                                 {tracks.map(track => (
                                     <option key={track.id} value={track.id}>
-                                        {track.name} (Typ nawierzchni: {track.typeOfSurface}, Długość: {track.length})
+                                        {track.name} ({t("makeReservations.trackType")} {track.typeOfSurface}, {t("makeReservations.trackLength")} {track.length})
                                     </option>
                                 ))}
                             </select>
 
-                            <label htmlFor="resStart">Data rozpoczęcia</label>
+                            <label htmlFor="resStart">{t("makeReservations.start")}</label>
                             <input id="resStart" type="datetime-local" className="info-input" value={startDate} onChange={handleStartDateChange} />
 
-                            <label htmlFor="resEnd">Data zakończenia</label>
+                            <label htmlFor="resEnd">{t("makeReservations.end")}</label>
                             <input id="resEnd" type="datetime-local" className="info-input" value={endDate} onChange={handleEndDateChange} />
 
                             {isAvailable === false && (
-                                <p className="text-danger">Ten tor jest już zajęty w wybranym terminie.</p>
+                                <p className="text-danger">{t("makeReservations.notAvailable")}</p>
                             )}
                             {isAvailable === true && (
-                                <p className="text-success">Tor jest dostępny w tym terminie.</p>
+                                <p className="text-success">{t("makeReservations.available")}</p>
                             )}
 
                             <div className="flex items-center mb-4">
                                 <input type="checkbox" id="rentEquipment" checked={rentEquipment} onChange={() => setRentEquipment(!rentEquipment)} className="mr-2" />
-                                <label htmlFor="rentEquipment" style={{ marginLeft: "8px" }}>Chcę wynająć sprzęt</label>
+                                <label htmlFor="rentEquipment" style={{ marginLeft: "8px" }}>{t("makeReservations.eq")}</label>
                             </div>
 
                             {rentEquipment && equipmentList.length > 0 && (
                                 <>
                                     <hr />
                                     <div className="mb-4">
-                                        <h4>Sprzęt do wyboru:</h4>
+                                        <h4>{t("makeReservations.selectEq")}</h4>
                                         {equipmentList.map(eq => (
                                             <div key={eq.id} className="flex items-center mb-1" style={{ paddingTop: '1rem' }}>
                                                 <label style={{ marginLeft: "8px" }}>{eq.name} ({eq.cost} zł)</label>
@@ -284,10 +286,10 @@ function MakeReservation() {
                             )}
                             <hr />
                             <div className="mb-4 font-semibold">
-                                Łączny koszt: {cost.toFixed(2)} zł
+                                {t("makeReservations.finalCost")} {cost.toFixed(2)} zł
                             </div>
 
-                            <button onClick={handleReservation}>Zarezerwuj tor</button>
+                            <button onClick={handleReservation}>{t("makeReservations.reserve")}</button>
                         </>
                     )
                     }

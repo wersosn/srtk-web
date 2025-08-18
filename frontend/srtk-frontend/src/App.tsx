@@ -9,6 +9,7 @@ import RequireAdmin from "./Admin/RequireAdmin";
 import RequireUser from "./Reservations/RequireUser";
 import AdminPanel from "./Admin/AdminPanel";
 import Dashboard from "./Admin/Dashboard";
+import Settings from "./Admin/Settings";
 import EquipmentsManagement from "./Equipments/EquipmentsManagement";
 import FacilitiesManagement from "./Facilities/FacilitiesManagement";
 import RoleManagement from "./Roles/RolesManagement";
@@ -61,6 +62,7 @@ function App() {
             <Route path="statusesManagement" element={<StatusesManagement />} />
             <Route path="tracksManagement" element={<TrackManagement />}/>
             <Route path="usersManagement" element={<UserManagement />} />
+            <Route path="adminPanelSettings" element={<Settings />} />
           </Route>
         </Routes>
         <Footer />

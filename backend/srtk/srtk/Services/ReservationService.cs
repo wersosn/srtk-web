@@ -11,16 +11,22 @@ using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using System.Globalization;
 using System.Linq;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Track = srtk.Models.Track;
 
 namespace srtk.Services
 {
     public class ReservationService
     {
         protected readonly AppDbContext context;
+        private readonly EmailService emailService;
 
-        public ReservationService(AppDbContext context)
+        public ReservationService(AppDbContext context, EmailService emailService)
         {
             this.context = context;
+            this.emailService = emailService;
         }
 
         // Pobranie wszystkich rezerwacji (ogółem):
@@ -143,6 +149,9 @@ namespace srtk.Services
         // Dodanie nowej rezerwacji:
         public async virtual Task<Reservation> Add(Reservation reservation)
         {
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
+            var track = await context.Tracks.FirstOrDefaultAsync(t => t.Id == reservation.TrackId);
+
             reservation.Start = reservation.Start.ToUniversalTime();
             reservation.End = reservation.End.ToUniversalTime();
 
@@ -173,6 +182,30 @@ namespace srtk.Services
             reservation.EquipmentReservations = await context.EquipmentReservations
                 .Where(er => er.ReservationId == reservation.Id)
                 .ToListAsync();
+
+            if(user != null)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await emailService.SendEmail(
+                            user.Email,
+                            "Potwierdzenie rezerwacji toru",
+                            $@"
+                            <div style='font-family: Arial, sans-serif; padding: 10px'>
+                                <h2>Witaj {user.Email}!</h2>
+                                <p>Dziękujemy za rezerwację toru <strong>{track?.Name}</strong>.</p>
+                                <p>Szczegóły rezerwacji możesz sprawdzić w zakładce 'Moje rezerwacje' :)</p>
+                            </div>"
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Błąd wysyłania maila: " + ex.Message);
+                    }
+                });
+            }
 
             return reservation;
         }

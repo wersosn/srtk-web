@@ -121,6 +121,10 @@ label {
   font-size: 1rem;
 }
 
+.info-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 .number-input {
   width: 100%;
   padding: 0.5rem;

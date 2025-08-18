@@ -4,10 +4,12 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import plLocale from '@fullcalendar/core/locales/pl';
+import enLocale from '@fullcalendar/core/locales/en-gb';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation, Track } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
+import { useTranslation } from "react-i18next";
 
 export default function ReservationCalendar() {
     const [tracks, setTracks] = useState<Track[]>([]);
@@ -17,6 +19,9 @@ export default function ReservationCalendar() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
+    const lang = localStorage.getItem('language');
+    const locale = lang == "pl" ? plLocale : enLocale;
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich torów z bazy:
     const fetchTracks = async () => {
@@ -117,9 +122,9 @@ export default function ReservationCalendar() {
         <>
         <div className="cldr">
                 <div className="selectTrack">
-                    <h2>Wybierz tor, którego obłożenie chcesz sprawdzić:</h2>
+                    <h2>{t("home.choseTrackTitle")}</h2>
                     <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
-                        <option value="">Wybierz tor</option>
+                        <option value="">{t("home.choseTrack")}</option>
                         {tracks.map(track => (
                             <option key={track.id} value={track.id}>
                                 {track.name}
@@ -129,12 +134,12 @@ export default function ReservationCalendar() {
                 </div>
 
                 <div className="calendar-container">
-                    {loading && <p>Ładowanie...</p>}
+                    {loading && <p>{t("universal.loading")}</p>}
                     {error && <p style={{ color: 'red' }}>{error}</p>}
 
                     <FullCalendar
                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                        locale={plLocale} // Ustawienie na język Polski, potem należy to dostosować do wybranego przez użytkownika języka
+                        locale={locale}
                         initialView="timeGridWeek"
                         selectable={false}
                         events={events}

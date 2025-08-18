@@ -1,7 +1,67 @@
 {
+  "universal": {
+    "loading": "Loading..."
+  },
   "home": {
     "title": "Reservation system for a cycle track",
+    "reserve": "Reserve a track",
+    "choseTrackTitle": "Select the track you want to check the occupancy of:",
+    "choseTrack": "Select track"
+  },
+  "navbar": {
+    "adminPanel": "Admin panel",
+    "logout": "Logout",
     "login": "Log in",
-    "reserve": "Reserve a track"
+    "register": "Sign up",
+    "myReservations": "My reservations",
+    "profile": "Profile"
+  },
+  "footer": {
+    "illustrations": "Illustrations by Storyset",
+    "icons": "Icons from Flaticon"
+  },
+  "makeReservations": {
+    "newReservation": "New reservation",
+    "loading": "Loading reservation form...",
+    "track": "Track",
+    "selectTrack": "Select track",
+    "trackType": "Surface type:",
+    "trackLength": "Length:",
+    "start": "Start Date",
+    "end": "End Date",
+    "notAvailable": "This track is already booked for the selected time.",
+    "available": "The track is available at this time.",
+    "eq": "I want to rent equipment",
+    "selectEq": "Equipment to choose:",
+    "finalCost": "Total cost:",
+    "reserve": "Reserve track",
+    "reservationPositive": "Reservation created successfully",
+    "reservationError": "Failed to create reservation",
+    "startDateNotAvailable": "The selected start date and time are not available for this track.",
+    "endDateNotAvailable": "The selected end date and time are not available for this track.",
+    "allInfo": "Please fill in all fields",
+    "datesError": "Start date must be earlier than end date.",
+    "availabilityFalse": "The track is booked at this time, please choose another time!"
+  },
+  "api": {
+    "tracksError": "Error fetching tracks",
+    "eqError": "Error fetching equipment",
+    "availabilityError": "Error checking availability"
+  },
+  "auth": {
+    "loginSuccessful": "Login successful",
+    "loginError": "Login error",
+    "passwd": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "login": "Log in",
+    "register": "Don't have an account yet? Register",
+    "registerSuccessful": "Registration completed successfully, redirecting to login page",
+    "registerError": "Registration error",
+    "registerTitle": "Registration",
+    "name": "First name",
+    "surname": "Last name",
+    "signin": "Register",
+    "accountLogin": "Already have an account? Log in"
   }
 }

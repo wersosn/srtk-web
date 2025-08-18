@@ -2,10 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
 import { Navbar, Container, Nav } from 'react-bootstrap';
+import { useTranslation } from "react-i18next";
 import Spinner from 'react-bootstrap/Spinner';
 
 const Navb: React.FC = () => {
   const { isLoggedIn, logout, isAuthChecked, userRole } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Czekanie na poprawne załadowanie navbara:
@@ -29,19 +31,19 @@ const Navb: React.FC = () => {
         <Nav className="ms-auto align-items-center">
           {isLoggedIn && userRole === 'Admin' ? (
             <>
-              <Nav.Link href="/adminPanel">Panel admina</Nav.Link>
-              <button onClick={handleLogout}>Wyloguj</button>
+              <Nav.Link href="/adminPanel">{t("navbar.adminPanel")}</Nav.Link>
+              <button onClick={handleLogout}>{t("navbar.logout")}</button>
             </>
           ) : isLoggedIn && userRole === 'Client' ? (
             <>
-              <Nav.Link href="/myReservations">Moje rezerwacje</Nav.Link>
-              <Nav.Link href="/profile">Profil</Nav.Link>
-              <button onClick={handleLogout}>Wyloguj</button>
+              <Nav.Link href="/myReservations">{t("navbar.myReservations")}</Nav.Link>
+              <Nav.Link href="/profile">{t("navbar.profile")}</Nav.Link>
+              <button onClick={handleLogout}>{t("navbar.logout")}</button>
             </>
           ) : (
             <>
-              <Nav.Link href="/login" className="me-2">Logowanie</Nav.Link>
-              <button onClick={() => window.location.href = '/register'}>Rejestracja</button>
+              <Nav.Link href="/login" className="me-2">{t("navbar.login")}</Nav.Link>
+              <button onClick={() => window.location.href = '/register'}>{t("navbar.register")}</button>
             </>
           )}
         </Nav>

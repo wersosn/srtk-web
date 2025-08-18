@@ -1,7 +1,67 @@
 {
+  "universal": {
+    "loading": "Ładowanie..."
+  },
   "home": {
     "title": "System rezerwacji toru kolarskiego",
+    "reserve": "Zarezerwuj tor",
+    "choseTrackTitle": "Wybierz tor, którego obłożenie chcesz sprawdzić:",
+    "choseTrack": "Wybierz tor"
+  },
+  "navbar": {
+    "adminPanel": "Panel admina",
+    "logout": "Wyloguj",
+    "login": "Logowanie",
+    "register": "Rejestracja",
+    "myReservations": "Moje rezerwacje",
+    "profile": "Profil"
+  },
+  "footer": {
+    "illustrations": "Ilustracje - Storyset",
+    "icons": "Ikony - Flaticon"
+  },
+  "makeReservations": {
+    "newReservation": "Nowa rezerwacja",
+    "loading": "Ładowanie formularza do dokonania rezerwacji...",
+    "track": "Tor",
+    "selectTrack": "Wybierz tor",
+    "trackType": "Typ nawierzchni:",
+    "trackLength": "Długość:",
+    "start": "Data rozpoczęcia",
+    "end": "Data zakończenia",
+    "notAvailable": "Ten tor jest już zajęty w wybranym terminie.",
+    "available": "Tor jest dostępny w tym terminie.",
+    "eq": "Chcę wynająć sprzęt",
+    "selectEq": "Sprzęt do wyboru:",
+    "finalCost": "Łączny koszt:",
+    "reserve": "Zarezerwuj tor",
+    "reservationPositive": "Rezerwacja utworzona pomyślnie",
+    "reservationError": "Nie udało się utworzyć rezerwacji",
+    "startDateNotAvailable": "Wybrana data i godzina rozpoczęcia nie są dostępne dla tego toru.",
+    "endDateNotAvailable": "Wybrana data i godzina zakończenia nie są dostępne dla tego toru.",
+    "allInfo": "Uzupełnij wszystkie pola",
+    "datesError": "Data rozpoczęcia musi być wcześniejsza niż data zakończenia.",
+    "availabilityFalse": "Tor jest zajęty w tym terminie, wybierz inny czas!"
+  },
+  "api": {
+    "tracksError": "Błąd podczas pobierania torów",
+    "eqError": "Błąd podczas pobierania sprzętu",
+    "availabilityError": "Błąd sprawdzania dostępności"
+  },
+  "auth": {
+    "loginSuccessful": "Zalogowano pomyślnie",
+    "loginError": "Błąd logowania",
+    "passwd": "Hasło",
+    "rememberMe": "Zapamiętaj mnie",
+    "forgotPassword": "Zapomniałeś/aś hasła?",
     "login": "Zaloguj się",
-    "reserve": "Zarezerwuj tor"
+    "register": "Nie masz jeszcze konta? Zarejestruj się",
+    "registerSuccessful": "Rejestracja przebiegła pomyślnie, przekierowanie na stronę logowania",
+    "registerError": "Błąd rejestracji",
+    "registerTitle": "Rejestracja",
+    "name": "Imię",
+    "surname": "Nazwisko",
+    "signin": "Zarejestruj się",
+    "accountLogin": "Masz już konto? Zaloguj się"
   }
 }

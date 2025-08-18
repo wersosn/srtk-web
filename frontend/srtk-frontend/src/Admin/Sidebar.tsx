@@ -67,6 +67,11 @@ function Sidebar() {
                     </li>
                 </>
                 )}
+                <li className="nav-item">
+                    <NavLink to="adminPanelSettings" className={getClassName}>
+                        Ustawienia
+                    </NavLink>
+                </li>
             </ul>
         </nav>
     );

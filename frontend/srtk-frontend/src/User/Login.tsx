@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
+import { useTranslation } from "react-i18next";
 import "./Login.css";
 import ComputerImage from "../assets/auth-panel.svg";
 
@@ -12,6 +13,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +34,10 @@ const Login = () => {
 
       const data = await response.json();
       login(data.token);
-      setInfo('Zalogowano pomyślnie');
+      setInfo(t("auth.loginSuccessful"));
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Błąd logowania');
+      setError(err.message || t("auth.loginError"));
     }
   };
 
@@ -48,7 +50,7 @@ const Login = () => {
 
       <div className="login-form-container">
         <form className="login-form" onSubmit={handleLogin}>
-          <h2>Logowanie</h2>
+          <h2>{t("navbar.login")}</h2>
           <input
             type="email"
             placeholder="Email"
@@ -59,7 +61,7 @@ const Login = () => {
           />
           <input
             type="password"
-            placeholder="Hasło"
+            placeholder={t("auth.passwd")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -69,18 +71,17 @@ const Login = () => {
           <div className="login-options">
             <label className="checkbox-label">
               <input type="checkbox" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)}/>
-                Zapamiętaj mnie
+                {t("auth.rememberMe")}
             </label>
 
-            <a href="/forgot-password" className="link">Zapomniałeś/aś hasła?</a>
+            <a href="/forgot-password" className="link">{t("auth.forgotPassword")}</a>
           </div>
 
-          <button type="submit">Zaloguj się</button>
+          <button type="submit">{t("auth.login")}</button>
 
-          {info && <p className="login-info">{info}</p>}
           {error && <p className="login-error">{error}</p>}
           <hr />
-          <a href="/register" className="link">Nie masz jeszcze konta? Zarejestruj się</a>
+          <a href="/register" className="link">{t("auth.register")}</a>
         </form>
       </div>
       </div>

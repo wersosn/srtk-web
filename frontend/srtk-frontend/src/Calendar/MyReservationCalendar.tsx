@@ -5,6 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import plLocale from '@fullcalendar/core/locales/pl';
+import enLocale from '@fullcalendar/core/locales/en-gb';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation } from '../Types/Types';
@@ -17,6 +18,8 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
+    const lang = localStorage.getItem('language');
+    const locale = lang == "pl" ? plLocale : enLocale;
 
     // Pobieranie rezerwacji użytkownika:
     const fetchReservations = async () => {
@@ -94,7 +97,7 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
 
                 <FullCalendar
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                    locale={plLocale} // Ustawienie na język Polski, potem należy to dostosować do wybranego przez użytkownika języka
+                    locale={locale}
                     initialView="timeGridDay"
                     selectable={false}
                     events={events}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
 import './Register.css';
 import ComputerImage from "../assets/auth-panel.svg";
 
@@ -10,6 +11,7 @@ const Register = () => {
     const [lastName, setLastName] = useState('');
     const [info, setInfo] = useState('');
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,10 +29,10 @@ const Register = () => {
                 throw new Error(msg);
             }
 
-            setInfo('Rejestracja przebiegła pomyślnie, przekierowanie na stronę logowania');
-            setTimeout(() => navigate('/login'), 2000);
+            setInfo(t("auth.registerSuccessful"));
+            setTimeout(() => navigate('/login'), 1000);
         } catch (err: any) {
-            setInfo(err.message || 'Błąd rejestracji');
+            setInfo(err.message || t("auth.registerError"));
         }
     };
 
@@ -43,7 +45,7 @@ const Register = () => {
 
                 <div className="register-form-container">
                     <form className="register-form" onSubmit={handleRegister}>
-                        <h2>Rejestracja</h2>
+                        <h2>{t("auth.registerTitle")}</h2>
                         <input
                             type="email"
                             placeholder="Email"
@@ -54,7 +56,7 @@ const Register = () => {
                         />
                         <input
                             type="text"
-                            placeholder="Imię"
+                            placeholder={t("auth.name")}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
@@ -62,7 +64,7 @@ const Register = () => {
                         />
                         <input
                             type="text"
-                            placeholder="Nazwisko"
+                            placeholder={t("auth.surname")}
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             required
@@ -70,19 +72,19 @@ const Register = () => {
                         />
                         <input
                             type="password"
-                            placeholder="Hasło"
+                            placeholder={t("auth.passwd")}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             className="register-input"
                         />
                         <button type="submit">
-                            Zarejestruj się
+                            {t("auth.signin")}
                         </button>
                         {info && <p className="register-info">{info}</p>}
                         <hr />
                         <a href="/login" className="link">
-                            Masz już konto? Zaloguj się
+                            {t("auth.accountLogin")}
                         </a>
                     </form>
                 </div>

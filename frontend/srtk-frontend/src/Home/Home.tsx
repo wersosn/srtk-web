@@ -31,7 +31,7 @@ const Home: React.FC = () => {
             </p>
             {!isLoggedIn ? (
             <div className="d-flex gap-2">
-                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/login')}>{t("home.login")}</button>
+                <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/login')}>{t("navbar.login")}</button>
                 <button style={{backgroundColor: "#ED8A62", color:"#030303"}} onClick={() => navigate('/makeReservation')}>{t("home.reserve")}</button>
             </div>
             ) : ( 

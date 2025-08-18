@@ -10,13 +10,15 @@ namespace srtk.Services
         private readonly JwtService jwtService;
         private readonly PasswordService passwordService;
         private readonly UserService userService;
+        private readonly EmailService emailService;
 
-        public AuthService(AppDbContext context, JwtService jwtService, PasswordService passwordService, UserService userService)
+        public AuthService(AppDbContext context, JwtService jwtService, PasswordService passwordService, UserService userService, EmailService emailService)
         {
             this.context = context;
             this.jwtService = jwtService;
             this.passwordService = passwordService;
             this.userService = userService;
+            this.emailService = emailService;
         }
 
         public async Task<string?> Register(RegisterDto dto)
@@ -38,6 +40,23 @@ namespace srtk.Services
                 RoleId = 1 // Domyślna rola - Klient
             };
             await userService.Add(user);
+
+            try
+            {
+                await emailService.SendEmail(
+                    user.Email,
+                    "Potwierdzenie pomyślnej rejestracji",
+                    $@"
+                    <div style='font-family: Arial, sans-serif; padding: 10px'>
+                        <h2>Witaj {user.Email}!</h2>
+                        <p>Dziękujemy za rejestrację w naszym serwisie. Możesz teraz dokonać rezerwacji toru kolarskiego :)</p>
+                    </div>"
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Błąd wysyłania maila: " + ex.Message);
+            }
             return null;
         }
 

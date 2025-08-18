@@ -6,7 +6,7 @@ footer {
     margin-top: 2rem;
 }
 
-a {
+a.links {
     color: light-dark(#1f2f40, #dde2e5);
     margin: 0 1rem; 
     text-decoration: none;
