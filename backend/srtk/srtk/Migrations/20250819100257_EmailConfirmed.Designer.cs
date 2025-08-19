@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace srtk.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250819100257_EmailConfirmed")]
+    partial class EmailConfirmed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,40 +23,6 @@ namespace srtk.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("srtk.Models.EmailConfirmation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Confirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("Expiry")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId1")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("EmailConfirmations");
-                });
 
             modelBuilder.Entity("srtk.Models.Equipment", b =>
                 {
@@ -163,40 +132,6 @@ namespace srtk.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("srtk.Models.PasswordReset", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Expiry")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("Used")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId1")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("PasswordResets");
                 });
 
             modelBuilder.Entity("srtk.Models.Reservation", b =>
@@ -379,23 +314,6 @@ namespace srtk.Migrations
                     b.HasDiscriminator().HasValue("Client");
                 });
 
-            modelBuilder.Entity("srtk.Models.EmailConfirmation", b =>
-                {
-                    b.HasOne("srtk.Models.User", null)
-                        .WithMany("EmailConfirmations")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("srtk.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("srtk.Models.Equipment", b =>
                 {
                     b.HasOne("srtk.Models.Facility", "Facility")
@@ -431,23 +349,6 @@ namespace srtk.Migrations
                     b.HasOne("srtk.Models.User", "User")
                         .WithMany("NotificationList")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("srtk.Models.PasswordReset", b =>
-                {
-                    b.HasOne("srtk.Models.User", null)
-                        .WithMany("PasswordResets")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("srtk.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -548,11 +449,7 @@ namespace srtk.Migrations
 
             modelBuilder.Entity("srtk.Models.User", b =>
                 {
-                    b.Navigation("EmailConfirmations");
-
                     b.Navigation("NotificationList");
-
-                    b.Navigation("PasswordResets");
 
                     b.Navigation("ReservationList");
                 });

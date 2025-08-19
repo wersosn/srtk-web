@@ -15,12 +15,15 @@ namespace srtk.Models
         [Required]
         public string Password { get; set; }
 
+        public bool EmailConfirmed { get; set; } = false;
+
         [ForeignKey(nameof(Role))]
         public int RoleId { get; set; }
         public Role? Role { get; set; }
 
         [JsonIgnore]
         public ICollection<Reservation> ReservationList { get; set; } = new List<Reservation>();
+
         [JsonIgnore]
         public ICollection<Notification> NotificationList { get; set; } = new List<Notification>();
     }

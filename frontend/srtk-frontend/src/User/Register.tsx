@@ -30,7 +30,7 @@ const Register = () => {
             }
 
             setInfo(t("auth.registerSuccessful"));
-            setTimeout(() => navigate('/login'), 1000);
+            setTimeout(() => navigate('/login'), 5000);
         } catch (err: any) {
             setInfo(err.message || t("auth.registerError"));
         }

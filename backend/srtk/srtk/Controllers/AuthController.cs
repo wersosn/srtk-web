@@ -6,6 +6,8 @@ using srtk.DTO;
 using srtk.Models;
 using srtk.Services;
 using Microsoft.AspNetCore.Authorization;
+using DocumentFormat.OpenXml.InkML;
+using System.Security.Claims;
 
 namespace srtk.Controllers
 {
@@ -55,6 +57,38 @@ namespace srtk.Controllers
         public async Task<IActionResult> Logout()
         {
             return Ok(new { message = "Wylogowano pomyślnie" });
+        }
+
+        // Żadanie potwierdzenia maila:
+        [HttpPost("email-confirmation")]
+        public async Task<IActionResult> EmailConfirmation([FromBody] EmailConfirmationDto dto)
+        {
+            await service.EmailConfirmation(dto.Email);
+            return Ok("Mail z linkiem do potwierdzenia e-maila został wysłany");
+        }
+
+        // Potwierdzenie maila:
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> EmailConfirmed([FromBody] EmailConfirmationDto dto)
+        {
+            await service.EmailConfirmed(dto.Token);
+            return Ok("Powtierdzono adres e-mail");
+        }
+
+        // Żądanie resetu hasła użytkownika:
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            await service.ForgotPassword(dto.Email);
+            return Ok("Mail z linkiem do resetu hasła został wysłany");
+        }
+
+        // Reset hasła użytkownika:
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            await service.ResetPassword(dto.Token, dto.NewPassword);
+            return Ok("Zresetowano hasło");
         }
     }
 }

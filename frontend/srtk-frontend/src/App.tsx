@@ -5,6 +5,9 @@ import Navb from "./Navbar/Navb";
 import Footer from "./Footer/Footer";
 import Home from "./Home/Home";
 import Profile from "./Profile/Profile";
+import ConfirmedEmail from "./Email/ConfirmedEmail";
+import ForgotPassword from "./Password/ForgotPassword";
+import ResetPassword from "./Password/ResetPassword";
 import RequireAdmin from "./Admin/RequireAdmin";
 import RequireUser from "./Reservations/RequireUser";
 import AdminPanel from "./Admin/AdminPanel";
@@ -31,6 +34,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/confirm-email" element={<ConfirmedEmail />} />
           <Route path="/profile" element={
             <RequireUser>
               <Profile />

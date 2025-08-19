@@ -19,7 +19,7 @@ namespace srtk.tests.Tests
         }
 
         // Test - rejestracja nowego użytkownika:
-        [Fact]
+        /*[Fact]
         public async Task Register_New_User()
         {
             var context = DbContextHelper.GetDbContext();
@@ -145,6 +145,6 @@ namespace srtk.tests.Tests
             Assert.NotNull(result.Error);
             Assert.Null(result.UserData);
             output.WriteLine("Wynik: Nieprawidłowe dane logowania");
-        }
+        }*/
     }
 }

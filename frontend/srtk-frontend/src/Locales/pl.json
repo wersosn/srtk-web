@@ -62,6 +62,17 @@
     "name": "Imię",
     "surname": "Nazwisko",
     "signin": "Zarejestruj się",
-    "accountLogin": "Masz już konto? Zaloguj się"
+    "accountLogin": "Masz już konto? Zaloguj się",
+    "resetPassword": "Reset hasła",
+    "resetPasswordSubmit": "Resetuj hasło",
+    "resetPasswordEmail": "Link do resetu hasła został wysłany na podany mail",
+    "resetPasswordError": "Błąd podczas resetu hasła",
+    "newPassword": "Ustawiono nowe hasło, przekierowanie na stronę logowania",
+    "differentPassword": "Wpisane hasła nie są identyczne",
+    "saveChanges": "Zapisz zmiany",
+    "repeatPassword": "Powtórz hasło",
+    "emailConfirmedTitle": "Potwierdzono adres e-mail",
+    "emailConfirmedDesc": "Dzięki potwierdzeniu adresu e-mail masz teraz dostęp do wszystkich funkcjonalności naszego systemu :)",
+    "emailConfirmedError": "Błąd podczas potwierdzania adresu e-mail"
   }
 }

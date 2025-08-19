@@ -187,6 +187,6 @@ namespace srtk.Services
             context.Users.Remove(user);
             await context.SaveChangesAsync();
             return true;
-        }
+        }   
     }
 }

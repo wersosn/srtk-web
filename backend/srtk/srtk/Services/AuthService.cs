@@ -1,6 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using srtk.DTO;
 using srtk.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace srtk.Services
 {
@@ -11,14 +16,16 @@ namespace srtk.Services
         private readonly PasswordService passwordService;
         private readonly UserService userService;
         private readonly EmailService emailService;
+        private readonly IConfiguration config;
 
-        public AuthService(AppDbContext context, JwtService jwtService, PasswordService passwordService, UserService userService, EmailService emailService)
+        public AuthService(AppDbContext context, JwtService jwtService, PasswordService passwordService, UserService userService, EmailService emailService, IConfiguration config)
         {
             this.context = context;
             this.jwtService = jwtService;
             this.passwordService = passwordService;
             this.userService = userService;
             this.emailService = emailService;
+            this.config = config;
         }
 
         public async Task<string?> Register(RegisterDto dto)
@@ -41,22 +48,28 @@ namespace srtk.Services
             };
             await userService.Add(user);
 
-            try
+            await EmailConfirmation(user.Email);
+
+            /*_ = Task.Run(async () =>
             {
-                await emailService.SendEmail(
-                    user.Email,
-                    "Potwierdzenie pomyślnej rejestracji",
-                    $@"
+                try
+                {
+                    await emailService.SendEmail(
+                        user.Email,
+                        "Potwierdzenie pomyślnej rejestracji",
+                        $@"
                     <div style='font-family: Arial, sans-serif; padding: 10px'>
                         <h2>Witaj {user.Email}!</h2>
                         <p>Dziękujemy za rejestrację w naszym serwisie. Możesz teraz dokonać rezerwacji toru kolarskiego :)</p>
                     </div>"
-                );
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Błąd wysyłania maila: " + ex.Message);
-            }
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Błąd wysyłania maila: " + ex.Message);
+                }
+            });*/
+
             return null;
         }
 
@@ -93,6 +106,121 @@ namespace srtk.Services
                 Token = token,
                 UserData = userData
             };
+        }
+
+        // Żadanie potwierdzenia maila:
+        public async Task EmailConfirmation(string email)
+        {
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                throw new Exception("Nie znaleziono użytkownika o podanym adresie email");
+            }
+
+            var token = jwtService.GenerateConfirmEmailToken(user);
+            var confirmLink = $"{config["Frontend:BaseUrl"]}/confirm-email?token={token}";
+
+            _ = Task.Run(async () =>
+            {
+                await emailService.SendEmail(
+                    user.Email,
+                    "Potwierdzenie pomyślnej rejestracji",
+                    $@"
+                    <div style='font-family: Arial, sans-serif; padding: 10px'>
+                        <h2>Witaj {user.Email}!</h2>
+                        <p>Dziękujemy za rejestrację w naszym serwisie. Możesz teraz dokonać rezerwacji toru kolarskiego :)</p>
+                        <p>Kliknij w poniższy link, aby potwierdzić swój e-mail:</p>
+                        <a href='{confirmLink}'>{confirmLink}</a>
+                   </div>"
+                );
+            });
+        }
+
+        // Potwierdzenie maila:
+        public async Task EmailConfirmed(string token)
+        {
+            var principal = jwtService.ValidateToken(token);
+            if (principal == null)
+            {
+                throw new Exception("Token nieprawidłowy lub wygasł");
+            }
+
+            var userIdClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                throw new Exception("Nie udało się odczytać użytkownika z tokena");
+            }
+
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                throw new Exception("Nie znaleziono użytkownika o podanym Id");
+            }
+
+            user.EmailConfirmed = true;
+            await context.SaveChangesAsync();
+        }
+
+        // Żądanie resetu hasła użytkownika:
+        public async Task ForgotPassword(string email)
+        {
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                throw new Exception("Nie znaleziono użytkownika o podanym adresie email");
+            }
+
+            if(user.EmailConfirmed == false)
+            {
+                throw new UnauthorizedAccessException("Musisz potwierdzić adres e-mail, aby zresetować hasło");
+            }
+
+            var token = jwtService.GenerateResetPasswordToken(user);
+            var resetLink = $"{config["Frontend:BaseUrl"]}/reset-password?token={token}";
+
+            _ = Task.Run(async () =>
+            {
+                await emailService.SendEmail(
+                    user.Email,
+                    "Reset hasła",
+                    $@"
+                    <div style='font-family: Arial, sans-serif; padding: 10px'>
+                        <h2>Reset hasła</h2>
+                        <p>Kliknij poniższy link, aby ustawić nowe hasło:</p>
+                        <a href='{resetLink}'>{resetLink}</a>
+                   </div>"
+                );
+            });
+        }
+
+        // Reset hasła użytkownika:
+        public async Task ResetPassword(string token, string newPassword)
+        {
+            var principal = jwtService.ValidateToken(token);
+            if (principal == null)
+            {
+                throw new Exception("Token nieprawidłowy lub wygasł");
+            }
+
+            var userIdClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                throw new Exception("Nie udało się odczytać użytkownika z tokena");
+            }
+
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if(user == null)
+            {
+                throw new Exception("Nie znaleziono użytkownika o podanym Id");
+            }
+
+            if (user.EmailConfirmed == false)
+            {
+                throw new UnauthorizedAccessException("Musisz potwierdzić adres e-mail, aby zresetować hasło");
+            }
+
+            user.Password = passwordService.HashPassword(newPassword);
+            await context.SaveChangesAsync();
         }
     }
 

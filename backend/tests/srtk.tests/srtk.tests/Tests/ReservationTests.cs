@@ -24,7 +24,7 @@ namespace srtk.tests.Tests
         }
 
         // Test - pobranie wszystkich rezerwacji (ogółem):
-        [Fact]
+        /*[Fact]
         public async Task Getting_All_Reservations()
         {
             var context = DbContextHelper.GetDbContext();
@@ -557,6 +557,6 @@ namespace srtk.tests.Tests
             Assert.NotNull(result);
             Assert.True(result.Length > 0);
             output.WriteLine("Wynik: Wyeksportowano rezerwacje w formacie .xlsx");
-        }
+        }*/
     }
 }

@@ -12,7 +12,7 @@ namespace srtk.tests.Helpers
 {
     public class ReservationServiceHelper : ReservationService
     {
-        public ReservationServiceHelper(AppDbContext context) : base(context) { }
+        public ReservationServiceHelper(AppDbContext context, EmailService emailService) : base(context, emailService) { }
 
         public override async Task<Reservation> Add(Reservation reservation)
         {
