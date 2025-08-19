@@ -1,13 +1,18 @@
 {
   "universal": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "error": "Error: ",
+    "saveChanges": "Save changes",
+    "cancel": "Cancel"
   },
+
   "home": {
     "title": "Reservation system for a cycle track",
     "reserve": "Reserve a track",
     "choseTrackTitle": "Select the track you want to check the occupancy of:",
     "choseTrack": "Select track"
   },
+
   "navbar": {
     "adminPanel": "Admin panel",
     "logout": "Logout",
@@ -16,10 +21,12 @@
     "myReservations": "My reservations",
     "profile": "Profile"
   },
+
   "footer": {
     "illustrations": "Illustrations by Storyset",
     "icons": "Icons from Flaticon"
   },
+
   "makeReservations": {
     "newReservation": "New reservation",
     "loading": "Loading reservation form...",
@@ -43,11 +50,18 @@
     "datesError": "Start date must be earlier than end date.",
     "availabilityFalse": "The track is booked at this time, please choose another time!"
   },
+
   "api": {
     "tracksError": "Error fetching tracks",
     "eqError": "Error fetching equipment",
-    "availabilityError": "Error checking availability"
+    "availabilityError": "Error checking availability",
+    "reservationError": "Error occurred while fetching reservations",
+    "reservationForTrackError": "Error occurred while fetching reservations for the track",
+    "statusError": "Error occurred while fetching reservation statuses",
+    "unknownTrack": "Unknown track",
+    "unknownStatus": "Unknown status"
   },
+
   "auth": {
     "loginSuccessful": "Login successful",
     "loginError": "Login error",
@@ -60,7 +74,6 @@
     "registerError": "Registration error",
     "registerTitle": "Registration",
     "name": "First name",
-    "surname": "Last name",
     "signin": "Register",
     "accountLogin": "Already have an account? Log in",
     "resetPassword": "Password reset",
@@ -73,6 +86,50 @@
     "repeatPassword": "Repeat password",
     "emailConfirmedTitle": "Email address confirmed",
     "emailConfirmedDesc": "Thanks to confirming your email address, you now have access to all the features of our system :)",
-    "emailConfirmedError": "Error occurred while confirming the email address"
+    "emailConfirmedError": "Error occurred while confirming the email address",
+    "emailNotConfirmed": "You must confirm your email address before resetting your password"
+  },
+
+  "profile": {
+    "userFetchError": "Error occurred while fetching user data",
+    "infoUpdated": "Information updated",
+    "myProfile": "My profile",
+    "loading": "Loading profile...",
+    "edit": "Edit information",
+    "settings": "Settings",
+    "language": "Language",
+    "noToken": "No token – please log in again!",
+    "name": "First name",
+    "surname": "Last name",
+    "phoneNum": "Phone number",
+    "saveChanges": "Save changes"
+  },
+
+  "user": {
+    "name": "First name",
+    "surname": "Last name",
+    "phoneNumber": "Phone number",
+    "role": "Role",
+    "facility": "Facility"
+  },
+
+  "reservation": {
+    "myReservations": "My reservations",
+    "loading": "Loading reservations...",
+    "list": "Reservation list",
+    "export": "Export to .pdf",
+    "exportExcel": "Export to .xlsx",
+    "trackId": "Track Id:",
+    "track": "Track:",
+    "start": "Start:",
+    "end": "End:",
+    "cost": "Cost:",
+    "edit": "Edit reservation",
+    "date": "Reservation date:",
+    "reserv": "Reservation:",
+    "deleteAlert": "Are you sure you want to delete this reservation?",
+    "deleteError": "Failed to delete the reservation",
+    "reservationManagement": "Reservation management",
+    "emptyList": "No reservations"
   }
 }

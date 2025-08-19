@@ -67,6 +67,18 @@ namespace srtk.Controllers
             return user;
         }
 
+        // Pobranie konkretnego użytkownika po adresie e-mail:
+        [HttpGet("email")]
+        public async Task<ActionResult<User>> GetUserByEmail(string email)
+        {
+            var user = await service.GetByEmail(email);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return user;
+        }
+
         // Pobranie konkretnego klienta:
         [HttpGet("clients/{id}")]
         public async Task<ActionResult<Client>> GetClientById(int id)

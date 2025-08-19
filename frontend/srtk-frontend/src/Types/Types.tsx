@@ -57,6 +57,15 @@ export type Role = {
     name: string;
 };
 
+// Użytkownik:
+export type User = {
+    id: number;
+    email: string;
+    password: string;
+    roleId: number;
+    emailConfirmed: boolean;
+}
+
 // Klient:
 export type Client = {
     id: number;

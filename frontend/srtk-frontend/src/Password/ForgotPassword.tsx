@@ -16,6 +16,16 @@ function ForgotPassword() {
         setInfo('');
 
         try {
+            const res = await fetch(`/api/users/email?email=${encodeURIComponent(email)}`);
+            if (!res.ok) throw new Error(t("profile.userFetchError"));
+
+            const data = await res.json();
+
+            if (data.emailConfirmed === false) {
+                setError(t("auth.emailNotConfirmed"));
+                return;
+            }
+
             const response = await fetch('/api/auth/forgot-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

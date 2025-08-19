@@ -7,6 +7,7 @@ import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import type { Reservation, Track, Status } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
+import { useTranslation } from "react-i18next";
 
 function ReservationManagement() {
     const [facilityId, setFacilityId] = useState<number | null>(null);
@@ -15,10 +16,10 @@ function ReservationManagement() {
     const [statuses, setStatuses] = useState<Status[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
-    const [userId, setUserId] = useState<number | undefined>(undefined);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     // Dynamiczne ustawianie odpowiedniej ikonki (w zależności od trybu (cielmy/jasny)):
     const [isDark, setIsDark] = useState(false);
@@ -68,12 +69,12 @@ function ReservationManagement() {
                     },
                 });
                 if (!res.ok) {
-                    throw new Error('Błąd podczas pobierania torów');
+                    throw new Error(t("api.tracksError"));
                 }
                 const data = await res.json();
                 setTracks(data);
             } catch (err: any) {
-                setError(err.message || 'Błąd przy pobieraniu torów');
+                setError(err.message || t("api.tracksError"));
             } finally {
                 setLoading(false);
             }
@@ -89,7 +90,7 @@ function ReservationManagement() {
                 const res = await fetch('/api/statuses', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                if (!res.ok) throw new Error('Błąd podczas pobierania statusów rezerwacji');
+                if (!res.ok) throw new Error(t("api.statusError"));
                 const data = await res.json();
                 setStatuses(data);
             } catch (error) {
@@ -111,7 +112,7 @@ function ReservationManagement() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) {
-                    throw new Error(`Błąd pobierania rezerwacji dla toru ${track.name}`);
+                    throw new Error(`${t("api.reservationForTrackError")} ${track.name}`);
                 }
                 const data = await res.json();
                 console.log(data);
@@ -126,7 +127,7 @@ function ReservationManagement() {
 
             setReservationsByTrack(grouped);
         } catch (err: any) {
-            setError(err.message || 'Błąd pobierania rezerwacji');
+            setError(err.message || t("api.reservationError"));
         } finally {
             setLoading(false);
         }
@@ -135,20 +136,6 @@ function ReservationManagement() {
     useEffect(() => {
         fetchReservations();
     }, [token, tracks]);
-
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                const userIdFromToken = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-                if (userIdFromToken) {
-                    setUserId(parseInt(userIdFromToken, 10));
-                }
-            } catch {
-                setUserId(undefined);
-            }
-        }
-    }, []);
 
     // Obsługa edycji rezerwacji:
     const handleEdit = (updated: Reservation) => {
@@ -167,7 +154,7 @@ function ReservationManagement() {
     // Ustawienie nazwy statusu:
     const getStatusName = (statusId: number) => {
         const status = statuses.find(t => t.id === statusId);
-        return status ? status.name : 'Nieznany status';
+        return status ? status.name : t("api.unknownStatus");
     };
 
     // Obsługa eksportu:
@@ -178,16 +165,16 @@ function ReservationManagement() {
     return (
         <>
             <div className="admin-content p-4">
-                <h2 className="mb-3">Zarządzanie rezerwacjami</h2>
+                <h2 className="mb-3">{t("reservation.reservationManagement")}</h2>
                 <hr />
 
                 {loading ? (
-                    <p>Ładowanie rezerwacji...</p>
+                    <p>{t("reservation.loading")}</p>
                 ) : error ? (
                     <p className="text-danger">{error}</p>
                 ) : (
                     <>
-                        <h5 className="mt-4">Lista rezerwacji</h5>
+                        <h5 className="mt-4">{t("reservation.list")}</h5>
                         {Object.entries(reservationsByTrack).map(([trackId, reservations]) => {
                             const track = tracks.find(t => t.id === Number(trackId));
                             return (
@@ -197,19 +184,19 @@ function ReservationManagement() {
                                             <em>{track?.name || `ID: ${trackId}`}</em>:
                                         </h6>
                                         {reservations.length !== 0 && (
-                                            <button onClick={() => handleExport(Number(trackId))} className="icon-button" title="Eksport do .xlsx">
+                                            <button onClick={() => handleExport(Number(trackId))} className="icon-button" title={t("reservation.exportExcel")}>
                                                 <img src={icon} alt="Eksport" style={{ width: '20px', height: '20px' }} />
                                             </button>
                                         )}
                                     </div>
                                     <ul className="list-group">
                                         {reservations.length === 0 ? (
-                                            <li className="list-group-item">Brak rezerwacji</li>
+                                            <li className="list-group-item">{t("reservation.emptyList")}</li>
                                         ) : (
                                             reservations.map(reservation => (
                                                 <li key={reservation.id} className="list-group-item p-0">
                                                     <div onClick={() => setShowDetails(prev => (prev?.id === reservation.id ? null : reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
-                                                        Rezerwacja: {formatToDatetimeLocal(reservation.start)} - {formatToDatetimeLocal(reservation.end)}
+                                                        {t("reservation.reserv")} {formatToDatetimeLocal(reservation.start)} - {formatToDatetimeLocal(reservation.end)}
                                                         <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
                                                             <button onClick={() => setEditingReservation(reservation)} disabled={loading} className="icon-button">
                                                                 <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
@@ -221,10 +208,10 @@ function ReservationManagement() {
                                                     {showDetails?.id === reservation.id && (
                                                         <div className="mt-2 ps-2 details">
                                                             <div>
-                                                                <strong>Id toru:</strong> {reservation.trackId}<br />
-                                                                <strong>Start:</strong> {formatToDatetimeLocal(reservation.start)}<br />
-                                                                <strong>Koniec:</strong> {formatToDatetimeLocal(reservation.end)}<br />
-                                                                <strong>Koszt:</strong> {reservation.cost}<br />
+                                                                <strong>{t("reservation.trackId")}</strong> {reservation.trackId}<br />
+                                                                <strong>{t("reservation.start")}</strong> {formatToDatetimeLocal(reservation.start)}<br />
+                                                                <strong>{t("reservation.end")}</strong> {formatToDatetimeLocal(reservation.end)}<br />
+                                                                <strong>{t("reservation.cost")}</strong> {reservation.cost}<br />
                                                                 <strong>Status:</strong> {getStatusName(reservation.statusId)}<br />
                                                             </div>
                                                         </div>
@@ -239,8 +226,7 @@ function ReservationManagement() {
                         <hr />
                         {editingReservation && (
                             <>
-                                {console.log('Edytowana rezerwacja:', editingReservation)}
-                                <h5 className="mt-4">Modyfikacja rezerwacji</h5>
+                                <h5 className="mt-4">{t("reservation.edit")}</h5>
                                 <EditReservation
                                     key={editingReservation.id}
                                     reservationId={editingReservation.id}

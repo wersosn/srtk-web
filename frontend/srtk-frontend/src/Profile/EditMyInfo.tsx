@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 
 interface EditMyInfoProps {
     userId: number;
@@ -16,11 +17,12 @@ const EditMyInfo: React.FC<EditMyInfoProps> = ({ userId, currentEmail, currentNa
     const [phoneNumber, setPhoneNumber] = useState(currentPhoneNumber);
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!token) {
-            setMessage('Brak tokena – zaloguj się ponownie.');
+            setMessage(t("profile.noToken"));
             return;
         }
 
@@ -41,10 +43,10 @@ const EditMyInfo: React.FC<EditMyInfoProps> = ({ userId, currentEmail, currentNa
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage('Błąd: ' + error);
+                setMessage(t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage('Błąd: ' + err.message);
+            setMessage(t("universal.error") + err.message);
         }
     };
 
@@ -55,21 +57,21 @@ const EditMyInfo: React.FC<EditMyInfoProps> = ({ userId, currentEmail, currentNa
                     <label htmlFor="userEmail">Email</label>
                     <input id="userEmail" value={email} onChange={e => setEmail(e.target.value)} required className="info-input" />
                     <div>
-                        <label htmlFor="userName">Imię</label>
+                        <label htmlFor="userName">{t("user.name")}</label>
                         <input id="userName" value={name} onChange={(e) => setName(e.target.value)} required className="info-input" />
                     </div>
                     <div>
-                        <label htmlFor="userSurname">Nazwisko</label>
+                        <label htmlFor="userSurname">{t("user.surname")}</label>
                         <input id="userSurname" value={surname} onChange={(e) => setSurname(e.target.value)} required className="info-input" />
                     </div>
                     <div>
-                        <label htmlFor="userPhone">Numer telefonu</label>
+                        <label htmlFor="userPhone">{t("user.phoneNumber")}</label>
                         <input id="userPhone" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="info-input" />
                     </div>
                 </div>
 
                 <div className="d-flex gap-2">
-                    <button type="submit">Zapisz zmiany</button>
+                    <button type="submit">{t("profile.saveChanges")}</button>
                 </div>
                 <div>{message}</div>
             </form>

@@ -7,6 +7,7 @@ import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import type { Reservation, Track, Status } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
+import { useTranslation } from "react-i18next";
 
 function MyReservations() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -19,6 +20,7 @@ function MyReservations() {
     const [error, setError] = useState<string | null>(null);
     const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     // Pobieranie rezerwacji użytkownika:
     const fetchReservations = async () => {
@@ -30,7 +32,7 @@ function MyReservations() {
             });
 
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania rezerwacji');
+                throw new Error(t("api.reservationError"));
             }
             const data = await res.json();
             console.log(data);
@@ -49,7 +51,7 @@ function MyReservations() {
                 const res = await fetch('/api/tracks', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                if (!res.ok) throw new Error('Błąd podczas pobierania torów');
+                if (!res.ok) throw new Error(t("api.tracksError"));
                 const data = await res.json();
                 setTracks(data);
             } catch (error) {
@@ -67,7 +69,7 @@ function MyReservations() {
                 const res = await fetch('/api/statuses', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                if (!res.ok) throw new Error('Błąd podczas pobierania statusów rezerwacji');
+                if (!res.ok) throw new Error(t("api.statusError"));
                 const data = await res.json();
                 setStatuses(data);
             } catch (error) {
@@ -109,13 +111,13 @@ function MyReservations() {
     // Ustawienie nazwy toru:
     const getTrackName = (trackId: number) => {
         const track = tracks.find(t => t.id === trackId);
-        return track ? track.name : 'Nieznany tor';
+        return track ? track.name : t("api.unknownTrack");
     };
 
     // Ustawienie nazwy statusu:
     const getStatusName = (statusId: number) => {
         const status = statuses.find(t => t.id === statusId);
-        return status ? status.name : 'Nieznany status';
+        return status ? status.name : t("api.unknownStatus");
     };
 
     // Obsługa eksportu:
@@ -127,16 +129,16 @@ function MyReservations() {
         <div className="res-container">
             <div className="res-card-wrapper">
                 <main className="res-main">
-                    <h2 className="mb-3">Moje rezerwacje</h2>
+                    <h2 className="mb-3">{t("reservation.myReservations")}</h2>
                     <hr />
 
                     {loading ? (
-                        <p>Ładowanie rezerwacji...</p>
+                        <p>{t("reservation.loading")}</p>
                     ) : error ? (
                         <p className="text-danger">{error}</p>
                     ) : (
                         <>
-                            <h5 className="mt-4">Lista rezerwacji</h5>
+                            <h5 className="mt-4">{t("reservation.list")}</h5>
                             <ul className="list-group">
                                 {reservations.map((Reservation) => (
                                     <li key={Reservation.id} className="list-group-item p-0">
@@ -148,7 +150,7 @@ function MyReservations() {
                                                 </span>
                                             </div>
                                             <div className="d-flex gap-2" onClick={(e) => e.stopPropagation()}>
-                                                <button onClick={() => handleExport(Number(Reservation.id))} className="icon-button" title="Eksport do .pdf">
+                                                <button onClick={() => handleExport(Number(Reservation.id))} className="icon-button" title={t("reservation.export")}>
                                                     <img src={downloadIcon} alt="Eksport" style={{ width: '16px', height: '16px' }} />
                                                 </button>
                                                 <button onClick={() => setEditingReservation(Reservation)} disabled={loading} className="icon-button">
@@ -161,10 +163,10 @@ function MyReservations() {
                                         {showDetails?.id === Reservation.id && (
                                             <div className="mt-2 ps-2 details">
                                                 <div>
-                                                    <strong>Tor:</strong> {getTrackName(Reservation.trackId)}<br />
-                                                    <strong>Start:</strong> {formatToDatetimeLocal(Reservation.start)}<br />
-                                                    <strong>Koniec:</strong> {formatToDatetimeLocal(Reservation.end)}<br />
-                                                    <strong>Koszt:</strong> {Reservation.cost}<br />
+                                                    <strong>{t("reservation.track")}</strong> {getTrackName(Reservation.trackId)}<br />
+                                                    <strong>{t("reservation.start")}</strong> {formatToDatetimeLocal(Reservation.start)}<br />
+                                                    <strong>{t("reservation.end")}</strong> {formatToDatetimeLocal(Reservation.end)}<br />
+                                                    <strong>{t("reservation.cost")}</strong> {Reservation.cost}<br />
                                                     <strong>Status:</strong> {getStatusName(Reservation.statusId)}<br />
                                                 </div>
                                             </div>
@@ -175,8 +177,7 @@ function MyReservations() {
                             <hr />
                             {editingReservation && (
                                 <>
-                                    {console.log('Edytowana rezerwacja:', editingReservation)}
-                                    <h5 className="mt-4">Modyfikacja rezerwacji</h5>
+                                    <h5 className="mt-4">{t("reservation.edit")}</h5>
                                     <EditReservation
                                         key={editingReservation.id}
                                         reservationId={editingReservation.id}

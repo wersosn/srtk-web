@@ -10,6 +10,7 @@ import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
+import { useTranslation } from "react-i18next";
 
 export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
@@ -20,6 +21,7 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
     const token = localStorage.getItem('token');
     const lang = localStorage.getItem('language');
     const locale = lang == "pl" ? plLocale : enLocale;
+    const { t } = useTranslation();
 
     // Pobieranie rezerwacji użytkownika:
     const fetchReservations = async () => {
@@ -31,12 +33,12 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
             });
 
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania rezerwacji');
+                throw new Error(t("api.reservationError"));
             }
             const data = await res.json();
             setReservationList(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -72,7 +74,7 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
 
             return {
                 id: String(r.id),
-                title: `Rezerwacja ${formatTime(start)} - ${formatTime(end)}`,
+                title: `${t("reservation.reserv")} ${formatTime(start)} - ${formatTime(end)}`,
                 start: r.start,
                 end: r.end,
                 allDay: false,
@@ -85,14 +87,14 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
         const id = parseInt(clickInfo.event.id, 10);
         const r = reservationList.find(r => r.id === id) || null;
         if (r) {
-            alert(`Rezerwacja nr ${r.id}\nData: ${formatToDatetimeLocal(r.start)} - ${formatToDatetimeLocal(r.end)}`);
+            alert(`${t("reservation.reserv")} nr ${r.id}\n${t("reservation.date")} ${formatToDatetimeLocal(r.start)} - ${formatToDatetimeLocal(r.end)}`);
         }
     }
 
     return (
         <>
             <div className="my-calendar-container">
-                {loading && <p>Ładowanie...</p>}
+                {loading && <p>{t("universal.loading")}</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 <FullCalendar

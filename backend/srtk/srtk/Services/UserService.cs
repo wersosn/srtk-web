@@ -37,6 +37,11 @@ namespace srtk.Services
         {
             return await context.Users.FindAsync(id);
         }
+        // Pobranie konkretnego użytkownika po adresie e-mail:
+        public async Task<User?> GetByEmail(string email)
+        {
+            return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
 
         // Pobranie konkretnego klienta:
         public async Task<Client?> GetClientById(int id)

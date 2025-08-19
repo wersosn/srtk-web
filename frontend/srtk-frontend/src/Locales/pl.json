@@ -1,13 +1,18 @@
 {
   "universal": {
-    "loading": "Ładowanie..."
+    "loading": "Ładowanie...",
+    "error": "Wystąił błąd ",
+    "saveChanges": "Zapisz zmiany",
+    "cancel": "Anuluj"
   },
+
   "home": {
     "title": "System rezerwacji toru kolarskiego",
     "reserve": "Zarezerwuj tor",
     "choseTrackTitle": "Wybierz tor, którego obłożenie chcesz sprawdzić:",
     "choseTrack": "Wybierz tor"
   },
+
   "navbar": {
     "adminPanel": "Panel admina",
     "logout": "Wyloguj",
@@ -16,10 +21,12 @@
     "myReservations": "Moje rezerwacje",
     "profile": "Profil"
   },
+
   "footer": {
     "illustrations": "Ilustracje - Storyset",
     "icons": "Ikony - Flaticon"
   },
+
   "makeReservations": {
     "newReservation": "Nowa rezerwacja",
     "loading": "Ładowanie formularza do dokonania rezerwacji...",
@@ -43,11 +50,18 @@
     "datesError": "Data rozpoczęcia musi być wcześniejsza niż data zakończenia.",
     "availabilityFalse": "Tor jest zajęty w tym terminie, wybierz inny czas!"
   },
+
   "api": {
     "tracksError": "Błąd podczas pobierania torów",
     "eqError": "Błąd podczas pobierania sprzętu",
-    "availabilityError": "Błąd sprawdzania dostępności"
+    "availabilityError": "Błąd sprawdzania dostępności",
+    "reservationError": "Błąd podczas pobierania rezerwacji",
+    "reservationForTrackError": "Błąd pobierania rezerwacji dla toru",
+    "statusError": "Błąd podczas pobierania statusów rezerwacji",
+    "unknownTrack": "Nieznany tor",
+    "unknownStatus": "Nieznany status"
   },
+
   "auth": {
     "loginSuccessful": "Zalogowano pomyślnie",
     "loginError": "Błąd logowania",
@@ -59,8 +73,6 @@
     "registerSuccessful": "Rejestracja przebiegła pomyślnie, przekierowanie na stronę logowania",
     "registerError": "Błąd rejestracji",
     "registerTitle": "Rejestracja",
-    "name": "Imię",
-    "surname": "Nazwisko",
     "signin": "Zarejestruj się",
     "accountLogin": "Masz już konto? Zaloguj się",
     "resetPassword": "Reset hasła",
@@ -73,6 +85,47 @@
     "repeatPassword": "Powtórz hasło",
     "emailConfirmedTitle": "Potwierdzono adres e-mail",
     "emailConfirmedDesc": "Dzięki potwierdzeniu adresu e-mail masz teraz dostęp do wszystkich funkcjonalności naszego systemu :)",
-    "emailConfirmedError": "Błąd podczas potwierdzania adresu e-mail"
+    "emailConfirmedError": "Błąd podczas potwierdzania adresu e-mail",
+    "emailNotConfirmed": "Aby zresetować hasło musisz najpierw potwierdzić adres e-mail"
+  },
+
+  "profile": {
+    "userFetchError": "Błąd podczas pobierania danych użytkownika",
+    "infoUpdated": "Zaktualizowano dane",
+    "myProfile": "Mój profil",
+    "loading": "Ładowanie profilu...",
+    "edit": "Zmiana danych",
+    "settings": "Ustawienia",
+    "language": "Język",
+    "noToken": "Brak tokena – zaloguj się ponownie!",
+    "saveChanges": "Zapisz zmiany"
+  },
+
+  "user": {
+    "name": "Imię",
+    "surname": "Nazwisko",
+    "phoneNumber": "Numer telefonu",
+    "role": "Rola",
+    "facility": "Obiekt"
+  },
+
+  "reservation": {
+    "myReservations": "Moje rezerwacje",
+    "loading": "Ładowanie rezerwacji...",
+    "list": "Lista rezerwacji",
+    "export": "Eksport do .pdf",
+    "exportExcel": "Eksport do .xlsx",
+    "trackId": "Id toru:",
+    "track": "Tor:",
+    "start": "Start:",
+    "end": "Koniec:",
+    "cost": "Koszt:",
+    "edit": "Modyfikacja rezerwacji",
+    "date": "Data rezerwacji:",
+    "reserv": "Rezerwacja",
+    "deleteAlert": "Czy na pewno chcesz usunąć tę rezerwację?",
+    "deleteError": "Nie udało się usunąć rezerwacji",
+    "reservationManagement": "Zarządzanie rezerwacjami",
+    "emptyList": "Brak rezerwacji"
   }
 }

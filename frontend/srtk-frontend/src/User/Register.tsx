@@ -56,7 +56,7 @@ const Register = () => {
                         />
                         <input
                             type="text"
-                            placeholder={t("auth.name")}
+                            placeholder={t("user.name")}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
@@ -64,7 +64,7 @@ const Register = () => {
                         />
                         <input
                             type="text"
-                            placeholder={t("auth.surname")}
+                            placeholder={t("user.surname")}
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             required

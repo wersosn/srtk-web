@@ -33,13 +33,13 @@ export default function ReservationCalendar() {
             });
 
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania torów');
+                throw new Error(t("api.tracksError"));
             }
 
             const data = await res.json();
             setTracks(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -66,13 +66,13 @@ export default function ReservationCalendar() {
             });
 
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania rezerwacji');
+                throw new Error(t("api.reservationError"));
             }
 
             const data: Reservation[] = await res.json();
             setReservationList(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -96,7 +96,7 @@ export default function ReservationCalendar() {
 
             return {
                 id: String(r.id),
-                title: `Rezerwacja ${formatTime(start)} - ${formatTime(end)}`,
+                title: `${t("reservation.reserv")} ${formatTime(start)} - ${formatTime(end)}`,
                 start: r.start,
                 end: r.end,
                 allDay: false,
@@ -114,7 +114,7 @@ export default function ReservationCalendar() {
         const id = parseInt(clickInfo.event.id, 10);
         const r = reservationList.find(r => r.id === id) || null;
         if (r) {
-            alert(`Data rezerwacji: ${formatToDatetimeLocal(r.start)} - ${formatToDatetimeLocal(r.end)}`);
+            alert(`${t("reservation.date")} ${formatToDatetimeLocal(r.start)} - ${formatToDatetimeLocal(r.end)}`);
         }
     }
 

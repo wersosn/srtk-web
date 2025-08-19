@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
 import type { Equipment, EquipmentWithQuantity, Track } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 interface EditReservationProps {
     reservationId: number;
@@ -20,12 +20,13 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const [rentEquipment, setRentEquipment] = useState(false);
     const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
     const [equipmentQuantities, setEquipmentQuantities] = useState<Record<string, number>>({});
-    const [t, setTrack] = useState<Track | null>(null);
+    const [tr, setTrack] = useState<Track | null>(null);
     const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
     const [datesChanged, setDatesChanged] = useState(false);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich torów z bazy:
     useEffect(() => {
@@ -34,7 +35,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 const res = await fetch(`/api/tracks/${trackId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) throw new Error('Błąd pobierania toru');
+                if (!res.ok) throw new Error(t("api.tracksError"));
                 const data = await res.json();
                 setTrack(data);
             } catch (e) {
@@ -51,12 +52,12 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 setEquipmentList([]);
                 return;
             }
-            if (!t) return;
+            if (!tr) return;
             try {
-                const res = await fetch(`/api/equipments/inFacility?facilityId=${t.facilityId}`, {
+                const res = await fetch(`/api/equipments/inFacility?facilityId=${tr.facilityId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) throw new Error('Błąd podczas pobierania sprzętu');
+                if (!res.ok) throw new Error(t("api.eqError"));
                 const data = await res.json();
                 setEquipmentList(data);
             } catch (err: any) {
@@ -64,7 +65,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             }
         };
         fetchEquipment();
-    }, [rentEquipment, t, trackId]);
+    }, [rentEquipment, tr, trackId]);
 
     // Pobieranie sprzętów przypisanych do edytowanej rezerwacji:
     useEffect(() => {
@@ -75,7 +76,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 const res = await fetch(`/api/reservations/equipments?reservationId=${reservationId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) throw new Error('Błąd pobierania sprzętu rezerwacji');
+                if (!res.ok) throw new Error(t("api.eqError"));
                 const data: EquipmentWithQuantity[] = await res.json();
 
                 const quantities: Record<number, number> = {};
@@ -122,7 +123,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         };
 
         calculateCostAndCheckAvailability();
-    }, [startDate, endDate, equipmentQuantities, equipmentList, t]);
+    }, [startDate, endDate, equipmentQuantities, equipmentList, tr]);
 
     // Sprawdzenie, czy tor jest dostępny do zarezerwowania (tzn. nie ma innej rezerwacji w wybranym czasie):
     useEffect(() => {
@@ -147,7 +148,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
-                if (!res.ok) throw new Error('Błąd sprawdzania dostępności');
+                if (!res.ok) throw new Error(t("api.availabilityError"));
                 const data = await res.json();
                 setIsAvailable(data.isAvailable);
                 return data.isAvailable;
@@ -160,9 +161,9 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         checkTrackAvailability();
     }, [trackId, startDate, endDate]);
 
-    const allowedDays = t ? parseAvailableDays(t.availableDays) : [];
-    const openingHour = t?.openingHour || '00:00';
-    const closingHour = t?.closingHour || '23:59';
+    const allowedDays = tr ? parseAvailableDays(tr.availableDays) : [];
+    const openingHour = tr?.openingHour || '00:00';
+    const closingHour = tr?.closingHour || '23:59';
 
     // Handler sprawdzający, czy data rozpoczęcia jest zgodna z godzinami funkcjonowania toru:
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,7 +172,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             setStartDate(val);
             setDatesChanged(true);
         } else {
-            alert('Wybrana data i godzina rozpoczęcia nie są dostępne dla tego toru.');
+            alert(t("makeReservations.startDateNotAvailable"));
         }
     };
 
@@ -182,7 +183,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             setEndDate(val);
             setDatesChanged(true);
         } else {
-            alert('Wybrana data i godzina zakończenia nie są dostępne dla tego toru.');
+            alert(t("makeReservations.endDateNotAvailable"));
         }
     };
 
@@ -199,12 +200,12 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         e.preventDefault();
 
         if (isAvailable === false) {
-            alert('Tor jest zajęty w tym terminie, wybierz inny czas!');
+            alert(t("makeReservations.availabilityFalse"));
             return;
         }
 
         if (new Date(startDate) >= new Date(endDate)) {
-            alert('Data rozpoczęcia musi być wcześniejsza niż data zakończenia.');
+            alert(t("makeReservations.datesError"));
             return;
         }
 
@@ -222,7 +223,6 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             TrackId: trackId,
             EquipmentReservations: equipmentReservations
         };
-        console.log("Wysyłane dane:", reservationBody);
 
         try {
             const response = await fetch(`/api/reservations/${reservationId}`, {
@@ -247,34 +247,34 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         }
     };
 
-    if (loading) return <p>Ładowanie...</p>;
+    if (loading) return <p>{t("universal.loading")}</p>;
 
     return (
         <>
             <form onSubmit={handleSubmit}>
-                <label>Data rozpoczęcia</label>
+                <label>{t("makeReservations.start")}</label>
                 <input type="datetime-local" className="info-input" value={startDate} onChange={handleStartDateChange} />
 
-                <label>Data zakończenia</label>
+                <label>{t("makeReservations.end")}</label>
                 <input type="datetime-local" className="info-input" value={endDate} onChange={handleEndDateChange} />
 
                 {datesChanged && isAvailable === false && (
-                    <p className="text-danger">Ten tor jest już zajęty w wybranym terminie.</p>
+                    <p className="text-danger">{t("makeReservations.noAvailable")}</p>
                 )}
                 {datesChanged && isAvailable === true && (
-                    <p className="text-success">Tor jest dostępny w tym terminie.</p>
+                    <p className="text-success">{t("makeReservations.availabile")}</p>
                 )}
 
                 <div className="flex items-center mb-4">
                     <input type="checkbox" id="rentEquipment" checked={rentEquipment} onChange={() => setRentEquipment(!rentEquipment)} className="mr-2" />
-                    <label htmlFor="rentEquipment" style={{ marginLeft: "8px" }}>Chcę wynająć sprzęt</label>
+                    <label htmlFor="rentEquipment" style={{ marginLeft: "8px" }}>{t("makeReservations.eq")}</label>
                 </div>
 
                 {rentEquipment && equipmentList.length > 0 && (
                     <>
                         <hr />
                         <div className="mb-4">
-                            <label>Sprzęt do wyboru:</label>
+                            <label>{t("makeReservations.selectEq")}</label>
                             {equipmentList.map(eq => (
                                 <div key={eq.id} className="flex items-center mb-1">
                                     <label>
@@ -295,11 +295,11 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
                 <hr />
                 <div className="mb-4 font-semibold">
-                    Łączny koszt: {cost.toFixed(2)} zł
+                    {t("makeReservations.finalCost")} {cost.toFixed(2)} zł
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">Zapisz zmiany</button>
-                    <button type="button" onClick={onCancel}>Anuluj</button>
+                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>
             </form>
