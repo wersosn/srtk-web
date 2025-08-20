@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import deleteIcon from '../assets/delete.png';
+import { useTranslation } from "react-i18next";
 
 interface DeleteFacilityProps {
     facilityId: number;
@@ -10,9 +11,10 @@ const DeleteFacility: React.FC<DeleteFacilityProps> = ({ facilityId, onDeleted }
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleDelete = async () => {
-        if (!window.confirm('Czy na pewno chcesz usunąć ten obiekt?')) { 
+        if (!window.confirm(t("facility.deleteAlert"))) { 
             return;
         }
 
@@ -30,10 +32,10 @@ const DeleteFacility: React.FC<DeleteFacilityProps> = ({ facilityId, onDeleted }
                 onDeleted();
             } else {
                 const text = await response.text();
-                setError(`Błąd: ${text || 'Nie udało się usunąć obiektu'}`);
+                setError(`${t("universal.error")} ${text || t("facility.deleteError")}`);
             }
         } catch (err: any) {
-            setError(`Błąd: ${err.message}`);
+            setError(`${t("universal.error")} ${err.message}`);
         } finally {
             setLoading(false);
         }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 
 interface EditFacilityProps {
     facilityId: number;
@@ -15,6 +16,7 @@ const EditFacility: React.FC<EditFacilityProps> = ({ facilityId, currentName, cu
     const [address, setAddress] = useState(currentAddress);
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,10 +36,10 @@ const EditFacility: React.FC<EditFacilityProps> = ({ facilityId, currentName, cu
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage('Błąd: ' + error);
+                setMessage(t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage('Błąd: ' + err.message);
+            setMessage(t("universal.error") + err.message);
         }
     };
 
@@ -45,20 +47,20 @@ const EditFacility: React.FC<EditFacilityProps> = ({ facilityId, currentName, cu
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="facilityName">Nazwa</label>
+                    <label htmlFor="facilityName">{t("facility.name")}</label>
                     <input id="facilityName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="facilityCity">Miasto</label>
+                    <label htmlFor="facilityCity">{t("facility.city")}</label>
                     <input id="facilityCity" value={city} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="facilityAddress">Adres</label>
+                    <label htmlFor="facilityAddress">{t("facility.address")}</label>
                     <input id="facilityAddress" value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">Zapisz zmiany</button>
-                    <button type="button" onClick={onCancel}>Anuluj</button>
+                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>
             </form>

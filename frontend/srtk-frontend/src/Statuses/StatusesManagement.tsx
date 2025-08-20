@@ -4,12 +4,14 @@ import AddStatus from './AddStatus';
 import EditStatus from './EditStatus';
 import DeleteStatus from './DeleteStatus';
 import type { Status } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 function StatusesManagement() {
     const [statuses, setStatuses] = useState<Status[]>([]);
     const [editingStatus, setEditingStatus] = useState<Status | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich statusów z bazy:
     const fetchStatuses = async () => {
@@ -21,12 +23,12 @@ function StatusesManagement() {
                 },
             });
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania statusów');
+                throw new Error(t("api.statusError"));
             }
             const data = await res.json();
             setStatuses(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -50,16 +52,16 @@ function StatusesManagement() {
 
     return (
         <div className="admin-content p-4">
-            <h2 className="mb-3">Zarządzanie statusami</h2>
+            <h2 className="mb-3">{t("admin.statusM")}</h2>
             <hr />
 
             {loading ? (
-                <p>Ładowanie statusów...</p>
+                <p>{t("status.loading")}</p>
             ) : error ? (
                 <p className="text-danger">{error}</p>
             ) : (
                 <>
-                    <h5 className="mt-4">Lista statusów</h5>
+                    <h5 className="mt-4">{t("status.list")}</h5>
                     <ul className="list-group">
                         {statuses.map((status) => (
                             <li key={status.id} className="list-group-item d-flex justify-content-between align-items-center">
@@ -76,12 +78,12 @@ function StatusesManagement() {
                     <hr />
                     {editingStatus ? (
                         <>
-                            <h5 className="mt-4">Edycja statusu</h5>
+                            <h5 className="mt-4">{t("status.edit")}</h5>
                             <EditStatus statusId={editingStatus.id} currentName={editingStatus.name} onUpdated={handleEdit} onCancel={() => setEditingStatus(null)}/>
                         </>
                     ) : (
                         <>
-                            <h5 className="mt-4">Nowy status</h5>
+                            <h5 className="mt-4">{t("status.add")}</h5>
                             <AddStatus onAddStatus={handleAdd} />
                         </>
                     )}

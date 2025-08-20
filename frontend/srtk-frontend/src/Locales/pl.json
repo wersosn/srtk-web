@@ -221,7 +221,7 @@
     "loading": "Ładowanie statusów rezerwacji...",
     "add": "Nowa statusu",
     "edit": "Edycja statusu",
-    "roleAdded": "Dodano status",
+    "statusAdded": "Dodano status",
     "deleteAlert": "Czy na pewno chcesz usunąć ten status?",
     "deleteError": "Nie udało się usunąć statusu"
   }

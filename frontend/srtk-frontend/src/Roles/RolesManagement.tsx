@@ -4,12 +4,14 @@ import EditRole from './EditRole';
 import DeleteRole from './DeleteRole';
 import editIcon from '../assets/edit.png';
 import type { Role } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 function RoleManagement() {
     const [roles, setRoles] = useState<Role[]>([]);
     const [editingRole, setEditingRole] = useState<Role | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich ról z bazy:
     const fetchRoles = async () => {
@@ -21,12 +23,12 @@ function RoleManagement() {
                 },
             });
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania ról');
+                throw new Error(t("api.roleError"));
             }
             const data = await res.json();
             setRoles(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -50,16 +52,16 @@ function RoleManagement() {
 
     return (
         <div className="admin-content p-4">
-            <h2 className="mb-3">Zarządzanie rolami</h2>
+            <h2 className="mb-3">{t("admin.roleM")}</h2>
             <hr />
 
             {loading ? (
-                <p>Ładowanie ról...</p>
+                <p>{t("role.loading")}</p>
             ) : error ? (
                 <p className="text-danger">{error}</p>
             ) : (
                 <>
-                    <h5 className="mt-4">Lista ról</h5>
+                    <h5 className="mt-4">{t("role.list")}</h5>
                     <ul className="list-group">
                         {roles.map((role) => (
                             <li key={role.id} className="list-group-item d-flex justify-content-between align-items-center">
@@ -76,12 +78,12 @@ function RoleManagement() {
                     <hr />
                     {editingRole ? (
                         <>
-                            <h5 className="mt-4">Edycja roli</h5>
+                            <h5 className="mt-4">{t("role.edit")}</h5>
                             <EditRole roleId={editingRole.id} currentName={editingRole.name} onUpdated={handleEdit} onCancel={() => setEditingRole(null)} />
                         </>
                     ) : (
                         <>
-                            <h5 className="mt-4">Nowa rola</h5>
+                            <h5 className="mt-4">{t("role.add")}</h5>
                             <AddRole onAddRole={handleAdd} />
                         </>
                     )}

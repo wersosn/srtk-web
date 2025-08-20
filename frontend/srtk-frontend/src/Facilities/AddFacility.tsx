@@ -1,5 +1,6 @@
 import React, { useState, type FormEvent } from "react";
 import type { Facility } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 interface AddFacilityProps {
   onAddFacility: (newFacility: Facility) => void;
@@ -11,6 +12,7 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
     const [address, setAddress] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -29,7 +31,7 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
 
           if (response.ok) {
               const createdFacility: Facility = await response.json();
-              setMessage("Dodano obiekt");
+              setMessage(t("facility.facilityAdded"));
               setName("");
               setCity("");
               setAddress("");
@@ -38,13 +40,13 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
               let errorText = await response.text();
               try {
                   const errorData = JSON.parse(errorText);
-                  setMessage("Error: " + (errorData.detail || JSON.stringify(errorData)));
+                  setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
               } catch {
-                  setMessage("Error: " + (errorText || "Wystąpił błąd"));
+                  setMessage(t("universal.error") + (errorText));
               }
           }
         } catch (error: any) {
-            setMessage("Error: " + error.message);
+            setMessage(t("universal.error") + error.message);
         }
     };
 
@@ -52,16 +54,16 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
     <>
           <form onSubmit={handleSubmit}>
               <div>
-                  <label htmlFor="facilityName">Nazwa</label>
+                  <label htmlFor="facilityName">{t("facility.name")}</label>
                   <input id="facilityName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
 
-                  <label htmlFor="facilityCity">Miasto</label>
+                  <label htmlFor="facilityCity">{t("facility.city")}</label>
                   <input id="facilityCity" value={city} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
 
-                  <label htmlFor="facilityAddress">Adres</label>
+                  <label htmlFor="facilityAddress">{t("facility.address")}</label>
                   <input id="facilityAddress" value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
               </div>
-              <button type="submit">Dodaj nowy obiekt</button>
+              <button type="submit">{t("universal.save")}</button>
               <div>{message}</div>
           </form>
       </>

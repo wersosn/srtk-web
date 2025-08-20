@@ -4,6 +4,7 @@ import AddFacility from './AddFacility';
 import EditFacility from './EditFacility';
 import DeleteFacility from './DeleteFacility';
 import type { Facility } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 function FacilitiesManagement() {
     const [facilities, setFacilities] = useState<Facility[]>([]);
@@ -11,6 +12,7 @@ function FacilitiesManagement() {
     const [showDetails, setShowDetails] = useState<Facility | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich obiektów z bazy:
     const fetchFacilities = async () => {
@@ -22,12 +24,12 @@ function FacilitiesManagement() {
                 },
             });
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania obiektów');
+                throw new Error(t("api.facilityError"));
             }
             const data = await res.json();
             setFacilities(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -51,16 +53,16 @@ function FacilitiesManagement() {
 
     return (
         <div className="admin-content p-4">
-            <h2 className="mb-3">Zarządzanie obiektami</h2>
+            <h2 className="mb-3">{t("admin.facilityM")}</h2>
             <hr />
 
             {loading ? (
-                <p>Ładowanie obiektów...</p>
+                <p>{t("facility.loading")}</p>
             ) : error ? (
                 <p className="text-danger">{error}</p>
             ) : (
                 <>
-                    <h5 className="mt-4">Lista obiektów</h5>
+                    <h5 className="mt-4">{t("facility.list")}</h5>
                     <ul className="list-group">
                         {facilities.map((facility) => (
                             <li key={facility.id} className="list-group-item p-0">
@@ -76,7 +78,10 @@ function FacilitiesManagement() {
 
                                 {showDetails?.id === facility.id && (
                                     <div className="mt-2 ps-2 details">
-                                        <div><strong>Miasto:</strong> {facility.city} <br/> <strong>Adres:</strong> {facility.address}</div>
+                                        <div>
+                                            <strong>{t("facility.city")}:</strong> {facility.city} <br/> 
+                                            <strong>{t("facility.address")}:</strong> {facility.address}
+                                        </div>
                                     </div>
                                 )}
                             </li>
@@ -85,12 +90,12 @@ function FacilitiesManagement() {
                     <hr />
                     {editingFacility ? (
                         <>
-                            <h5 className="mt-4">Edycja obiektu</h5>
+                            <h5 className="mt-4">{t("facility.edit")}</h5>
                             <EditFacility facilityId={editingFacility.id} currentName={editingFacility.name} currentCity={editingFacility.city} currentAddress={editingFacility.address} onUpdated={handleEdit} onCancel={() => setEditingFacility(null)} />
                         </>
                     ) : (
                         <>
-                            <h5 className="mt-4">Nowy obiekt</h5>
+                            <h5 className="mt-4">{t("facility.add")}</h5>
                             <AddFacility onAddFacility={handleAdd} />
                         </>
                     )}

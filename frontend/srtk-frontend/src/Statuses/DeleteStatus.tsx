@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import deleteIcon from '../assets/delete.png';
+import { useTranslation } from "react-i18next";
 
 interface DeleteStatusProps {
     statusId: number;
@@ -10,9 +11,10 @@ const DeleteStatus: React.FC<DeleteStatusProps> = ({ statusId, onDeleted }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleDelete = async () => {
-        if (!window.confirm('Czy na pewno chcesz usunąć ten status?')) { 
+        if (!window.confirm(t("status.deleteAlert"))) { 
             return;
         }
 
@@ -30,10 +32,10 @@ const DeleteStatus: React.FC<DeleteStatusProps> = ({ statusId, onDeleted }) => {
                 onDeleted();
             } else {
                 const text = await response.text();
-                setError(`Błąd: ${text || 'Nie udało się usunąć statusu'}`);
+                setError(`${t("universal.error")} ${text || t("status.deleteError")}`);
             }
         } catch (err: any) {
-            setError(`Błąd: ${err.message}`);
+            setError(`${t("universal.error")} ${err.message}`);
         } finally {
             setLoading(false);
         }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 
 interface EditRoleProps {
     roleId: number;
@@ -11,6 +12,7 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
     const [name, setName] = useState(currentName);
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,10 +32,10 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage('Błąd: ' + error);
+                setMessage(t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage('Błąd: ' + err.message);
+            setMessage(t("universal.error") + err.message);
         }
     };
 
@@ -41,12 +43,12 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="roleName">Nazwa</label>
+                    <label htmlFor="roleName">{t("role.name")}</label>
                     <input id="roleName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">Zapisz zmiany</button>
-                    <button type="button" onClick={onCancel}>Anuluj</button>
+                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>
             </form>

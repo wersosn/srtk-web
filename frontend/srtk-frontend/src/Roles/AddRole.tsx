@@ -1,5 +1,6 @@
 import React, { useState, type FormEvent } from "react";
 import type { Role } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 interface AddRoleProps {
   onAddRole: (newRole: Role) => void;
@@ -9,6 +10,7 @@ const AddRole: React.FC<AddRoleProps> = ({ onAddRole }) => {
     const [name, setName] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -25,20 +27,20 @@ const AddRole: React.FC<AddRoleProps> = ({ onAddRole }) => {
 
             if (response.ok) {
                 const createdRole: Role = await response.json();
-                setMessage("Dodano rolę");
+                setMessage(t("role.roleAdded"));
                 setName("");
                 onAddRole(createdRole);
             } else {
                 let errorText = await response.text();
                 try {
                     const errorData = JSON.parse(errorText);
-                    setMessage("Error: " + (errorData.detail || JSON.stringify(errorData)));
+                    setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
                 } catch {
-                    setMessage("Error: " + (errorText || "Wystąpił błąd"));
+                    setMessage(t("universal.error") + (errorText));
                 }
             }
         } catch (error: any) {
-            setMessage("Error: " + error.message);
+            setMessage(t("universal.error") + error.message);
         }
       };
 
@@ -46,10 +48,10 @@ const AddRole: React.FC<AddRoleProps> = ({ onAddRole }) => {
       <>
           <form onSubmit={handleSubmit}>
               <div>
-                  <label htmlFor="roleName">Nazwa</label>
+                  <label htmlFor="roleName">{t("role.name")}</label>
                   <input id="roleName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
               </div>
-              <button type="submit">Dodaj nową rolę</button>
+              <button type="submit">{t("universal.save")}</button>
               <div>{message}</div>
           </form>
       </>

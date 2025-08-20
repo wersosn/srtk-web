@@ -225,7 +225,7 @@
     "loading": "Loading reservation statuses...",
     "add": "New status",
     "edit": "Edit status",
-    "roleAdded": "Status added",
+    "statusAdded": "Status added",
     "deleteAlert": "Are you sure you want to delete this status?",
     "deleteError": "Failed to delete the status"
   }
