@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 
 interface EditEquipmentProps {
     equipmentId: number;
@@ -17,6 +18,7 @@ const EditEquipment: React.FC<EditEquipmentProps> = ({ equipmentId, currentName,
     const facilityId = currentFacilityId;
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -36,10 +38,10 @@ const EditEquipment: React.FC<EditEquipmentProps> = ({ equipmentId, currentName,
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage('Błąd: ' + error);
+                setMessage(t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage('Błąd: ' + err.message);
+            setMessage(t("universal.error") + err.message);
         }
     };
 
@@ -47,20 +49,20 @@ const EditEquipment: React.FC<EditEquipmentProps> = ({ equipmentId, currentName,
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="eqName">Nazwa</label>
+                    <label htmlFor="eqName">{t("eq.name")}</label>
                     <input id="eqName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="eqType">Rodzaj</label>
+                    <label htmlFor="eqType">{t("eq.name")}</label>
                     <input id="eqType" value={type} onChange={e => setType(e.target.value)} required className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="eqCost">Koszt</label>
+                    <label htmlFor="eqCost">{t("eq.cost")}</label>
                     <input id="eqCost" value={cost} onChange={e => setCost(Number(e.target.value))} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">Zapisz zmiany</button>
-                    <button type="button" onClick={onCancel}>Anuluj</button>
+                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>
             </form>

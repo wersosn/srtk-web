@@ -4,6 +4,7 @@ import EditUser from './EditUser';
 import DeleteUser from './DeleteUser';
 import { jwtDecode } from 'jwt-decode';
 import type { Client, Admin } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 function UserManagement() {
     const [clients, setClients] = useState<Client[]>([]);
@@ -14,6 +15,7 @@ function UserManagement() {
     const [loadingAdmins, setLoadingAdmins] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [facilityId, setFacilityId] = useState<number | null>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -42,7 +44,7 @@ function UserManagement() {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then(res => {
-                if (!res.ok) throw new Error("Błąd podczas pobierania klientów");
+                if (!res.ok) throw new Error(t("api.clientsError"));
                 return res.json();
             })
             .then(data => setClients(data))
@@ -59,7 +61,7 @@ function UserManagement() {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then(res => {
-                if (!res.ok) throw new Error("Błąd podczas pobierania adminów");
+                if (!res.ok) throw new Error(t("api.adminsError"));
                 return res.json();
             })
             .then(data => {
@@ -114,14 +116,14 @@ function UserManagement() {
 
     return (
         <div className="admin-content p-4">
-            <h2 className="mb-3">Zarządzanie użytkownikami</h2>
+            <h2 className="mb-3">{t("admin.userM")}</h2>
             <hr />
             <>
                 {error && <p className="text-danger">{error}</p>}
 
-                <h5 className="mt-4">Klienci</h5>
+                <h5 className="mt-4">{t("user.clients")}</h5>
                 {loadingClients ? (
-                    <p>Ładowanie klientów...</p>
+                    <p>{t("admin.clientsLoading")}.</p>
                 ) : (
                     <ul className="list-group mb-4">
                         {clients.map(client => (
@@ -141,9 +143,9 @@ function UserManagement() {
 
                                 {showDetails?.id === client.id && (
                                     <div className="mt-2 ps-2 details">
-                                        <strong>Imię:</strong> {client.name} <br />
-                                        <strong>Nazwisko:</strong> {client.surname} <br />
-                                        <strong>Numer telefonu:</strong> {client.phoneNumber}
+                                        <strong>{t("user.name")}:</strong> {client.name} <br />
+                                        <strong>{t("user.surname")}:</strong> {client.surname} <br />
+                                        <strong>{t("user.phoneNumber")}:</strong> {client.phoneNumber} 
                                     </div>
                                 )}
                             </li>
@@ -151,9 +153,9 @@ function UserManagement() {
                     </ul>
                 )}
 
-                <h5>Administratorzy</h5>
+                <h5>{t("user.admins")}</h5>
                 {loadingAdmins ? (
-                    <p>Ładowanie administratorów...</p>
+                    <p>{t("admin.adminsLoading")}</p>
                 ) : (
                     <ul className="list-group">
                         {admins.map(admin => (
@@ -173,7 +175,7 @@ function UserManagement() {
                                 {showDetails?.id === admin.id && (
                                     <div className="mt-2 ps-2 details">
                                         <em>Admin</em> <br />
-                                        <strong>Id obiektu:</strong> {admin.facilityId}
+                                        <strong>{t("user.faclityId")}:</strong> {admin.facilityId}
                                     </div>
                                 )}
                             </li>
@@ -184,7 +186,7 @@ function UserManagement() {
                 <hr />
                 {editingUser && (
                     <>
-                        <h5 className="mt-4">Edycja użytkownika</h5>
+                        <h5 className="mt-4">{t("user.edit")}</h5>
                         {editingUser.roleId === 1 ? (
                             <EditUser
                                 userId={editingUser.id}

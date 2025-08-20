@@ -3,6 +3,7 @@
     "loading": "Loading...",
     "error": "Error: ",
     "saveChanges": "Save changes",
+    "save": "Save",
     "cancel": "Cancel"
   },
 
@@ -52,12 +53,16 @@
   },
 
   "api": {
-    "tracksError": "Error fetching tracks",
-    "eqError": "Error fetching equipment",
+    "tracksError": "Error occurred while fetching tracks",
+    "facilityError": "Error occurred while fetching facilities",
+    "roleError": "Error occurred while fetching roles",
+    "eqError": "Error occurred while fetching equipment",
     "availabilityError": "Error checking availability",
     "reservationError": "Error occurred while fetching reservations",
     "reservationForTrackError": "Error occurred while fetching reservations for the track",
     "statusError": "Error occurred while fetching reservation statuses",
+    "clientsError": "Error occurred while fetching clients",
+    "adminsError": "Error occurred while fetching admins",
     "unknownTrack": "Unknown track",
     "unknownStatus": "Unknown status"
   },
@@ -110,7 +115,15 @@
     "surname": "Last name",
     "phoneNumber": "Phone number",
     "role": "Role",
-    "facility": "Facility"
+    "facility": "Facility",
+    "clients": "Clients",
+    "admins": "Admins",
+    "facilityId": "Facility Id",
+    "edit": "Edit user",
+    "selectRole": "Select role",
+    "selectFacility": "Select facility",
+    "deleteAlert": "Are you sure you want to delete this user?",
+    "deleteError": "Failed to delete the user"
   },
 
   "reservation": {
@@ -131,5 +144,89 @@
     "deleteError": "Failed to delete the reservation",
     "reservationManagement": "Reservation management",
     "emptyList": "No reservations"
+  },
+
+  "admin": {
+    "dashboard": "Welcome to the admin panel",
+    "userM": "User management",
+    "trackM": "Track management",
+    "eqM": "Equipment management",
+    "reservationM": "Reservation management",
+    "facilityM": "Facility management",
+    "statusM": "Reservation status management",
+    "roleM": "Role management",
+    "clientsLoading": "Loading clients...",
+    "adminsLoading": "Loading admins..."
+  },
+
+  "track": {
+    "name": "Name",
+    "typeOfSurface": "Type of surface",
+    "length": "Length",
+    "open": "Opening hour",
+    "close": "Closing hour",
+    "days": "Days when the track is open",
+    "facility": "Facility",
+    "facilityId": "Facility Id",
+    "list": "Track list",
+    "loading": "Loading tracks...",
+    "add": "New track",
+    "edit": "Edit track",
+    "trackAdded": "Track added",
+    "availableDays": "Opening days",
+    "selectFacility": "Select facility",
+    "deleteAlert": "Are you sure you want to delete this track?",
+    "deleteError": "Failed to delete the track"
+  },
+
+  "eq": {
+    "name": "Name",
+    "type": "Type",
+    "cost": "Cost",
+    "facility": "Facility",
+    "facilityId": "Facility Id",
+    "list": "Equipment list",
+    "loading": "Loading equipment...",
+    "add": "New equipment",
+    "edit": "Edit equipment",
+    "eqAdded": "Equipment added",
+    "selectFacility": "Select facility",
+    "deleteAlert": "Are you sure you want to delete this equipment?",
+    "deleteError": "Failed to delete the equipment"
+  },
+
+  "facility": {
+    "name": "Name",
+    "city": "City",
+    "address": "Address",
+    "list": "Facility list",
+    "loading": "Loading facilities...",
+    "add": "New facility",
+    "edit": "Edit facility",
+    "facilityAdded": "Facility added",
+    "deleteAlert": "Are you sure you want to delete this facility?",
+    "deleteError": "Failed to delete the facility"
+},
+
+"role": {
+    "name": "Name",
+    "list": "Role list",
+    "loading": "Loading roles...",
+    "add": "New role",
+    "edit": "Edit role",
+    "roleAdded": "Role added",
+    "deleteAlert": "Are you sure you want to delete this role?",
+    "deleteError": "Failed to delete the role"
+},
+
+"status": {
+    "name": "Name",
+    "list": "Reservation status list",
+    "loading": "Loading reservation statuses...",
+    "add": "New status",
+    "edit": "Edit status",
+    "roleAdded": "Status added",
+    "deleteAlert": "Are you sure you want to delete this status?",
+    "deleteError": "Failed to delete the status"
   }
 }

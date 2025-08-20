@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import type { Facility, Role } from '../Types/Types';
+import { useTranslation } from "react-i18next";
+
 interface EditUserProps {
     userId: number;
     currentEmail: string;
@@ -25,6 +27,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
     const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (token) {
@@ -48,7 +51,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 const data = await res.json();
                 setFacilities(data);
             } catch (err) {
-                console.error('Błąd podczas pobierania obiektów');
+                console.error(t("api.facilityError"));
             }
         };
         const fetchRoles = async () => {
@@ -61,7 +64,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 const data = await res.json();
                 setRoles(data);
             } catch (err) {
-                console.error('Błąd podczas pobierania ról');
+                console.error(t("api.roleError"));
             }
         };
         fetchFacilities();
@@ -116,9 +119,9 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                     <label htmlFor="userEmail">Email</label>
                     <input id="userEmail" value={email} onChange={e => setEmail(e.target.value)} required className="info-input" />
 
-                    <label>Rola</label>
+                    <label>{t("user.role")}</label>
                     <select id="roleSelect" value={roleId} onChange={(e) => setRoleId(Number(e.target.value))} className="info-input">
-                        <option value="">Wybierz rolę</option>
+                        <option value="">{t("user.selectRole")}</option>
                         {roles.map((role) => (
                             <option key={role.id} value={role.id}>
                                 {role.name}
@@ -129,15 +132,15 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                     {roleId === 1 && (
                         <>
                             <div>
-                                <label htmlFor="userName">Imię</label>
+                                <label htmlFor="userName">{t("user.name")}</label>
                                 <input id="userName" value={name} onChange={(e) => setName(e.target.value)} required className="info-input" />
                             </div>
                             <div>
-                                <label htmlFor="userSurname">Nazwisko</label>
+                                <label htmlFor="userSurname">{t("user.surname")}</label>
                                 <input id="userSurname" value={surname} onChange={(e) => setSurname(e.target.value)} required className="info-input" />
                             </div>
                             <div>
-                                <label htmlFor="userPhone">Numer telefonu</label>
+                                <label htmlFor="userPhone">{t("user.phoneNumber")}</label>
                                 <input id="userPhone" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="info-input" />
                             </div>
                         </>
@@ -146,9 +149,9 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                     {roleId === 2 && (
                         adminInFacility === 0 ? (
                             <div>
-                                <label>Obiekt</label>
+                                <label>{t("user.facility")}</label>
                                 <select id="facilitySelect" value={facilityId} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
-                                    <option value="">Wybierz obiekt</option>
+                                    <option value="">{t("user.selectFacility")}</option>
                                     {facilities.map((f) => (
                                         <option key={f.id} value={f.id}>
                                             {f.name}
@@ -158,7 +161,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                             </div>
                         ) : (
                             <div>
-                                <label>Obiekt</label>
+                                <label>{t("user.facility")}</label>
                                 <input id="facilitySet" type="text" className="info-input" disabled value={facilities.find(f => f.id === facilityId)?.name || 'Twój obiekt'} />
                             </div>
                         )
@@ -166,8 +169,8 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 </div>
 
                 <div className="d-flex gap-2">
-                    <button type="submit">Zapisz zmiany</button>
-                    <button type="button" onClick={onCancel}>Anuluj</button>
+                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>
             </form>

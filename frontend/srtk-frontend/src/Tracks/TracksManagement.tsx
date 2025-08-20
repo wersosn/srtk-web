@@ -5,6 +5,7 @@ import EditTrack from './EditTrack';
 import DeleteTrack from './DeleteTrack';
 import { jwtDecode } from 'jwt-decode';
 import type { Track } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 function TrackManagement() {
     const [tracks, setTracks] = useState<Track[]>([]);
@@ -12,6 +13,7 @@ function TrackManagement() {
     const [showDetails, setShowDetails] = useState<Track | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich torów z bazy:
     const fetchAllTracks = async () => {
@@ -43,12 +45,12 @@ function TrackManagement() {
             });
 
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania torów');
+                throw new Error(t("api.tracksError"));
             }
             const data = await res.json();
             setTracks(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -72,16 +74,16 @@ function TrackManagement() {
 
     return (
         <div className="admin-content p-4">
-            <h2 className="mb-3">Zarządzanie torami</h2>
+            <h2 className="mb-3">{t("admin.trackM")}</h2>
             <hr />
 
             {loading ? (
-                <p>Ładowanie torów...</p>
+                <p>{t("track.loading")}</p>
             ) : error ? (
                 <p className="text-danger">{error}</p>
             ) : (
                 <>
-                    <h5 className="mt-4">Lista torów</h5>
+                    <h5 className="mt-4">{t("track.list")}</h5>
                     <ul className="list-group">
                         {tracks.map((track) => (
                             <li key={track.id} className="list-group-item p-0">
@@ -98,12 +100,12 @@ function TrackManagement() {
                                 {showDetails?.id === track.id && (
                                     <div className="mt-2 ps-2 details">
                                         <div>
-                                            <strong>Rodzaj nawierzchni:</strong> {track.typeOfSurface} 
-                                            <br /> <strong>Długość:</strong> {track.length} 
-                                            <br /> <strong>Godzina otwarcia:</strong> {track.openingHour}
-                                            <br /> <strong>Godzina zamknięcia:</strong> {track.closingHour}
-                                            <br /> <strong>Dni, gdy tor jest otwarty:</strong> {track.availableDays}
-                                            <br /> <strong>Obiekt:</strong> {track.facilityId}
+                                            <strong>{t("track.typeOfSurface")}:</strong> {track.typeOfSurface} 
+                                            <br /> <strong>{t("track.length")}:</strong> {track.length} 
+                                            <br /> <strong>{t("track.open")}:</strong> {track.openingHour}
+                                            <br /> <strong>{t("track.close")}:</strong> {track.closingHour}
+                                            <br /> <strong>{t("track.days")}:</strong> {track.availableDays}
+                                            <br /> <strong>{t("track.facilityId")}:</strong> {track.facilityId}
                                         </div>
                                     </div>
                                 )}
@@ -113,7 +115,7 @@ function TrackManagement() {
                     <hr />
                     {editingTrack ? (
                         <>
-                            <h5 className="mt-4">Edycja toru</h5>
+                            <h5 className="mt-4">{t("track.edit")}</h5>
                             <EditTrack trackId={editingTrack.id} 
                                 currentName={editingTrack.name} 
                                 currentTypeOfSurface={editingTrack.typeOfSurface} 
@@ -127,7 +129,7 @@ function TrackManagement() {
                         </>
                     ) : (
                         <>
-                            <h5 className="mt-4">Nowy tor</h5>
+                            <h5 className="mt-4">{t("track.add")}</h5>
                             <AddTrack onAddTrack={handleAdd} />
                         </>
                     )}

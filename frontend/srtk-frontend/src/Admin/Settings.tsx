@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import { useState } from 'react';
 import { useTranslation } from "react-i18next";
 import i18n from "../Locales/i18next";
 
@@ -23,10 +22,10 @@ function Settings() {
     return (
         <>
             <div className="admin-content p-4">
-                <h2 className="mb-3">Ustawienia</h2>
+                <h2 className="mb-3">{t("profile.settings")}</h2>
                 <hr />
                 <div className="setting-item">
-                    <label htmlFor="language">Język</label>
+                    <label htmlFor="language">{t("profile.language")}</label>
                     <select id="language" name="language" value={language} onChange={(e) => handleLanguageChange(e.target.value)} className="info-input">
                         <option value="pl">Polski</option>
                         <option value="en">English</option>

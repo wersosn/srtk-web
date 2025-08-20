@@ -1,6 +1,7 @@
 import React, { useState, useEffect, type FormEvent } from "react";
 import { jwtDecode } from 'jwt-decode';
 import type { Track, Facility } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 interface AddTrackProps {
     onAddTrack: (newTrack: Track) => void;
@@ -19,6 +20,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const [message, setMessage] = useState<string>("");
     const token = localStorage.getItem('token');
     const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (token) {
@@ -39,11 +41,11 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                         Authorization: `Bearer ${token}`,
                     }
                 });
-                if (!res.ok) throw new Error('Błąd pobierania obiektów');
+                if (!res.ok) throw new Error(t("api.facilityError"));
                 const data = await res.json();
                 setFacilities(data);
             } catch (err: any) {
-                setMessage(err.message || 'Błąd pobierania obiektów');
+                setMessage(err.message || t("api.facilityError"));
             }
         };
         fetchFacilities();
@@ -67,7 +69,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
 
             if (response.ok) {
                 const createdTrack: Track = await response.json();
-                setMessage("Dodano tor");
+                setMessage(t("track.trackAdded"));
                 setName("");
                 setTypeofsurface("");
                 setLength(0);
@@ -80,13 +82,13 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                 let errorText = await response.text();
                 try {
                     const errorData = JSON.parse(errorText);
-                    setMessage("Error: " + (errorData.detail || JSON.stringify(errorData)));
+                    setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
                 } catch {
-                    setMessage("Error: " + (errorText || "Wystąpił błąd"));
+                    setMessage(t("universal.error") + (errorText));
                 }
             }
         } catch (error: any) {
-            setMessage("Error: " + error.message);
+            setMessage(t("universal.error") + error.message);
         }
     };
 
@@ -96,9 +98,9 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                 <div>
                     {adminInFacility === 0 && (
                         <>
-                            <label>Obiekt</label><br />
+                            <label>{t("track.facility")}</label><br />
                             <select id="facilitySelect" value={facilityID} onChange={e => setFacilityId(Number(e.target.value))} required className="info-input">
-                                <option value="">Wybierz obiekt</option>
+                                <option value="">{t("track.selectFacility")}</option>
                                 {facilities.map(facility => (
                                     <option key={facility.id} value={facility.id}>
                                         {facility.name}
@@ -108,23 +110,23 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                         </>
                     )}
 
-                    <label htmlFor="trackName">Nazwa</label>
+                    <label htmlFor="trackName">{t("track.name")}</label>
                     <input id="trackName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
 
-                    <label htmlFor="trackType">Typ nawierzchni</label>
+                    <label htmlFor="trackType">{t("track.typeOfSurface")}</label>
                     <input id="trackType" value={typeofsurface} onChange={e => setTypeofsurface(e.target.value)} required maxLength={50} className="info-input" />
 
-                    <label htmlFor="trackLength">Długość</label>
+                    <label htmlFor="trackLength">{t("track.length")}</label>
                     <input id="trackLength" type="number" value={length} onChange={e => setLength(Number(e.target.value))} required maxLength={50} className="info-input" />
 
-                    <label htmlFor="trackOpeningHour">Godzina otwarcia</label>
+                    <label htmlFor="trackOpeningHour">{t("track.open")}</label>
                     <input id="trackOpeningHour" type="time" value={openingHour} onChange={e => setOpeningHour(e.target.value)} required className="info-input" />
 
-                    <label htmlFor="trackClosingHour">Godzina zamknięcia</label>
+                    <label htmlFor="trackClosingHour">{t("track.close")}</label>
                     <input id="trackClosingHour" type="time" value={closingHour} onChange={e => setClosingHour(e.target.value)} required className="info-input" />
 
                     <div className="mb-2">
-                        <label>Dni otwarcia</label>
+                        <label>{t("track.availableDays")}</label>
                         <div className="d-flex flex-wrap gap-2 mt-1">
                             {allDays.map(day => (
                                 <label key={day} className="form-check">
@@ -145,7 +147,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                         </div>
                     </div>
                 </div>
-                <button type="submit">Dodaj nowy tor</button>
+                <button type="submit">{t("universal.save")}</button>
                 <div>{message}</div>
             </form>
         </>

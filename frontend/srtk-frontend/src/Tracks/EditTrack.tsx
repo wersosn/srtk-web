@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from "react-i18next";
 
 interface EditTrackProps {
     trackId: number;
@@ -24,6 +25,7 @@ const EditTrack: React.FC<EditTrackProps> = ({ trackId, currentName, currentType
     const facilityId = currentFacilityId;
     const [message, setMessage] = useState('');
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,10 +45,10 @@ const EditTrack: React.FC<EditTrackProps> = ({ trackId, currentName, currentType
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage('Błąd: ' + error);
+                setMessage(t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage('Błąd: ' + err.message);
+            setMessage(t("universal.error") + err.message);
         }
     };
 
@@ -54,27 +56,27 @@ const EditTrack: React.FC<EditTrackProps> = ({ trackId, currentName, currentType
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="trackName">Nazwa</label>
+                    <label htmlFor="trackName">{t("track.name")}</label>
                     <input id="trackName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="trackType">Typ nawierzchi</label>
+                    <label htmlFor="trackType">{t("track.typeOfSurface")}</label>
                     <input id="trackType" value={typeofsurface} onChange={e => setTypeofsurface(e.target.value)} required className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="trackLength">Długość</label>
+                    <label htmlFor="trackLength">{t("track.length")}</label>
                     <input id="trackLength" value={length} onChange={e => setLength(Number(e.target.value))} required className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="trackOpeningHour">Godzina otwarcia</label>
+                    <label htmlFor="trackOpeningHour">{t("track.open")}</label>
                     <input id="trackOpeningHour" type="time" value={openingHour} onChange={e => setOpeningHour(e.target.value)} required className="info-input" />
                 </div>
                 <div>
-                    <label htmlFor="trackClosingHour">Godzina zamknięcia</label>
+                    <label htmlFor="trackClosingHour">{t("track.close")}</label>
                     <input id="trackClosingHour" type="time" value={closingHour} onChange={e => setClosingHour(e.target.value)} required className="info-input" />
                 </div>
                 <div className="mb-2">
-                        <label>Dni otwarcia</label>
+                        <label>{t("track.availableDays")}</label>
                         <div className="d-flex flex-wrap gap-2 mt-1">
                             {allDays.map(day => (
                                 <label key={day} className="form-check">
@@ -95,8 +97,8 @@ const EditTrack: React.FC<EditTrackProps> = ({ trackId, currentName, currentType
                         </div>
                     </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">Zapisz zmiany</button>
-                    <button type="button" onClick={onCancel}>Anuluj</button>
+                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>
             </form>

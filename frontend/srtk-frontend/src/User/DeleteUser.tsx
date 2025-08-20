@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import deleteIcon from '../assets/delete.png';
+import { useTranslation } from "react-i18next";
 
 interface DeleteUserProps {
     userId: number;
@@ -10,9 +11,10 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ userId, onDeleted }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
 
     const handleDelete = async () => {
-        if (!window.confirm('Czy na pewno chcesz usunąć tego użytkownika?')) { 
+        if (!window.confirm(t("user.deleteAlert"))) { 
             return;
         }
 
@@ -30,10 +32,10 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ userId, onDeleted }) => {
                 onDeleted();
             } else {
                 const text = await response.text();
-                setError(`Błąd: ${text || 'Nie udało się usunąć użytkownika'}`);
+                setError(`${t("universal.error")} ${text || t("user.deleteError")}`);
             }
         } catch (err: any) {
-            setError(`Błąd: ${err.message}`);
+            setError(`${t("universal.error")} ${err.message}`);
         } finally {
             setLoading(false);
         }

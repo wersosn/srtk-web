@@ -1,7 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { useTranslation } from "react-i18next";
 
 function Sidebar() {
+    const { t } = useTranslation();
     const getClassName = ({ isActive }: { isActive: boolean }) => (isActive ? "nav-link active no-wrap" : "nav-link no-wrap");
 
     let showMore = false;
@@ -29,22 +31,22 @@ function Sidebar() {
                 </li>
                 <li className="nav-item">
                     <NavLink to="usersManagement" className={getClassName}>
-                        Zarządzanie użytkownikami
+                        {t("admin.userM")}
                     </NavLink>
                 </li>
                 <li className="nav-item">
                     <NavLink to="tracksManagement" className={getClassName}>
-                        Zarządzanie torami
+                        {t("admin.trackM")}
                     </NavLink>
                 </li>
                 <li className="nav-item">
                     <NavLink to="equipmentsManagement" className={getClassName}>
-                        Zarządzanie sprzętem
+                        {t("admin.eqM")}
                     </NavLink>
                 </li>
                 <li className="nav-item">
                     <NavLink to="reservationsManagement" className={getClassName}>
-                        Zarządzanie rezerwacjami
+                        {t("admin.reservationM")}
                     </NavLink>
                 </li>
 
@@ -52,24 +54,24 @@ function Sidebar() {
                 <>
                     <li className="nav-item">
                         <NavLink to="facilitiesManagement" className={getClassName}>
-                            Zarządzanie obiektami
+                            {t("admin.facilityM")}
                         </NavLink>
                     </li>
                     <li className="nav-item">
                         <NavLink to="roleManagement" className={getClassName}>
-                            Zarządzanie rolami
+                            {t("admin.roleM")}
                         </NavLink>
                     </li>
                     <li className="nav-item">
                         <NavLink to="statusesManagement" className={getClassName}>
-                            Zarządzanie statusami rezerwacji
+                            {t("admin.statusM")}
                         </NavLink>
                     </li>
                 </>
                 )}
                 <li className="nav-item">
                     <NavLink to="adminPanelSettings" className={getClassName}>
-                        Ustawienia
+                        {t("profile.settings")}
                     </NavLink>
                 </li>
             </ul>

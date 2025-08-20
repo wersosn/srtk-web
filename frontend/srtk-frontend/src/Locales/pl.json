@@ -3,6 +3,7 @@
     "loading": "Ładowanie...",
     "error": "Wystąił błąd ",
     "saveChanges": "Zapisz zmiany",
+    "save": "Zapisz",
     "cancel": "Anuluj"
   },
 
@@ -53,11 +54,15 @@
 
   "api": {
     "tracksError": "Błąd podczas pobierania torów",
+    "facilityError": "Błąd podczas pobierania obiektów",
+    "roleError": "Błąd podczas pobierania ról",
     "eqError": "Błąd podczas pobierania sprzętu",
     "availabilityError": "Błąd sprawdzania dostępności",
     "reservationError": "Błąd podczas pobierania rezerwacji",
     "reservationForTrackError": "Błąd pobierania rezerwacji dla toru",
     "statusError": "Błąd podczas pobierania statusów rezerwacji",
+    "clientsError": "Błąd podczas pobierania klientów",
+    "adminsError": "Błąd podczas pobierania adminów",
     "unknownTrack": "Nieznany tor",
     "unknownStatus": "Nieznany status"
   },
@@ -106,7 +111,15 @@
     "surname": "Nazwisko",
     "phoneNumber": "Numer telefonu",
     "role": "Rola",
-    "facility": "Obiekt"
+    "facility": "Obiekt",
+    "clients": "Klienci",
+    "admins": "Administratorzy",
+    "facilityId": "Id obiektu",
+    "edit": "Edycja użytkownika",
+    "selectRole": "Wybierz rolę",
+    "selectFacility": "Wybierz obiekt",
+    "deleteAlert": "Czy na pewno chcesz usunąć tego użytkownika?",
+    "deleteError": "Nie udało się usunąć użytkownika"
   },
 
   "reservation": {
@@ -127,5 +140,89 @@
     "deleteError": "Nie udało się usunąć rezerwacji",
     "reservationManagement": "Zarządzanie rezerwacjami",
     "emptyList": "Brak rezerwacji"
+  },
+
+  "admin": {
+    "dashboard": "Witaj w panelu admina.",
+    "userM": "Zarządzanie użytkownikami",
+    "trackM": "Zarządzanie torami",
+    "eqM": "Zarządzanie sprzętem",
+    "reservationM": "Zarządzanie rezerwacjami",
+    "facilityM": "Zarządzanie obiektami",
+    "statusM": "Zarządzanie statusami rezerwacji",
+    "roleM": "Zarządzanie rolami",
+    "clientsLoading": "Ładowanie klientów...",
+    "adminsLoading": "Ładowanie administratorów..."
+  },
+
+  "track": {
+    "name": "Nazwa",
+    "typeOfSurface": "Rodzaj nawierzchni",
+    "length": "Długość",
+    "open": "Godzina otwarcia",
+    "close": "Godzina zamknięcia",
+    "days": "Dni, gdy tor jest otwarty",
+    "facility": "Obiekt",
+    "facilityId": "Id obiektu",
+    "list": "Lista torów",
+    "loading": "Ładowanie torów...",
+    "add": "Nowy tor",
+    "edit": "Edycja toru",
+    "trackAdded": "Dodano tor",
+    "availableDays": "Dni otwarcia",
+    "selectFacility": "Wybierz obiekt",
+    "deleteAlert": "Czy na pewno chcesz usunąć ten tor?",
+    "deleteError": "Nie udało się usunąć toru"
+  },
+
+  "eq": {
+    "name": "Nazwa",
+    "type": "Rodzaj",
+    "cost": "Koszt",
+    "facility": "Obiekt",
+    "facilityId": "Id obiektu",
+    "list": "Lista sprzętów",
+    "loading": "Ładowanie sprzętów...",
+    "add": "Nowy sprzęt",
+    "edit": "Edycja sprzętu",
+    "eqAdded": "Dodano sprzęt",
+    "selectFacility": "Wybierz obiekt",
+    "deleteAlert": "Czy na pewno chcesz usunąć ten sprzęt?",
+    "deleteError": "Nie udało się usunąć sprzętu"
+  },
+
+  "facility": {
+    "name": "Nazwa",
+    "city": "Miasto",
+    "address": "Adres",
+    "list": "Lista obiektów",
+    "loading": "Ładowanie obiektów...",
+    "add": "Nowy obiekt",
+    "edit": "Edycja obiektu",
+    "facilityAdded": "Dodano obiekt",
+    "deleteAlert": "Czy na pewno chcesz usunąć ten obiekt?",
+    "deleteError": "Nie udało się usunąć obiektu"
+  },
+
+  "role": {
+    "name": "Nazwa",
+    "list": "Lista ról",
+    "loading": "Ładowanie ról...",
+    "add": "Nowa rola",
+    "edit": "Edycja roli",
+    "roleAdded": "Dodano rolę",
+    "deleteAlert": "Czy na pewno chcesz usunąć tę rolę?",
+    "deleteError": "Nie udało się usunąć roli"
+  },
+
+  "status": {
+    "name": "Nazwa",
+    "list": "Lista statusów rezerwacji",
+    "loading": "Ładowanie statusów rezerwacji...",
+    "add": "Nowa statusu",
+    "edit": "Edycja statusu",
+    "roleAdded": "Dodano status",
+    "deleteAlert": "Czy na pewno chcesz usunąć ten status?",
+    "deleteError": "Nie udało się usunąć statusu"
   }
 }

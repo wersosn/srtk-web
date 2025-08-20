@@ -5,6 +5,7 @@ import EditEquipment from './EditEquipment';
 import DeleteEquipment from './DeleteEquipment';
 import { jwtDecode } from 'jwt-decode';
 import type { Equipment } from '../Types/Types';
+import { useTranslation } from "react-i18next";
 
 function EquipmentsManagement() {
     const [eqs, setEqs] = useState<Equipment[]>([]);
@@ -12,6 +13,7 @@ function EquipmentsManagement() {
     const [showDetails, setShowDetails] = useState<Equipment | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     // Pobieranie wszystkich torów z bazy:
     const fetchAllEqs = async () => {
@@ -43,12 +45,12 @@ function EquipmentsManagement() {
             });
 
             if (!res.ok) {
-                throw new Error('Błąd podczas pobierania sprzętów');
+                throw new Error(t("api.eqError"));
             }
             const data = await res.json();
             setEqs(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
@@ -72,16 +74,16 @@ function EquipmentsManagement() {
 
     return (
         <div className="admin-content p-4">
-            <h2 className="mb-3">Zarządzanie sprzętem</h2>
+            <h2 className="mb-3">{t("admin.eqM")}</h2>
             <hr />
 
             {loading ? (
-                <p>Ładowanie sprzętu...</p>
+                <p>{t("eq.loading")}</p>
             ) : error ? (
                 <p className="text-danger">{error}</p>
             ) : (
                 <>
-                    <h5 className="mt-4">Lista sprzętów</h5>
+                    <h5 className="mt-4">{t("eq.list")}</h5>
                     <ul className="list-group">
                         {eqs.map((Equipment) => (
                             <li key={Equipment.id} className="list-group-item p-0">
@@ -97,7 +99,11 @@ function EquipmentsManagement() {
 
                                 {showDetails?.id === Equipment.id && (
                                     <div className="mt-2 ps-2 details">
-                                        <div><strong>Rodzaj:</strong> {Equipment.type} <br /> <strong>Cena:</strong> {Equipment.cost} <br /> <strong>Obiekt:</strong> {Equipment.facilityId}</div>
+                                        <div>
+                                            <strong>{t("eq.type")}:</strong> {Equipment.type} <br /> 
+                                            <strong>{t("eq.cost")}:</strong> {Equipment.cost} <br /> 
+                                            <strong>{t("eq.facilityId")}:</strong> {Equipment.facilityId}
+                                        </div>
                                     </div>
                                 )}
                             </li>
@@ -106,12 +112,19 @@ function EquipmentsManagement() {
                     <hr />
                     {editingEquipment ? (
                         <>
-                            <h5 className="mt-4">Edycja toru</h5>
-                            <EditEquipment equipmentId={editingEquipment.id} currentName={editingEquipment.name} currentType={editingEquipment.type} currentCost={editingEquipment.cost} currentFacilityId={editingEquipment.facilityId} onUpdated={handleEdit} onCancel={() => setEditingEquipment(null)} />
+                            <h5 className="mt-4">{t("eq.edit")}</h5>
+                            <EditEquipment 
+                                equipmentId={editingEquipment.id} 
+                                currentName={editingEquipment.name} 
+                                currentType={editingEquipment.type} 
+                                currentCost={editingEquipment.cost} 
+                                currentFacilityId={editingEquipment.facilityId} 
+                                onUpdated={handleEdit} 
+                                onCancel={() => setEditingEquipment(null)} />
                         </>
                     ) : (
                         <>
-                            <h5 className="mt-4">Nowy tor</h5>
+                            <h5 className="mt-4">{t("eq.add")}</h5>
                             <AddEquipment onAddEquipment={handleAdd} />
                         </>
                     )}
