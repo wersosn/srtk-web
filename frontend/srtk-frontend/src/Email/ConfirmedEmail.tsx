@@ -23,7 +23,7 @@ function ConfirmedEmail() {
             try {
                 const response = await fetch('/api/auth/confirm-email', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'X-Client-Type': 'web' },
                     body: JSON.stringify({ token }),
                 });
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -37,6 +38,7 @@ namespace srtk.Services
         {
             return await context.Users.FindAsync(id);
         }
+
         // Pobranie konkretnego użytkownika po adresie e-mail:
         public async Task<User?> GetByEmail(string email)
         {

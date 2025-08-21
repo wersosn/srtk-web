@@ -103,7 +103,9 @@
     "settings": "Ustawienia",
     "language": "Język",
     "noToken": "Brak tokena – zaloguj się ponownie!",
-    "saveChanges": "Zapisz zmiany"
+    "saveChanges": "Zapisz zmiany",
+    "confirmation": "Potwierdzenie adresu e-mail",
+    "sendConfirmation": "Wysłano link do potwierdzenia na adres e-mail"
   },
 
   "user": {

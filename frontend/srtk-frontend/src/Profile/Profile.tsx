@@ -10,6 +10,8 @@ import './Profile.css';
 function Profile() {
     const [userId, setUserId] = useState<number>();
     const [user, setUser] = useState<Client>();
+    const [email, setEmail] = useState<string>("");
+    const [emailConfirmed, setEmailConfirmed] = useState<boolean | null>(null);
     const [language, setLanguage] = useState(i18n.language);
     const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
@@ -28,6 +30,8 @@ function Profile() {
           if (!res.ok) throw new Error(t("profile.userFetchError"));
           const data = await res.json();
           setUser(data);
+          setEmail(data.email);
+          setEmailConfirmed(data.emailConfirmed);
       } catch (err: any) {
           setError(err.message || t("profile.userFetchError"));
       } finally {
@@ -50,8 +54,10 @@ function Profile() {
     }, [token]);
 
     useEffect(() => {
-        fetchUserInfo();
-    }, [fetchUserInfo]);
+        if (userId) {
+          fetchUserInfo();
+        }
+    }, [userId, fetchUserInfo]);
 
     // Obsługa zmiany danych:
     const handleEdit = (updatedUser: Client) => {
@@ -69,6 +75,27 @@ function Profile() {
         }
         else {
             alert("Zmieniono język");
+        }
+    };
+
+    // Obsługa wysyłania maila z linkiem do potwierdzenia adresu e-mail:
+    const handleSendingEmail = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch('/api/auth/email-confirmation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Client-Type': 'web' },
+                body: JSON.stringify({ email }),
+            });
+
+            if (!response.ok) {
+                const msg = await response.text();
+                throw new Error(msg);
+            }
+            alert(t("profile.sendConfirmation"))
+        } catch (err: any) {
+            setError(err.message);
         }
     };
 
@@ -111,6 +138,11 @@ function Profile() {
                         <option value="en">English</option>
                       </select>
                     </div>
+                    {emailConfirmed !== null && emailConfirmed === false && (
+                      <div className="setting-item">
+                        <button onClick={handleSendingEmail}>{t("profile.confirmation")}</button>
+                      </div>
+                    )}
                   </>
                 ))}
             </main>

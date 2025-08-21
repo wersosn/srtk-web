@@ -25,7 +25,8 @@ namespace srtk.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            var error = await service.Register(dto);
+            var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
+            var error = await service.Register(dto, clientType);
             if (error != null)
             {
                 return BadRequest(error);
@@ -63,7 +64,8 @@ namespace srtk.Controllers
         [HttpPost("email-confirmation")]
         public async Task<IActionResult> EmailConfirmation([FromBody] EmailConfirmationDto dto)
         {
-            await service.EmailConfirmation(dto.Email);
+            var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
+            await service.EmailConfirmation(dto.Email, clientType);
             return Ok("Mail z linkiem do potwierdzenia e-maila został wysłany");
         }
 
@@ -79,7 +81,8 @@ namespace srtk.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
-            await service.ForgotPassword(dto.Email);
+            var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
+            await service.ForgotPassword(dto.Email, clientType);
             return Ok("Mail z linkiem do resetu hasła został wysłany");
         }
 

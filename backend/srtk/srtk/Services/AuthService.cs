@@ -28,7 +28,7 @@ namespace srtk.Services
             this.config = config;
         }
 
-        public async Task<string?> Register(RegisterDto dto)
+        public async Task<string?> Register(RegisterDto dto, string clientType)
         {
             var usedEmail = await context.Users.AnyAsync(u => u.Email == dto.Email);
             if (usedEmail)
@@ -48,28 +48,7 @@ namespace srtk.Services
             };
             await userService.Add(user);
 
-            await EmailConfirmation(user.Email);
-
-            /*_ = Task.Run(async () =>
-            {
-                try
-                {
-                    await emailService.SendEmail(
-                        user.Email,
-                        "Potwierdzenie pomyślnej rejestracji",
-                        $@"
-                    <div style='font-family: Arial, sans-serif; padding: 10px'>
-                        <h2>Witaj {user.Email}!</h2>
-                        <p>Dziękujemy za rejestrację w naszym serwisie. Możesz teraz dokonać rezerwacji toru kolarskiego :)</p>
-                    </div>"
-                    );
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Błąd wysyłania maila: " + ex.Message);
-                }
-            });*/
-
+            await EmailConfirmation(user.Email, clientType);
             return null;
         }
 
@@ -109,7 +88,7 @@ namespace srtk.Services
         }
 
         // Żadanie potwierdzenia maila:
-        public async Task EmailConfirmation(string email)
+        public async Task EmailConfirmation(string email, string clientType)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
@@ -118,7 +97,15 @@ namespace srtk.Services
             }
 
             var token = jwtService.GenerateConfirmEmailToken(user);
-            var confirmLink = $"{config["Frontend:BaseUrl"]}/confirm-email?token={token}";
+            string confirmLink;
+            if (clientType.Equals("mobile", StringComparison.OrdinalIgnoreCase))
+            {
+                confirmLink = $"{config["MobileApp:DeepLink"]}/confirm-email?token={token}";
+            }
+            else
+            {
+                confirmLink = $"{config["Frontend:BaseUrl"]}/confirm-email?token={token}";
+            }
 
             _ = Task.Run(async () =>
             {
@@ -162,7 +149,7 @@ namespace srtk.Services
         }
 
         // Żądanie resetu hasła użytkownika:
-        public async Task ForgotPassword(string email)
+        public async Task ForgotPassword(string email, string clientType)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
@@ -176,7 +163,15 @@ namespace srtk.Services
             }
 
             var token = jwtService.GenerateResetPasswordToken(user);
-            var resetLink = $"{config["Frontend:BaseUrl"]}/reset-password?token={token}";
+            string resetLink;
+            if (clientType.Equals("mobile", StringComparison.OrdinalIgnoreCase))
+            {
+                resetLink = $"{config["MobileApp:DeepLink"]}/reset-password?token={token}";
+            }
+            else
+            {
+                resetLink = $"{config["Frontend:BaseUrl"]}/reset-password?token={token}";
+            }
 
             _ = Task.Run(async () =>
             {

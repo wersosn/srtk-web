@@ -107,7 +107,9 @@
     "name": "First name",
     "surname": "Last name",
     "phoneNum": "Phone number",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "confirmation": "Email address confirmation",
+    "sendConfirmation": "Confirmation link has been sent to your email address"
   },
 
   "user": {
