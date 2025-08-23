@@ -245,71 +245,81 @@ namespace srtk.Services
         // Edycja istniejącej rezerwacji:
         public async Task<Reservation?> Update(int id, [FromBody] ReservationDto dto)
         {
-            var reservation = await context.Reservations
-                .Include(r => r.EquipmentReservations)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (reservation == null)
+            await using var transaction = await context.Database.BeginTransactionAsync();
+            try
             {
-                return null;
-            }
+                var reservation = await context.Reservations
+                    .Include(r => r.EquipmentReservations)
+                    .FirstOrDefaultAsync(r => r.Id == id);
 
-            if (!await IsTrackAvailable(dto.TrackId, dto.Start.ToUniversalTime(), dto.End.ToUniversalTime(), id))
-            {
-                throw new Exception("Tor jest już zarezerwowany w tym czasie!");
-            }
-
-            var existingEquipmentReservations = await context.EquipmentReservations
-                    .Where(er => er.ReservationId == reservation.Id)
-                    .ToListAsync();
-
-            // Aktualizacja istniejących sprzętów:
-            var dtoEquipmentDict = dto.EquipmentReservations.ToDictionary(e => e.EquipmentId);
-            foreach (var existing in existingEquipmentReservations)
-            {
-                if (!dtoEquipmentDict.ContainsKey(existing.EquipmentId))
+                if (reservation == null)
                 {
-                    context.EquipmentReservations.Remove(existing);
+                    return null;
                 }
-                else
+
+                if (!await IsTrackAvailable(dto.TrackId, dto.Start.ToUniversalTime(), dto.End.ToUniversalTime(), id))
                 {
-                    var dtoItem = dtoEquipmentDict[existing.EquipmentId];
-                    if (dtoItem.Quantity <= 0)
+                    throw new Exception("Tor jest już zarezerwowany w tym czasie!");
+                }
+
+                var existingEquipmentReservations = await context.EquipmentReservations
+                        .Where(er => er.ReservationId == reservation.Id)
+                        .ToListAsync();
+
+                // Aktualizacja istniejących sprzętów:
+                var dtoEquipmentDict = dto.EquipmentReservations.ToDictionary(e => e.EquipmentId);
+                foreach (var existing in existingEquipmentReservations)
+                {
+                    if (!dtoEquipmentDict.ContainsKey(existing.EquipmentId))
                     {
                         context.EquipmentReservations.Remove(existing);
                     }
-                    else if (existing.Quantity != dtoItem.Quantity)
+                    else
                     {
-                        existing.Quantity = dtoItem.Quantity;
-                        context.Entry(existing).State = EntityState.Modified;
+                        var dtoItem = dtoEquipmentDict[existing.EquipmentId];
+                        if (dtoItem.Quantity <= 0)
+                        {
+                            context.EquipmentReservations.Remove(existing);
+                        }
+                        else if (existing.Quantity != dtoItem.Quantity)
+                        {
+                            existing.Quantity = dtoItem.Quantity;
+                            context.Entry(existing).State = EntityState.Modified;
+                        }
                     }
                 }
-            }
 
-            // Dodawanie nowych sprzętów:
-            foreach (var dtoItem in dto.EquipmentReservations)
-            {
-                var alreadyExists = existingEquipmentReservations.Any(er => er.EquipmentId == dtoItem.EquipmentId);
-                if (!alreadyExists && dtoItem.Quantity > 0)
+                // Dodawanie nowych sprzętów:
+                foreach (var dtoItem in dto.EquipmentReservations)
                 {
-                    var newReservation = new EquipmentReservation
+                    var alreadyExists = existingEquipmentReservations.Any(er => er.EquipmentId == dtoItem.EquipmentId);
+                    if (!alreadyExists && dtoItem.Quantity > 0)
                     {
-                        ReservationId = reservation.Id,
-                        EquipmentId = dtoItem.EquipmentId,
-                        Quantity = dtoItem.Quantity
-                    };
-                    await context.EquipmentReservations.AddAsync(newReservation);
+                        var newReservation = new EquipmentReservation
+                        {
+                            ReservationId = reservation.Id,
+                            EquipmentId = dtoItem.EquipmentId,
+                            Quantity = dtoItem.Quantity
+                        };
+                        await context.EquipmentReservations.AddAsync(newReservation);
+                    }
                 }
+
+                // Aktualizacja głównych parametrów:
+                reservation.Start = dto.Start.ToUniversalTime();
+                reservation.End = dto.End.ToUniversalTime();
+                reservation.Cost = dto.Cost;
+                reservation.TrackId = dto.TrackId;
+
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return reservation;
             }
-
-            // Aktualizacja głównych parametrów:
-            reservation.Start = dto.Start.ToUniversalTime();
-            reservation.End = dto.End.ToUniversalTime();
-            reservation.Cost = dto.Cost;
-            reservation.TrackId = dto.TrackId;
-
-            await context.SaveChangesAsync();
-            return reservation;
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         // Usunięcie istniejącej rezerwacji:
