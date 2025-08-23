@@ -25,7 +25,7 @@ namespace srtk.Services
             _settings = settings.Value;
         }
 
-        public async Task SendEmail(string to, string subject, string bodyHtml)
+        public async virtual Task SendEmail(string to, string subject, string bodyHtml)
         {
             if (string.IsNullOrWhiteSpace(to))
             {

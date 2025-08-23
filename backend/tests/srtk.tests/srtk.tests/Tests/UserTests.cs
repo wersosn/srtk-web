@@ -228,6 +228,34 @@ namespace srtk.tests.Tests
             output.WriteLine("Wynik: Zmodyfikowano użytkownika");
         }
 
+        // Test - edycja użytkownika przez samego siebie:
+        [Fact]
+        public async Task Updating_Myself()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+
+            var client = new Client
+            {
+                Email = "test@test.pl",
+                Password = "abc123",
+                RoleId = 1,
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789"
+            };
+            await service.Add(client);
+
+            var updatedUserDto = new UserDto
+            {
+                Email = "testNowy@test.pl",
+            };
+
+            var updated = await service.UpdateMyself(client.Id, updatedUserDto);
+            Assert.Equal("testNowy@test.pl", updated.Email);
+            output.WriteLine("Wynik: Zmodyfikowano swoje dane");
+        }
+
         // Test - usuwanie użytkownika:
         [Fact]
         public async Task Deleting_User()

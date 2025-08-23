@@ -106,7 +106,7 @@ namespace srtk.Services
             return Convert.ToBase64String(bytes);
         }
 
-        public ClaimsPrincipal? ValidateToken(string token)
+        public virtual ClaimsPrincipal? ValidateToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
             try
