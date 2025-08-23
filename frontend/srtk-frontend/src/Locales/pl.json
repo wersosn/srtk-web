@@ -35,6 +35,8 @@
     "selectTrack": "Wybierz tor",
     "trackType": "Typ nawierzchni:",
     "trackLength": "Długość:",
+    "trackHours": "Tor otwarty jest w godzinach: ",
+    "trackDays": " i dniach: ",
     "start": "Data rozpoczęcia",
     "end": "Data zakończenia",
     "notAvailable": "Ten tor jest już zajęty w wybranym terminie.",

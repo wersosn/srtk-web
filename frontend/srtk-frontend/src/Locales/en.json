@@ -35,6 +35,8 @@
     "selectTrack": "Select track",
     "trackType": "Surface type:",
     "trackLength": "Length:",
+    "trackHours": "The track is open from: ",
+    "trackDays": " and on days: ",
     "start": "Start Date",
     "end": "End Date",
     "notAvailable": "This track is already booked for the selected time.",

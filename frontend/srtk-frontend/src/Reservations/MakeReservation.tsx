@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
-import { parseAvailableDays, isValidDateTime } from './DateHelper';
+import { parseAvailableDays, isValidDateTime, dayMap } from './DateHelper';
 import type { Equipment, Track } from '../Types/Types';
 import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
@@ -10,6 +10,7 @@ import cycleImage from '../assets/cycle.svg';
 function MakeReservation() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
+    const [trackInfo, setTrackInfo] = useState<string>("");
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [rentEquipment, setRentEquipment] = useState(false);
@@ -109,6 +110,18 @@ function MakeReservation() {
         }
     };
 
+    // Ustawienie szczegółów:
+    const trackDetails = async () => {
+        const track = tracks.find(t => t.id === selectedTrackId);
+        if (!track) {
+            return null;
+        }
+        const allowedDays = parseAvailableDays(track.availableDays).map(d => Object.keys(dayMap).find(key => dayMap[key] === d)).join(', ');
+        const openingHour = track?.openingHour || '00:00';
+        const closingHour = track?.closingHour || '23:59';
+        setTrackInfo(t("makeReservations.trackHours") + openingHour + " - " + closingHour + t("makeReservations.trackDays") + allowedDays);
+    }
+
     useEffect(() => {
         if (token) {
             try {
@@ -136,6 +149,10 @@ function MakeReservation() {
         checkTrackAvailability();
     }, [selectedTrackId, startDate, endDate]);
 
+    useEffect(() => {
+        trackDetails();
+    }, [selectedTrackId])
+
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
     const openingHour = track?.openingHour || '00:00';
@@ -153,8 +170,7 @@ function MakeReservation() {
 
     // Handler sprawdzający, czy data zakończenia jest zgodna z godzinami funkcjonowania toru:
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        
+        const val = e.target.value;     
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
             setEndDate(val);
         } else {
@@ -239,6 +255,8 @@ function MakeReservation() {
                                     </option>
                                 ))}
                             </select>
+                                
+                            {trackInfo && selectedTrackId !== 0 && <p>{trackInfo}</p>}
 
                             <label htmlFor="resStart">{t("makeReservations.start")}</label>
                             <input id="resStart" type="datetime-local" className="info-input" value={startDate} onChange={handleStartDateChange} />

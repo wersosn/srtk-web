@@ -126,6 +126,9 @@ namespace srtk.Services
         // Pobieranie rezerwacji, które trwają w określonym przedziale czasowym - do znajdywania kolizji:
         public async virtual Task<bool> IsTrackAvailable(int trackId, DateTime start, DateTime end, int? reservationId = null)
         {
+            start = start.ToUniversalTime();
+            end = end.ToUniversalTime();
+
             return !await context.Reservations
                 .AnyAsync(r =>
                     r.TrackId == trackId &&
@@ -149,8 +152,7 @@ namespace srtk.Services
         // Dodanie nowej rezerwacji:
         public async virtual Task<Reservation> Add(Reservation reservation)
         {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
-            var track = await context.Tracks.FirstOrDefaultAsync(t => t.Id == reservation.TrackId);
+            using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
             reservation.Start = reservation.Start.ToUniversalTime();
             reservation.End = reservation.End.ToUniversalTime();
@@ -161,10 +163,27 @@ namespace srtk.Services
             }
 
             var equipmentReservations = reservation.EquipmentReservations.ToList();
-            reservation.EquipmentReservations.Clear();
+            foreach (var eqRes in equipmentReservations)
+            {
+                var equipmentExists = await context.Equipments.AnyAsync(e => e.Id == eqRes.EquipmentId);
+                if (!equipmentExists)
+                {
+                    throw new Exception($"Sprzęt {eqRes.Equipment?.Name} nie istnieje.");
+                }
+            }
 
+            reservation.EquipmentReservations.Clear();
             context.Reservations.Add(reservation);
-            await context.SaveChangesAsync();
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Tor jest już zarezerwowany w tym czasie (wykryto konflikt): ", ex);
+            }
 
             foreach (var eqRes in equipmentReservations)
             {
@@ -177,13 +196,26 @@ namespace srtk.Services
                 eqRes.ReservationId = reservation.Id;
                 context.EquipmentReservations.Add(eqRes);
             }
-            await context.SaveChangesAsync();
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("Tor jest już zarezerwowany w tym czasie (wykryto konflikt).", ex);
+            }
 
             reservation.EquipmentReservations = await context.EquipmentReservations
                 .Where(er => er.ReservationId == reservation.Id)
                 .ToListAsync();
 
-            if(user != null)
+            await transaction.CommitAsync();
+
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
+            var track = await context.Tracks.FirstOrDefaultAsync(t => t.Id == reservation.TrackId);
+            if (user != null)
             {
                 _ = Task.Run(async () =>
                 {

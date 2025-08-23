@@ -22,6 +22,10 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Reservation>()
+            .HasIndex(r => new { r.TrackId, r.Start, r.End })
+            .IsUnique();
+
+        modelBuilder.Entity<Reservation>()
             .HasOne(r => r.User)
             .WithMany(u => u.ReservationList)
             .HasForeignKey(r => r.UserId)

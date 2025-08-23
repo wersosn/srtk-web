@@ -100,8 +100,23 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<Reservation>> AddReservation(Reservation reservation)
         {
-            var r = await service.Add(reservation);
-            return CreatedAtAction(nameof(GetReservationById), new { id = r.Id }, r);
+            try
+            {
+                var r = await service.Add(reservation);
+                return CreatedAtAction(nameof(GetReservationById), new { id = r.Id }, r);
+            }
+            catch (DbUpdateException)
+            {
+                return Conflict("Tor jest już zarezerwowany w tym czasie! Wybierz inny czas!");
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException is DbUpdateException)
+                {
+                    return Conflict("Tor został już zarezerwowany w tym czasie! Wybierz inny czas!");
+                }
+                return BadRequest(ex.Message);
+            }
         }
 
         // Edycja istniejącej rezerwacji:
