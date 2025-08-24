@@ -12,7 +12,7 @@ import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
 import { useTranslation } from "react-i18next";
 
-export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
+function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const [events, setEvents] = useState<any[]>([]);
@@ -112,3 +112,5 @@ export default function MyReservationCalendar({ refreshTrigger }: { refreshTrigg
         </>
     );
 }
+
+export default MyReservationCalendar;

@@ -232,5 +232,14 @@
     "statusAdded": "Status added",
     "deleteAlert": "Are you sure you want to delete this status?",
     "deleteError": "Failed to delete the status"
+  },
+
+  "filters": {
+    "title": "Filters",
+    "allTracks": "All tracks",
+    "allStatuses": "All statuses",
+    "allFacilities": "All facilities",
+    "allUsers": "All users",
+    "reset": "Reset filters"
   }
 }

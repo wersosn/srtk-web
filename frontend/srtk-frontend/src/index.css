@@ -54,6 +54,11 @@ button {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+button:hover {
+  background-color: light-dark(#162533, #cfd4d7);
+  color: light-dark(#dde2e5, #1f2f40);
+}
+
 h2, h5 {
   text-align: center;
   color: light-dark(#1f2f40, #dde2e5);
@@ -109,6 +114,11 @@ label {
   box-shadow: none;
 }
 
+.icon-button:hover {
+  background: none;
+  border:none;
+}
+
 .info-input {
   display: block;
   width: 100%;
@@ -122,7 +132,7 @@ label {
 }
 
 .info-input::-webkit-calendar-picker-indicator {
-  filter: invert(1);
+  filter: brightness(0) saturate(100%);
 }
 
 .number-input {
@@ -136,6 +146,18 @@ label {
   font-size: 1rem;
   width: 80px;
   margin-left: 8px;
+}
+
+.btn-filter {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background-color: light-dark(#1f2f40, #dde2e5);
+  color: light-dark(#dde2e5, #1f2f40);
+  border: 1px solid #dde2e5;
+  font-size: 1rem;
 }
 
 .details {

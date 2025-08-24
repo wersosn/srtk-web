@@ -145,7 +145,7 @@ function UserManagement() {
                                     <div className="mt-2 ps-2 details">
                                         <strong>{t("user.name")}:</strong> {client.name} <br />
                                         <strong>{t("user.surname")}:</strong> {client.surname} <br />
-                                        <strong>{t("user.phoneNumber")}:</strong> {client.phoneNumber} 
+                                        <strong>{t("user.phoneNumber")}:</strong> {client.phoneNumber}
                                     </div>
                                 )}
                             </li>

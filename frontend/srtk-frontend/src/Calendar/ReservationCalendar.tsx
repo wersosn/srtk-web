@@ -11,7 +11,7 @@ import type { Reservation, Track } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
 import { useTranslation } from "react-i18next";
 
-export default function ReservationCalendar() {
+function ReservationCalendar() {
     const [tracks, setTracks] = useState<Track[]>([]);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
@@ -153,3 +153,5 @@ export default function ReservationCalendar() {
         </>
     );
 }
+
+export default ReservationCalendar;

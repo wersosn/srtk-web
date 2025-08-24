@@ -5,6 +5,7 @@ import downloadIcon from '../assets/download.png';
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
+import FilterReservations from '../Filters/FilterReservations';
 import type { Reservation, Track, Status } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
@@ -13,6 +14,7 @@ function MyReservations() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
+    const [filteredReservations, setFilteredReservations] = useState<Reservation[]>(reservations);
     const [userId, setUserId] = useState<number | undefined>(undefined);
     const [tracks, setTracks] = useState<Track[]>([]);
     const [statuses, setStatuses] = useState<Status[]>([]);
@@ -108,6 +110,28 @@ function MyReservations() {
         setRefreshCalendarCounter(prev => prev + 1);
     };
 
+    // Obsługa filtrowania:
+    const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
+        let result = reservations;
+        if (trackId) {
+            result = result.filter(r => r.trackId === trackId);
+        }
+        if (statusId) {
+            result = result.filter(r => r.statusId === statusId);
+        }
+        if (startDate) {
+            result = result.filter(r => {
+                const reservationDate = new Date(r.start).toISOString().split('T')[0];
+                return reservationDate === startDate;
+            });
+        }
+        setFilteredReservations(result);
+    };
+
+    useEffect(() => {
+        setFilteredReservations(reservations);
+    }, [reservations]);
+
     // Ustawienie nazwy toru:
     const getTrackName = (trackId: number) => {
         const track = tracks.find(t => t.id === trackId);
@@ -131,6 +155,12 @@ function MyReservations() {
                 <main className="res-main">
                     <h2 className="mb-3">{t("reservation.myReservations")}</h2>
                     <hr />
+                    <h5 className="mt-4">{t("filters.title")}</h5>
+                    <FilterReservations
+                        reservations={reservations}
+                        tracks={tracks}
+                        statuses={statuses}
+                        onFilterChange={handleFilterChange} />
 
                     {loading ? (
                         <p>{t("reservation.loading")}</p>
@@ -140,7 +170,7 @@ function MyReservations() {
                         <>
                             <h5 className="mt-4">{t("reservation.list")}</h5>
                             <ul className="list-group">
-                                {reservations.map((Reservation) => (
+                                {filteredReservations.map((Reservation) => (
                                     <li key={Reservation.id} className="list-group-item p-0">
                                         <div onClick={() => setShowDetails(prev => (prev?.id === Reservation.id ? null : Reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                             <div className="d-flex align-items-center gap-1">

@@ -228,5 +228,14 @@
     "statusAdded": "Dodano status",
     "deleteAlert": "Czy na pewno chcesz usunąć ten status?",
     "deleteError": "Nie udało się usunąć statusu"
+  },
+
+  "filters": {
+    "title": "Filtry",
+    "allTracks": "Wszystkie tory",
+    "allStatuses": "Wszystkie statusy",
+    "allFacilities": "Wszystkie obiekty",
+    "allUsers": "Wszyscy użytkownicy",
+    "reset": "Resetuj filtry"
   }
 }

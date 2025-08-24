@@ -3,14 +3,17 @@ import editIcon from '../assets/edit.png';
 import AddEquipment from './AddEquipment';
 import EditEquipment from './EditEquipment';
 import DeleteEquipment from './DeleteEquipment';
+import FilterEquipments from '../Filters/FilterEquipment';
 import { jwtDecode } from 'jwt-decode';
 import type { Equipment } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 
 function EquipmentsManagement() {
     const [eqs, setEqs] = useState<Equipment[]>([]);
+    const [facilityId, setFacilityId] = useState<number | undefined>();
     const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
     const [showDetails, setShowDetails] = useState<Equipment | null>(null);
+    const [filteredEqs, setFilteredEqs] = useState<Equipment[]>(eqs);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
@@ -21,12 +24,11 @@ function EquipmentsManagement() {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            let facilityId: number | undefined;
 
             if (token) {
                 const decoded: any = jwtDecode(token);
                 if (decoded && decoded.FacilityId) {
-                    facilityId = parseInt(decoded.FacilityId, 10);
+                    setFacilityId(parseInt(decoded.FacilityId, 10));
                 }
             }
             console.log(facilityId);
@@ -72,10 +74,29 @@ function EquipmentsManagement() {
         setEditingEquipment(null);
     };
 
+    // Obsługa filtrowania:
+    const handleFilterChange = (facilityId?: number) => {
+        let result = eqs;
+        if (facilityId) {
+            result = result.filter(t => t.facilityId === facilityId);
+        }
+        setFilteredEqs(result);
+    };
+
+    useEffect(() => {
+        setFilteredEqs(eqs);
+    }, [eqs]);
+
     return (
         <div className="admin-content p-4">
             <h2 className="mb-3">{t("admin.eqM")}</h2>
             <hr />
+            {(facilityId == 0 || !facilityId) && (
+                <>
+                    <h5 className="mt-4">{t("filters.title")}</h5>
+                    <FilterEquipments equipments={eqs} onFilterChange={handleFilterChange} />
+                </>
+            )}
 
             {loading ? (
                 <p>{t("eq.loading")}</p>
@@ -85,7 +106,7 @@ function EquipmentsManagement() {
                 <>
                     <h5 className="mt-4">{t("eq.list")}</h5>
                     <ul className="list-group">
-                        {eqs.map((Equipment) => (
+                        {filteredEqs.map((Equipment) => (
                             <li key={Equipment.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === Equipment.id ? null : Equipment))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {Equipment.name}
@@ -100,8 +121,8 @@ function EquipmentsManagement() {
                                 {showDetails?.id === Equipment.id && (
                                     <div className="mt-2 ps-2 details">
                                         <div>
-                                            <strong>{t("eq.type")}:</strong> {Equipment.type} <br /> 
-                                            <strong>{t("eq.cost")}:</strong> {Equipment.cost} <br /> 
+                                            <strong>{t("eq.type")}:</strong> {Equipment.type} <br />
+                                            <strong>{t("eq.cost")}:</strong> {Equipment.cost} <br />
                                             <strong>{t("eq.facilityId")}:</strong> {Equipment.facilityId}
                                         </div>
                                     </div>
@@ -113,13 +134,13 @@ function EquipmentsManagement() {
                     {editingEquipment ? (
                         <>
                             <h5 className="mt-4">{t("eq.edit")}</h5>
-                            <EditEquipment 
-                                equipmentId={editingEquipment.id} 
-                                currentName={editingEquipment.name} 
-                                currentType={editingEquipment.type} 
-                                currentCost={editingEquipment.cost} 
-                                currentFacilityId={editingEquipment.facilityId} 
-                                onUpdated={handleEdit} 
+                            <EditEquipment
+                                equipmentId={editingEquipment.id}
+                                currentName={editingEquipment.name}
+                                currentType={editingEquipment.type}
+                                currentCost={editingEquipment.cost}
+                                currentFacilityId={editingEquipment.facilityId}
+                                onUpdated={handleEdit}
                                 onCancel={() => setEditingEquipment(null)} />
                         </>
                     ) : (

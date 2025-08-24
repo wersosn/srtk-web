@@ -3,14 +3,17 @@ import editIcon from '../assets/edit.png';
 import AddTrack from './AddTrack';
 import EditTrack from './EditTrack';
 import DeleteTrack from './DeleteTrack';
+import FilterTracks from '../Filters/FilterTracks';
 import { jwtDecode } from 'jwt-decode';
 import type { Track } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 
 function TrackManagement() {
     const [tracks, setTracks] = useState<Track[]>([]);
+    const [facilityId, setFacilityId] = useState<number | undefined>();
     const [editingTrack, setEditingTrack] = useState<Track | null>(null);
     const [showDetails, setShowDetails] = useState<Track | null>(null);
+    const [filteredTracks, setFilteredTracks] = useState<Track[]>(tracks);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
@@ -21,15 +24,14 @@ function TrackManagement() {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            let facilityId: number | undefined;
 
             if (token) {
                 const decoded: any = jwtDecode(token);
                 if (decoded && decoded.FacilityId) {
-                    facilityId = parseInt(decoded.FacilityId, 10);
+                    setFacilityId(parseInt(decoded.FacilityId, 10));
                 }
             }
-            console.log(facilityId);
+
             let url: string;
 
             if (!facilityId || facilityId === 0) {
@@ -72,10 +74,29 @@ function TrackManagement() {
         setEditingTrack(null);
     };
 
+    // Obsługa filtrowania:
+    const handleFilterChange = (facilityId?: number) => {
+        let result = tracks;
+        if (facilityId) {
+            result = result.filter(t => t.facilityId === facilityId);
+        }
+        setFilteredTracks(result);
+    };
+
+    useEffect(() => {
+        setFilteredTracks(tracks);
+    }, [tracks]);
+
     return (
         <div className="admin-content p-4">
             <h2 className="mb-3">{t("admin.trackM")}</h2>
             <hr />
+            {(facilityId == 0 || !facilityId) && (
+                <>
+                    <h5 className="mt-4">{t("filters.title")}</h5>
+                    <FilterTracks tracks={tracks} onFilterChange={handleFilterChange} />
+                </>
+            )}
 
             {loading ? (
                 <p>{t("track.loading")}</p>
@@ -85,7 +106,7 @@ function TrackManagement() {
                 <>
                     <h5 className="mt-4">{t("track.list")}</h5>
                     <ul className="list-group">
-                        {tracks.map((track) => (
+                        {filteredTracks.map((track) => (
                             <li key={track.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === track.id ? null : track))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {track.name}
@@ -100,8 +121,8 @@ function TrackManagement() {
                                 {showDetails?.id === track.id && (
                                     <div className="mt-2 ps-2 details">
                                         <div>
-                                            <strong>{t("track.typeOfSurface")}:</strong> {track.typeOfSurface} 
-                                            <br /> <strong>{t("track.length")}:</strong> {track.length} 
+                                            <strong>{t("track.typeOfSurface")}:</strong> {track.typeOfSurface}
+                                            <br /> <strong>{t("track.length")}:</strong> {track.length}
                                             <br /> <strong>{t("track.open")}:</strong> {track.openingHour}
                                             <br /> <strong>{t("track.close")}:</strong> {track.closingHour}
                                             <br /> <strong>{t("track.days")}:</strong> {track.availableDays}
@@ -116,15 +137,15 @@ function TrackManagement() {
                     {editingTrack ? (
                         <>
                             <h5 className="mt-4">{t("track.edit")}</h5>
-                            <EditTrack trackId={editingTrack.id} 
-                                currentName={editingTrack.name} 
-                                currentTypeOfSurface={editingTrack.typeOfSurface} 
-                                currentLength={editingTrack.length} 
+                            <EditTrack trackId={editingTrack.id}
+                                currentName={editingTrack.name}
+                                currentTypeOfSurface={editingTrack.typeOfSurface}
+                                currentLength={editingTrack.length}
                                 currentOpeningHour={editingTrack.openingHour}
                                 currentClosingHour={editingTrack.closingHour}
                                 currentAvailableDays={editingTrack.availableDays}
                                 currentFacilityId={editingTrack.facilityId}
-                                onUpdated={handleEdit} 
+                                onUpdated={handleEdit}
                                 onCancel={() => setEditingTrack(null)} />
                         </>
                     ) : (

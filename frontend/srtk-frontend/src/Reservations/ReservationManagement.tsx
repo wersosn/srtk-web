@@ -5,6 +5,7 @@ import downloadIconLight from '../assets/download-light.png';
 import { jwtDecode } from 'jwt-decode';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
+import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
 import type { Reservation, Track, Status } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,7 @@ function ReservationManagement() {
     const [reservationsByTrack, setReservationsByTrack] = useState<Record<number, Reservation[]>>({});
     const [statuses, setStatuses] = useState<Status[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
+    const [filteredReservations, setFilteredReservations] = useState<Record<number, Reservation[]>>(reservationsByTrack);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -29,7 +31,7 @@ function ReservationManagement() {
 
         const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
         mq.addEventListener("change", handler);
-        
+
         return () => mq.removeEventListener("change", handler);
     }, []);
     const icon = isDark ? downloadIconLight : downloadIcon;
@@ -151,6 +153,35 @@ function ReservationManagement() {
         // TODO: Wysyłanie powiadomień o zmianach do użytkownika
     };
 
+    // Obsługa filtrowania:
+    const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
+        let result: Record<number, Reservation[]> = {};
+
+        if (trackId) {
+            const reservations = reservationsByTrack[trackId] || [];
+            result[trackId] = reservations.filter(r => {
+                let statusMatch = statusId ? r.statusId === statusId : true;
+                let dateMatch = startDate ? new Date(r.start).toISOString().split('T')[0] === startDate : true;
+                return statusMatch && dateMatch;
+            });
+        } else {
+            Object.entries(reservationsByTrack).forEach(([id, reservations]) => {
+                const filtered = reservations.filter(r => {
+                    let statusMatch = statusId ? r.statusId === statusId : true;
+                    let dateMatch = startDate ? new Date(r.start).toISOString().split('T')[0] === startDate : true;
+                    return statusMatch && dateMatch;
+                });
+                result[Number(id)] = filtered;
+            });
+        }
+
+        setFilteredReservations(result);
+    };
+
+    useEffect(() => {
+        setFilteredReservations(reservationsByTrack);
+    }, [reservationsByTrack]);
+
     // Ustawienie nazwy statusu:
     const getStatusName = (statusId: number) => {
         const status = statuses.find(t => t.id === statusId);
@@ -167,6 +198,13 @@ function ReservationManagement() {
             <div className="admin-content p-4">
                 <h2 className="mb-3">{t("reservation.reservationManagement")}</h2>
                 <hr />
+                <h5 className="mt-4">{t("filters.title")}</h5>
+                <FilterReservationsAdmin
+                    reservationsByTrack={reservationsByTrack}
+                    tracks={tracks}
+                    statuses={statuses}
+                    onFilterChange={handleFilterChange} />
+
 
                 {loading ? (
                     <p>{t("reservation.loading")}</p>
@@ -175,7 +213,7 @@ function ReservationManagement() {
                 ) : (
                     <>
                         <h5 className="mt-4">{t("reservation.list")}</h5>
-                        {Object.entries(reservationsByTrack).map(([trackId, reservations]) => {
+                        {Object.entries(filteredReservations).map(([trackId, reservations]) => {
                             const track = tracks.find(t => t.id === Number(trackId));
                             return (
                                 <div key={trackId} style={{ marginBottom: '2rem' }}>
