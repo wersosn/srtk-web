@@ -68,8 +68,8 @@ test('Pomyślne pobranie listy wszystkich rezerwacji w danym torze', async ({ pa
     const start = formatToDatetimeLocal('2025-08-12T12:00:00Z');
     const end = formatToDatetimeLocal('2025-08-12T15:00:00Z');
 
-    await expect(page.locator('text=Tor Kartingowy Szybka Strefa')).toBeVisible();
-    await expect(page.locator(`text=Rezerwacja: ${formatToDatetimeLocal(start)} - ${formatToDatetimeLocal(end)}`)).toBeVisible();
+    await expect(page.locator('em', { hasText: 'Tor Kartingowy Szybka Strefa' })).toBeVisible();
+    await expect(page.locator(`li.list-group-item >> text=Rezerwacja ${formatToDatetimeLocal(start)} - ${formatToDatetimeLocal(end)}`)).toBeVisible();
     // Godzny się różną, gdyż w formatowaniu jest brana pod uwagę strefa czasowa
 })
 

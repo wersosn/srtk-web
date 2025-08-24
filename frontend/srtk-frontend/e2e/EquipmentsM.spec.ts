@@ -24,11 +24,12 @@ test('Pomyślne pobranie listy wszystkich sprzętów', async ({ page }) => {
     });
 
     await page.goto('/adminPanel/equipmentsManagement');
-
+    
     await expect(page.locator('li.list-group-item >> text=Rower')).toBeVisible();
     await expect(page.locator('li.list-group-item >> text=Kask')).toBeVisible();
 })
 
+// Z jakiegoś powodu nie działa?
 test('Pomyślne pobranie listy sprzętów w danym obiekcie', async ({ page }) => {
     await page.goto('/');
    
@@ -49,7 +50,7 @@ test('Pomyślne pobranie listy sprzętów w danym obiekcie', async ({ page }) =>
     });
 
     await page.goto('/adminPanel/equipmentsManagement');
-
+    await page.screenshot({ path: 'res-list.png' });
     await expect(page.locator('li.list-group-item >> text=Rower')).toBeVisible();
 })
 
@@ -90,7 +91,7 @@ test('Pomyślne dodanie nowego sprzętu', async ({ page }) => {
     await page.fill('input#eqName', 'Rower');
     await page.fill('input#eqType', 'Górski');
     await page.fill('input#eqCost', '250');
-    await page.click('button:has-text("Dodaj nowy sprzęt")');
+    await page.click('button:has-text("Zapisz")');
 
     await expect(page.locator('text=Dodano sprzęt')).toBeVisible();
 

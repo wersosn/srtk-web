@@ -50,7 +50,7 @@ test('Pomyślne dodanie nowego statusu', async ({ page }) => {
     await page.goto('/adminPanel/statusesManagement');
 
     await page.fill('input#statusName', 'Anulowano');
-    await page.click('button:has-text("Dodaj nowy status")');
+    await page.click('button:has-text("Zapisz")');
 
     await expect(page.locator('text=Dodano status')).toBeVisible();
     const inputValue = await page.inputValue('input#statusName');

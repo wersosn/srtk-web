@@ -44,7 +44,7 @@ test('Pomyślne pobranie listy torów w danym obiekcie', async ({ page }) => {
             route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify([{ id: 1, name: 'Tor', typeOfSurface: 'Twarda', length: 1000, openingHour: "08:00", closingHour: "20:00", availableDays: ['Wtorek', 'Środa', 'Piątek'], facilityId: 1 }]),
+                body: JSON.stringify([{ id: 1, name: 'Tor Kartingowy Szybka Strefa', typeOfSurface: 'Twarda', length: 1000, openingHour: "08:00", closingHour: "20:00", availableDays: ['Wtorek', 'Środa', 'Piątek'], facilityId: 1 }]),
             });
         } else {
             route.continue();
@@ -52,8 +52,7 @@ test('Pomyślne pobranie listy torów w danym obiekcie', async ({ page }) => {
     });
 
     await page.goto('/adminPanel/tracksManagement');
-
-    await expect(page.locator('li.list-group-item >> text=Tor')).toBeVisible();
+    await expect(page.locator('li.list-group-item >> text=Tor Kartingowy Szybka Strefa')).toBeVisible();
 });
 
 test('Pomyślne dodanie nowego toru', async ({ page }) => {
@@ -98,7 +97,7 @@ test('Pomyślne dodanie nowego toru', async ({ page }) => {
     await page.check('text=Wtorek');
     await page.check('text=Środa');
     await page.check('text=Piątek');
-    await page.click('button:has-text("Dodaj nowy tor")');
+    await page.click('button:has-text("Zapisz")');
 
     await expect(page.locator('text=Dodano tor')).toBeVisible();
 

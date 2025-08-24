@@ -53,7 +53,7 @@ test('Pomyślne dodanie nowego obiektu', async ({ page }) => {
     await page.fill('input#facilityName', 'Duży obiekt kolarski');
     await page.fill('input#facilityCity', 'Białystok');
     await page.fill('input#facilityAddress', 'ul. Zwierzyniecka');
-    await page.click('button:has-text("Dodaj nowy obiekt")');
+    await page.click('button:has-text("Zapisz")');
 
     await expect(page.locator('text=Dodano obiekt')).toBeVisible();
     await expect(page.locator('input#facilityName')).toHaveValue('');

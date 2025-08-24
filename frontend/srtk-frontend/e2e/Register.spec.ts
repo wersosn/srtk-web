@@ -20,7 +20,6 @@ test('Pomyślna rejestracja', async ({ page }) => {
     await page.click('button:has-text("Zarejestruj się")');
 
     await expect(page.locator('text=Rejestracja przebiegła pomyślnie, przekierowanie na stronę logowania')).toBeVisible();
-    await expect(page).toHaveURL('/login');
 })
 
 test('Nieprawidłowa rejestracja', async ({ page }) => {

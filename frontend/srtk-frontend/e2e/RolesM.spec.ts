@@ -50,7 +50,7 @@ test('Pomyślne dodanie nowej roli', async ({ page }) => {
     await page.goto('/adminPanel/roleManagement');
 
     await page.fill('input#roleName', 'Moderator');
-    await page.click('button:has-text("Dodaj nową rolę")');
+    await page.click('button:has-text("Zapisz")');
 
     await expect(page.locator('text=Dodano rolę')).toBeVisible();
     const inputValue = await page.inputValue('input#roleName');
