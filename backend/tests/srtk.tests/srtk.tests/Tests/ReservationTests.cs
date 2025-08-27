@@ -458,7 +458,7 @@ namespace srtk.tests.Tests
                 TrackId = track.Id
             };
 
-            var updated = await service.Update(reservation.Id, updatedReservation);
+            var updated = await service.Update(reservation.Id, updatedReservation, "Client");
 
             Assert.NotNull(updated);
             Assert.Equal(DateTime.MinValue.ToUniversalTime(), updated.Start);

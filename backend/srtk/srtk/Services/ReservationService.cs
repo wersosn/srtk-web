@@ -306,6 +306,7 @@ namespace srtk.Services
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
+                // Wysłanie maila z powiadomieniem o zmodyfikowaniu rezerwacji przez admina:
                 if (currentUserRole == "Admin")
                 {
                     var user = await context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
