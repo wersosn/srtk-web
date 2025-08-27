@@ -3,17 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
 using ClosedXML.Excel;
-using System.IO;
-using System.Text;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Office2019.Presentation;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using System.Globalization;
-using System.Linq;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Track = srtk.Models.Track;
 
 namespace srtk.Services
@@ -243,7 +235,7 @@ namespace srtk.Services
         }
 
         // Edycja istniejącej rezerwacji:
-        public async Task<Reservation?> Update(int id, [FromBody] ReservationDto dto)
+        public async Task<Reservation?> Update(int id, [FromBody] ReservationDto dto, string currentUserRole)
         {
             await using var transaction = await context.Database.BeginTransactionAsync();
             try
@@ -313,6 +305,50 @@ namespace srtk.Services
 
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+                if (currentUserRole == "Admin")
+                {
+                    var user = await context.Users.FirstOrDefaultAsync(u => u.Id == reservation.UserId);
+                    var track = await context.Tracks.FirstOrDefaultAsync(t => t.Id == reservation.TrackId);
+                    var equipmentListHtml = "<ul>";
+                    foreach (var er in reservation.EquipmentReservations)
+                    {
+                        var eq = await context.Equipments.FirstOrDefaultAsync(e => e.Id == er.EquipmentId);
+                        if (eq != null)
+                        {
+                            equipmentListHtml += $"<li>{eq.Name}: {er.Quantity}</li>";
+                        }
+                    }
+                    equipmentListHtml += "</ul>";
+
+                    if (user != null)
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                await emailService.SendEmail(
+                                    user.Email,
+                                    "Zmodyfikowano szczegóły rezerwacji toru",
+                                    $@"
+                                    <div style='font-family: Arial, sans-serif; padding: 10px'>
+                                        <h2>Witaj {user.Email}!</h2>
+                                        <p>Twoja rezerwacja toru <strong>{track?.Name}</strong> została zmodyfikowana.</p>
+                                        <p>Obecne szczegóły rezerwacji:</p>
+                                        <p>Data: {reservation.Start} - {reservation.End}</p>
+                                        <p>Koszt: {reservation.Cost} zł</p>
+                                        <p>Sprzęty: {equipmentListHtml}</p>
+                                    </div>"
+                                );
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Błąd wysyłania maila: " + ex.Message);
+                            }
+                        });
+                    }
+                }
+
                 return reservation;
             }
             catch

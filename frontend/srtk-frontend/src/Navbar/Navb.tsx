@@ -31,6 +31,7 @@ const Navb: React.FC = () => {
         <Nav className="ms-auto align-items-center">
           {isLoggedIn && userRole === 'Admin' ? (
             <>
+              <Nav.Link href="/myReservations">{t("navbar.myReservations")}</Nav.Link>
               <Nav.Link href="/adminPanel">{t("navbar.adminPanel")}</Nav.Link>
               <button onClick={handleLogout}>{t("navbar.logout")}</button>
             </>

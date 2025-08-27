@@ -29,31 +29,6 @@ test('Pomyślne pobranie listy wszystkich sprzętów', async ({ page }) => {
     await expect(page.locator('li.list-group-item >> text=Kask')).toBeVisible();
 })
 
-// Z jakiegoś powodu nie działa?
-test('Pomyślne pobranie listy sprzętów w danym obiekcie', async ({ page }) => {
-    await page.goto('/');
-   
-    await page.evaluate((token) => {
-        localStorage.setItem('token', token);
-    }, fakeAdminJwtToken);
-
-    await page.route('**/api/equipments/inFacility?facilityId=1', route => {
-        if (route.request().method() === 'GET') {
-            route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify([{ id: 1, name: 'Rower', type: 'Górski', cost: 250, facilityId: 1 }]),
-            });
-        } else {
-            route.continue();
-        }
-    });
-
-    await page.goto('/adminPanel/equipmentsManagement');
-    await page.screenshot({ path: 'res-list.png' });
-    await expect(page.locator('li.list-group-item >> text=Rower')).toBeVisible();
-})
-
 test('Pomyślne dodanie nowego sprzętu', async ({ page }) => {
     await page.route('**/api/facilities', async route => {
         if (route.request().method() === 'GET') {

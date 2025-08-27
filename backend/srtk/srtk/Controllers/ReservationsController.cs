@@ -123,7 +123,7 @@ namespace srtk.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReservation(int id, [FromBody] ReservationDto dto)
         {
-            var reservation = await service.Update(id, dto);
+            var reservation = await service.Update(id, dto, User.IsInRole("Admin") ? "Admin" : "Client");
             if (reservation == null)
             {
                 return NotFound("Rezerwacja nie istnieje");
