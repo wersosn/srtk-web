@@ -20,7 +20,8 @@
     "login": "Log in",
     "register": "Sign up",
     "myReservations": "My reservations",
-    "profile": "Profile"
+    "profile": "Profile",
+    "notification": "Notifications"
   },
 
   "footer": {

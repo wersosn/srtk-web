@@ -20,7 +20,8 @@
     "login": "Logowanie",
     "register": "Rejestracja",
     "myReservations": "Moje rezerwacje",
-    "profile": "Profil"
+    "profile": "Profil",
+    "notification": "Powiadomienia"
   },
 
   "footer": {

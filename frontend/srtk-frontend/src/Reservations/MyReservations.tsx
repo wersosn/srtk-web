@@ -37,7 +37,6 @@ function MyReservations() {
                 throw new Error(t("api.reservationError"));
             }
             const data = await res.json();
-            console.log(data);
             setReservations(data);
         } catch (err: any) {
             setError(err.message || 'Wystąpił błąd');

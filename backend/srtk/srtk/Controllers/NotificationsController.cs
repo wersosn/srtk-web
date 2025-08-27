@@ -25,7 +25,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie powiadomień konkretnego użytkownika:
-        [HttpGet("users/{userId}/all")]
+        [HttpGet("{userId}/all")]
         public async Task<ActionResult<List<Notification>>> GetAllUserNotification(int userId)
         {
             var notifications = await service.GetAllForUser(userId);
@@ -33,7 +33,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie powiadomień nieprzeczytanych:
-        [HttpGet("users/{userId}/unread")]
+        [HttpGet("{userId}/unread")]
         public async Task<ActionResult<List<Notification>>> GetAllUnReadNotifications(int userId)
         {
             var notifications = await service.GetAllUnRead(userId);
@@ -41,7 +41,7 @@ namespace srtk.Controllers
         }
 
         // Pobieranie powiadomień nprzeczytanych:
-        [HttpGet("users/{userId}/read")]
+        [HttpGet("{userId}/read")]
         public async Task<ActionResult<List<Notification>>> GetAllReadNotifications(int userId)
         {
             var notifications = await service.GetAllRead(userId);

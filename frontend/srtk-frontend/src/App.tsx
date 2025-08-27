@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 import Login from "./User/Login";
 import Register from "./User/Register";
 import Navb from "./Navbar/Navb";
@@ -25,6 +27,34 @@ import MyReservations from "./Reservations/MyReservations";
 import ReservationManagement from "./Reservations/ReservationManagement";
 
 function App() {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    const isTokenValid = () => {
+      if (!token) {
+        return false;
+      }
+
+      try {
+        const decoded = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+
+        const exp = decoded?.exp;
+        if (!exp) {
+          return false; 
+        }
+        return exp > currentTime;
+      } catch (error) {
+        return false;
+      }
+    };
+
+    if (!isTokenValid()) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+  }, []);
+
   return (
     <Router>
       <div className="app-wrapper">
@@ -41,19 +71,19 @@ function App() {
             <RequireUser>
               <Profile />
             </RequireUser>
-          }/>
+          } />
 
           <Route path="/makeReservation" element={
             <RequireUser>
               <MakeReservation />
             </RequireUser>
-          }/>
+          } />
 
-           <Route path="/myReservations" element={
+          <Route path="/myReservations" element={
             <RequireUser>
               <MyReservations />
             </RequireUser>
-          }/>
+          } />
 
           <Route path="/adminPanel" element={
             <RequireAdmin>
@@ -66,7 +96,7 @@ function App() {
             <Route path="reservationsManagement" element={<ReservationManagement />} />
             <Route path="roleManagement" element={<RoleManagement />} />
             <Route path="statusesManagement" element={<StatusesManagement />} />
-            <Route path="tracksManagement" element={<TrackManagement />}/>
+            <Route path="tracksManagement" element={<TrackManagement />} />
             <Route path="usersManagement" element={<UserManagement />} />
             <Route path="adminPanelSettings" element={<Settings />} />
           </Route>
