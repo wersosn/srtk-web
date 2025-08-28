@@ -73,6 +73,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<EquipmentService>();
 builder.Services.AddScoped<FacilityService>();
+builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ReservationService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<StatusService>();

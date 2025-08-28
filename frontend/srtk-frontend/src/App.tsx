@@ -51,7 +51,6 @@ function App() {
 
     if (!isTokenValid()) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
     }
   }, []);
 

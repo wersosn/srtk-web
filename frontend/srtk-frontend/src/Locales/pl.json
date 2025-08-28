@@ -56,6 +56,7 @@
   },
 
   "api": {
+    "notificationError": "Błąd podczas pobierania powiadomień",
     "tracksError": "Błąd podczas pobierania torów",
     "facilityError": "Błąd podczas pobierania obiektów",
     "roleError": "Błąd podczas pobierania ról",
@@ -238,5 +239,14 @@
     "allFacilities": "Wszystkie obiekty",
     "allUsers": "Wszyscy użytkownicy",
     "reset": "Resetuj filtry"
+  },
+
+  "notification": {
+    "loading": "Ładowanie powiadomień...",
+    "notificationAddError": "Błąd podczas dodawania powiadomienia",
+    "notifications": "Powiadomienia",
+    "noNotifications": "Brak powiadomień",
+    "resTitle": "Zarezerwowano tor",
+    "resDesc": "Twoja rezerwacja zaczyna się w dniu "
   }
 }

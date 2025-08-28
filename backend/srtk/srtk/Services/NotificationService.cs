@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.Models;
+using srtk.DTO;
 using System.Data;
 
 namespace srtk.Services
@@ -21,9 +22,20 @@ namespace srtk.Services
         }
 
         // Pobieranie powiadomień konkretnego użytkownika:
-        public async Task<List<Notification>> GetAllForUser(int userId)
+        public async Task<List<NotificationDto>> GetAllForUser(int userId)
         {
-            return await context.Notifications.Where(u => u.UserId == userId).ToListAsync();
+            var notifications = await context.Notifications
+                .Where(n => n.UserId == userId)
+                .Select(n => new NotificationDto
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Description = n.Description,
+                    TimeStamp = n.TimeStamp,
+                    IsRead = n.IsRead
+                })
+                .ToListAsync();
+            return notifications;
         }
 
         // Pobieranie powiadomień nieprzeczytanych:

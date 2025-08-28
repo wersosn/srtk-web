@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
@@ -82,6 +83,14 @@ namespace srtk.Controllers
         {
             var isAvailable = await service.IsTrackAvailable(trackId, start.ToUniversalTime(), end.ToUniversalTime(), reservationId);
             return Ok(new { isAvailable });
+        }
+
+        // Pobranie nadchodzących rezerwacji użytkownika (do powiadomień):
+        [HttpGet("upcoming/{userId}")]
+        public async virtual Task<ActionResult<List<ReservationDto>>> GetUpcomingUserNotifications(int userId)
+        {
+            var reservations = await service.GetUpcomingNotifications(userId);
+            return reservations;
         }
 
         // Pobranie konkretnej rezerwacji:

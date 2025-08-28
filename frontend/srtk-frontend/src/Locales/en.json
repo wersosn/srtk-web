@@ -56,6 +56,7 @@
   },
 
   "api": {
+    "notificationError": "Error occured while fetching notifications",
     "tracksError": "Error occurred while fetching tracks",
     "facilityError": "Error occurred while fetching facilities",
     "roleError": "Error occurred while fetching roles",
@@ -242,5 +243,14 @@
     "allFacilities": "All facilities",
     "allUsers": "All users",
     "reset": "Reset filters"
+  },
+
+  "notification": {
+    "loading": "Loading notifications...",
+    "notificationAddError": "Error occured while adding new notification",
+    "notifications": "Notifications",
+    "noNotifications": "No notifications",
+    "resTitle": "Track reserved",
+    "resDesc": "Your reservation starts on "
   }
 }

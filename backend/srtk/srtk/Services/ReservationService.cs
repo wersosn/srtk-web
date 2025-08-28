@@ -130,6 +130,24 @@ namespace srtk.Services
                 );
         }
 
+        // Pobranie nadchodzących rezerwacji użytkownika (do powiadomień):
+        public async virtual Task<List<ReservationDto>> GetUpcomingNotifications(int userId)
+        {
+            var now = DateTime.UtcNow;
+            return await context.Reservations
+                .Where(r => r.UserId == userId && r.Start > now && r.Start <= now.AddHours(1))
+                .Include(r => r.Track)
+                .Select(r => new ReservationDto
+                {
+                    Id = r.Id,
+                    Start = r.Start,
+                    End = r.End,
+                    Cost = r.Cost,
+                    TrackId = r.TrackId,
+                    TrackName = r.Track.Name
+                }).ToListAsync();
+        }
+
         // Pobranie konkretnej rezerwacji:
         public async virtual Task<Reservation?> GetById(int id)
         {

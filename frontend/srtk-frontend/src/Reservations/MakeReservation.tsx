@@ -151,7 +151,34 @@ function MakeReservation() {
 
     useEffect(() => {
         trackDetails();
-    }, [selectedTrackId])
+    }, [selectedTrackId]);
+
+    const addNotification = async (title: string, description: string) => {
+        if (!userId) return;
+
+        try {
+            const res = await fetch('/api/notifications', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    Title: title,
+                    Description: description,
+                    TimeStamp: new Date().toISOString(),
+                    IsRead: false,
+                    UserId: userId
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error(t("notification.notificationAddError"));
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
@@ -170,7 +197,7 @@ function MakeReservation() {
 
     // Handler sprawdzający, czy data zakończenia jest zgodna z godzinami funkcjonowania toru:
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;     
+        const val = e.target.value;
         if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
             setEndDate(val);
         } else {
@@ -223,9 +250,14 @@ function MakeReservation() {
                 },
                 body: JSON.stringify(reservationBody),
             });
-            console.log(reservationBody);
             if (!res.ok) throw new Error(t("makeReservations.reservationError"));
             alert(t("makeReservations.reservationPositive"));
+
+            await addNotification(
+                `${t("notification.resTitle")} ${track?.name}`,
+                `${t("notification.resDesc")}  ${new Date(startDate).toLocaleTimeString()}`
+            );
+
             navigate('/');
         } catch (err: any) {
             alert(err.message);
@@ -255,7 +287,7 @@ function MakeReservation() {
                                     </option>
                                 ))}
                             </select>
-                                
+
                             {trackInfo && selectedTrackId !== 0 && <p>{trackInfo}</p>}
 
                             <label htmlFor="resStart">{t("makeReservations.start")}</label>

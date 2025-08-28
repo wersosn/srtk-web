@@ -4,26 +4,12 @@ import { useAuth } from '../User/AuthContext';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import { useTranslation } from "react-i18next";
 import Spinner from 'react-bootstrap/Spinner';
-import bellIconLight from '../assets/bell-light.png'
-import bellIconDark from '../assets/bell-dark.png'
+import NotificationBell from '../Notifications/NotificationBell';
 
 const Navb: React.FC = () => {
   const { isLoggedIn, logout, isAuthChecked, userRole } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
-
-  // Dynamiczne ustawianie odpowiedniej ikonki (w zależności od trybu (cielmy/jasny)):
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    setIsDark(mq.matches);
-
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-    mq.addEventListener("change", handler);
-
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  const icon = isDark ? bellIconLight : bellIconDark;
 
   // Czekanie na poprawne załadowanie navbara:
   if (!isAuthChecked) {
@@ -48,18 +34,14 @@ const Navb: React.FC = () => {
             <>
               <Nav.Link href="/myReservations">{t("navbar.myReservations")}</Nav.Link>
               <Nav.Link className="me-2" href="/adminPanel">{t("navbar.adminPanel")}</Nav.Link>
-              <button className="icon-button me-3" title={t("navbar.notification")}>
-                <img src={icon} alt="Powiadomienia" style={{ width: '24px', height: '24px' }} />
-              </button>
+              <NotificationBell/>
               <button onClick={handleLogout}>{t("navbar.logout")}</button>
             </>
           ) : isLoggedIn && userRole === 'Client' ? (
             <>
               <Nav.Link href="/myReservations">{t("navbar.myReservations")}</Nav.Link>
               <Nav.Link className="me-2" href="/profile">{t("navbar.profile")}</Nav.Link>
-              <button className="icon-button me-3" title={t("navbar.notification")}>
-                <img src={icon} alt="Powiadomienia" style={{ width: '24px', height: '24px' }} />
-              </button>
+              <NotificationBell />
               <button onClick={handleLogout}>{t("navbar.logout")}</button>
             </>
           ) : (

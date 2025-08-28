@@ -63,7 +63,7 @@ function updateNotificationBadge(count) {
 
 // Funkcja pobierająca ilość nieodczytanych powiadomień:
 function fetchNotificationCount() {
-    fetch('/Notifications/GetUnreadNotifications')
+    fetch('/api/notifications/${userId}/all')
         .then(response => response.json())
         .then(data => {
             console.log("Ilość nieodczytanych powiadomień:", data);

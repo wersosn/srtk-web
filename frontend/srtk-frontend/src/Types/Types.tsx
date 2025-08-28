@@ -85,3 +85,13 @@ export type Admin = {
     roleId: number;
     facilityId: number;
 };
+
+// Powiadomienie:
+export type Notification = {
+    id: number;
+    title: string;
+    description: string;
+    isRead: boolean;
+    timeStamp: string;
+    userId: number;
+}

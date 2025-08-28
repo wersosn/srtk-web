@@ -23,7 +23,7 @@ function ReservationManagement() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
-    // Dynamiczne ustawianie odpowiedniej ikonki (w zależności od trybu (cielmy/jasny)):
+    // Dynamiczne ustawianie odpowiedniej ikonki (w zależności od trybu (ciemny/jasny)):
     const [isDark, setIsDark] = useState(false);
     useEffect(() => {
         const mq = window.matchMedia("(prefers-color-scheme: dark)");

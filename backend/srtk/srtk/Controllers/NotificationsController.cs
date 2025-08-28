@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using srtk.DTO;
 using srtk.Models;
 using srtk.Services;
 
@@ -26,7 +27,7 @@ namespace srtk.Controllers
 
         // Pobieranie powiadomień konkretnego użytkownika:
         [HttpGet("{userId}/all")]
-        public async Task<ActionResult<List<Notification>>> GetAllUserNotification(int userId)
+        public async Task<ActionResult<List<NotificationDto>>> GetAllUserNotifications(int userId)
         {
             var notifications = await service.GetAllForUser(userId);
             return notifications;
