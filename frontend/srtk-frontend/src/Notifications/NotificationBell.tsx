@@ -158,16 +158,19 @@ function NotificationBell() {
                                 {notifications.length === 0 ? (
                                     <li className="notif-text">{t("notification.noNotifications")}</li>
                                 ) : (
-                                    notifications.map(n => (
-                                        <li key={n.id}>
-                                            <div className="notif-text">
-                                                <strong>{n.title}</strong><br />
-                                                <small>{n.description}</small><br />
-                                                <small><em>{new Date(n.timeStamp).toLocaleTimeString()}</em></small>
-                                            </div>
-                                            <hr />
-                                        </li>
-                                    ))
+                                    notifications
+                                        .slice()
+                                        .sort((a, b) => new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime())
+                                        .map(n => (
+                                            <li key={n.id}>
+                                                <div className="notif-text">
+                                                    <strong>{n.title}</strong><br />
+                                                    <small>{n.description}</small><br />
+                                                    <small><em>{new Date(n.timeStamp).toLocaleTimeString()}</em></small>
+                                                </div>
+                                                <hr />
+                                            </li>
+                                        ))
                                 )}
                             </ul>
                         </>

@@ -255,7 +255,7 @@ function MakeReservation() {
 
             await addNotification(
                 `${t("notification.resTitle")} ${track?.name}`,
-                `${t("notification.resDesc")}  ${new Date(startDate).toLocaleTimeString()}`
+                `${t("notification.resDesc")}  ${new Date(startDate).toLocaleString()}`
             );
 
             navigate('/');
