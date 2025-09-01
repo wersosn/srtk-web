@@ -1,6 +1,7 @@
 import React, { useState, useEffect, type FormEvent } from "react";
 import { jwtDecode } from 'jwt-decode';
 import type { Equipment, Facility } from '../Types/Types';
+import { getAllFacilities } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 interface AddEquipmentProps {
@@ -32,14 +33,10 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
 
         const fetchFacilities = async () => {
             try {
-                const res = await fetch('/api/facilities', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    }
-                });
-                if (!res.ok) throw new Error(t("api.facilityError"));
-                const data = await res.json();
-                setFacilities(data);
+                if (token) {
+                    const data = await getAllFacilities(token);
+                    setFacilities(data);
+                }
             } catch (err: any) {
                 setMessage(err.message || t("api.facilityError"));
             }

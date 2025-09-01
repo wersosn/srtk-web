@@ -25,49 +25,49 @@ namespace srtk.Controllers
         public async Task<ActionResult<List<ReservationDto>>> GetAllReservations()
         {
             var reservations = await service.GetAll();
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("inTrack")]
         public async Task<ActionResult<List<ReservationDto>>> GetAllReservationsInTrack(int trackId)
         {
             var reservations = await service.GetAllInTrack(trackId);
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("withStatus")]
         public async Task<ActionResult<List<ReservationDto>>> GetAllReservationsWithStatus(int statusId)
         {
             var reservations = await service.GetAllWithStatus(statusId);
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("user")]
         public async Task<ActionResult<List<ReservationDto>>> GetAllUserReservations(int userId)
         {
             var reservations = await service.GetUserReservations(userId);
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("equipments")]
         public async Task<ActionResult<List<EquipmentReservationDto>>> GetEquipmentsInReservation([FromQuery] int reservationId)
         {
             var reservations = await service.GetEquipments(reservationId);
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("startDateTime")]
         public async Task<ActionResult<List<ReservationDto>>> GetReservationsByStartDateAndHour(DateTime date, TimeSpan hour)
         {
             var reservations = await service.GetByStartDateAndHour(date, hour);
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("endDateTime")]
         public async Task<ActionResult<List<ReservationDto>>> GetReservationsByEndDateAndHour(DateTime date, TimeSpan hour)
         {
             var reservations = await service.GetByEndDateAndHour(date, hour);
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("isAvailable")]
@@ -81,7 +81,7 @@ namespace srtk.Controllers
         public async virtual Task<ActionResult<List<ReservationDto>>> GetUpcomingUserNotifications(int userId)
         {
             var reservations = await service.GetUpcomingNotifications(userId);
-            return reservations;
+            return Ok(reservations);
         }
 
         [HttpGet("{id}")]
@@ -92,7 +92,7 @@ namespace srtk.Controllers
             {
                 return NotFound();
             }
-            return reservation;
+            return Ok(reservation);
         }
 
         [HttpPost]
@@ -134,9 +134,20 @@ namespace srtk.Controllers
             var reservation = await service.Delete(id);
             if (!reservation)
             {
-                return NotFound();
+                return NotFound("Rezerwacja nie istnieje");
             }
             return Ok(new { message = "Rezerwacja została usunięta" });
+        }
+
+        [HttpPut("{id}/cancel")]
+        public async Task<ActionResult> CancelReservation(int id)
+        {
+            var reservation = await service.Cancel(id);
+            if (!reservation)
+            {
+                return NotFound("Rezerwacja nie istnieje");
+            }
+            return Ok(new { message = "Rezerwacja została anulowana" });
         }
 
         // Eksport danych w formacie .xlsx (dla administratora):

@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace srtk.Controllers
         public async Task<ActionResult<List<UserDto>>> GetAllUsers()
         {
             var users = await service.GetAll();
-            return users;
+            return Ok(users);
         }
 
         [HttpGet("clients")]
@@ -49,7 +50,7 @@ namespace srtk.Controllers
             {
                 return NotFound();
             }
-            return users;
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
@@ -60,7 +61,7 @@ namespace srtk.Controllers
             {
                 return NotFound();
             }
-            return user;
+            return Ok(user);
         }
 
         [HttpGet("email")]
@@ -71,7 +72,7 @@ namespace srtk.Controllers
             {
                 return NotFound();
             }
-            return user;
+            return Ok(user);
         }
 
         [HttpGet("clients/{id}")]

@@ -1,7 +1,8 @@
 {
   "universal": {
     "loading": "Ładowanie...",
-    "error": "Wystąił błąd ",
+    "error": "Wystąpił błąd ",
+    "errorFetching": "Wystąpił błąd podczas pobierania danych",
     "saveChanges": "Zapisz zmiany",
     "save": "Zapisz",
     "cancel": "Anuluj"

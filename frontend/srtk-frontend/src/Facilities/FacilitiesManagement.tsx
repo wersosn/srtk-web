@@ -4,6 +4,7 @@ import AddFacility from './AddFacility';
 import EditFacility from './EditFacility';
 import DeleteFacility from './DeleteFacility';
 import type { Facility } from '../Types/Types';
+import { getAllFacilities } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 function FacilitiesManagement() {
@@ -12,22 +13,16 @@ function FacilitiesManagement() {
     const [showDetails, setShowDetails] = useState<Facility | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     // Pobieranie wszystkich obiektów z bazy:
     const fetchFacilities = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/facilities', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) {
-                throw new Error(t("api.facilityError"));
+            if (token) {
+                const data = await getAllFacilities(token);
+                setFacilities(data);
             }
-            const data = await res.json();
-            setFacilities(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));
         } finally {
@@ -79,7 +74,7 @@ function FacilitiesManagement() {
                                 {showDetails?.id === facility.id && (
                                     <div className="mt-2 ps-2 details">
                                         <div>
-                                            <strong>{t("facility.city")}:</strong> {facility.city} <br/> 
+                                            <strong>{t("facility.city")}:</strong> {facility.city} <br />
                                             <strong>{t("facility.address")}:</strong> {facility.address}
                                         </div>
                                     </div>

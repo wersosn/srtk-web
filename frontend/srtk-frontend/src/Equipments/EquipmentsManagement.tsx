@@ -6,6 +6,7 @@ import DeleteEquipment from './DeleteEquipment';
 import FilterEquipments from '../Filters/FilterEquipment';
 import { jwtDecode } from 'jwt-decode';
 import type { Equipment } from '../Types/Types';
+import { getAllEquipmentsForAdmin } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 function EquipmentsManagement() {
@@ -16,41 +17,24 @@ function EquipmentsManagement() {
     const [filteredEqs, setFilteredEqs] = useState<Equipment[]>(eqs);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
-    // Pobieranie wszystkich torów z bazy:
     const fetchAllEqs = async () => {
         setLoading(true);
         setError(null);
         try {
-            const token = localStorage.getItem('token');
-
             if (token) {
                 const decoded: any = jwtDecode(token);
                 if (decoded && decoded.FacilityId) {
                     setFacilityId(parseInt(decoded.FacilityId, 10));
                 }
-            }
-            console.log(facilityId);
-            let url: string;
 
-            if (!facilityId || facilityId === 0) {
-                url = '/api/equipments';  // Wszystkie sprzęty
-            } else {
-                url = `/api/equipments/inFacility?facilityId=${facilityId}`;  // Sprzęty dla danego obiektu
+                if (facilityId !== undefined) {
+                    const data = await getAllEquipmentsForAdmin(facilityId, token);
+                    setEqs(data);
+                }
             }
-
-            const res = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (!res.ok) {
-                throw new Error(t("api.eqError"));
-            }
-            const data = await res.json();
-            setEqs(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));
         } finally {

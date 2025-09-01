@@ -471,6 +471,23 @@ namespace srtk.Services
             return true;
         }
 
+        public async Task<bool> Cancel(int id)
+        {
+            var reservation = await context.Reservations.FindAsync(id);
+            if (reservation == null)
+            {
+                return false;
+            }
+
+            var status = await context.Statuses.FirstOrDefaultAsync(s => s.Name == "Anulowano");
+            if(status != null)
+            {
+                reservation.StatusId = status.Id;
+            }
+            await context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<byte[]> ExportToExcel(int trackId)
         {
             var reservations = await context.Reservations

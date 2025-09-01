@@ -10,6 +10,7 @@ import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
+import { getUserReservations } from "../Services/Api";
 import { useTranslation } from "react-i18next";
 
 function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
@@ -28,15 +29,10 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`/api/reservations/user?userId=${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            if (!res.ok) {
-                throw new Error(t("api.reservationError"));
+            if(token && userId !== undefined) {
+                const data = await getUserReservations(userId, token);
+                setReservationList(data);
             }
-            const data = await res.json();
-            setReservationList(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));
         } finally {

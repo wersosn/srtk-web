@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { parseAvailableDays, isValidDateTime, dayMap } from './DateHelper';
 import type { Equipment, Track } from '../Types/Types';
+import { getAllTracks, getAllEquipmentsInFacility, getTrackAvailability } from '../Services/Api';
 import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
 
@@ -27,25 +28,21 @@ function MakeReservation() {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    // Pobieranie wszystkich torów z bazy:
     const fetchAllTracks = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch('/api/tracks', {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error(t("api.tracksError"));
-            const data = await res.json();
-            setTracks(data);
+            if(token) {
+                const data = await getAllTracks(token);
+                setTracks(data);
+            }
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
     };
 
-    // Pobieranie sprzętów należących do odpowiedniego obiektu (w zależności od toru):
     const fetchEquipment = async () => {
         if (!selectedTrackId || !rentEquipment) {
             setEquipmentList([]);
@@ -56,12 +53,10 @@ function MakeReservation() {
         if (!track) return;
 
         try {
-            const res = await fetch(`/api/equipments/inFacility?facilityId=${track.facilityId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error(t("api.eqError"));
-            const data = await res.json();
-            setEquipmentList(data);
+            if(token) {
+                const data = await getAllEquipmentsInFacility(track.facilityId, token);
+                setEquipmentList(data);
+            }
         } catch (err: any) {
             console.error(err);
         }
@@ -69,15 +64,6 @@ function MakeReservation() {
 
     // Obliczanie kosztów:
     const calculateCost = async () => {
-        let baseCost = 0;
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const durationInDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-
-        if (!isNaN(durationInDays) && durationInDays > 0) {
-            baseCost = 0; // Tu można ustawić, żeby rezerwacje coś kosztowały, póki co będą free
-        }
-
         const equipmentCost = Object.entries(equipmentQuantities)
             .map(([id, qty]) => {
                 const equipment = equipmentList.find(e => e.id === parseInt(id));
@@ -85,7 +71,7 @@ function MakeReservation() {
             })
             .reduce((sum, val) => sum + val, 0);
 
-        setCost(baseCost + equipmentCost);
+        setCost(equipmentCost);
     };
 
     // Sprawdzenie, czy tor jest dostępny do zarezerwowania (tzn. nie ma innej rezerwacji w wybranym czasie):
@@ -96,13 +82,11 @@ function MakeReservation() {
         }
 
         try {
-            const res = await fetch(`/api/reservations/isAvailable?trackId=${selectedTrackId}&start=${new Date(startDate).toISOString()}&end=${new Date(endDate).toISOString()}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            if (!res.ok) throw new Error(t("api.availabilityError"));
-            const data = await res.json();
-            setIsAvailable(data.isAvailable);
-            return data.isAvailable;
+            if(token) {
+                const data = await getTrackAvailability(selectedTrackId, startDate, endDate, token);
+                setIsAvailable(data.isAvailable);
+                return data.isAvailable;
+            }
         } catch (err) {
             console.error(err);
             setIsAvailable(null);

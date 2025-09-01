@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useTranslation } from "react-i18next";
 import i18n from "../Locales/i18next";
 import type { Client } from '../Types/Types';
+import { getUserInfo } from '../Services/Api';
 import EditMyInfo from './EditMyInfo';
 import profileImage from '../assets/profile.svg';
 import './Profile.css';
@@ -24,14 +25,13 @@ function Profile() {
         setLoading(true);
         setError(null);
         try {
-          const res = await fetch(`/api/users/clients/${userId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-          });
-          if (!res.ok) throw new Error(t("profile.userFetchError"));
-          const data = await res.json();
-          setUser(data);
-          setEmail(data.email);
-          setEmailConfirmed(data.emailConfirmed);
+          if(token) {
+              const data = await getUserInfo(userId, token);
+              setUser(data);
+              setEmail(data.email);
+              setEmailConfirmed(data.emailConfirmed);
+              console.log(data.emailConfirmed);
+          }
       } catch (err: any) {
           setError(err.message || t("profile.userFetchError"));
       } finally {

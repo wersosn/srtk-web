@@ -2,6 +2,7 @@
   "universal": {
     "loading": "Loading...",
     "error": "Error: ",
+    "errorFetching": "Error occured while fetching data",
     "saveChanges": "Save changes",
     "save": "Save",
     "cancel": "Cancel"

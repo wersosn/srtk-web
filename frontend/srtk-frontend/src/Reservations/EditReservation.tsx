@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
-import type { Equipment, EquipmentWithQuantity, Track } from '../Types/Types';
+import type { Equipment, Track } from '../Types/Types';
+import { getTrackById, getAllEquipmentsInFacility, getAllEquipmentsInReservation } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 interface EditReservationProps {
@@ -28,16 +29,13 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
-    // Pobieranie wszystkich torów z bazy:
     useEffect(() => {
         const fetchTrack = async () => {
             try {
-                const res = await fetch(`/api/tracks/${trackId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error(t("api.tracksError"));
-                const data = await res.json();
-                setTrack(data);
+                if (token) {
+                    const data = await getTrackById(trackId, token);
+                    setTrack(data);
+                }
             } catch (e) {
                 console.error(e);
             }
@@ -54,12 +52,10 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             }
             if (!tr) return;
             try {
-                const res = await fetch(`/api/equipments/inFacility?facilityId=${tr.facilityId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error(t("api.eqError"));
-                const data = await res.json();
-                setEquipmentList(data);
+                if (token) {
+                    const data = await getAllEquipmentsInFacility(tr.facilityId, token);
+                    setEquipmentList(data);
+                }
             } catch (err: any) {
                 console.error(err);
             }
@@ -73,19 +69,16 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
         const fetchReservationEquipments = async () => {
             try {
-                const res = await fetch(`/api/reservations/equipments?reservationId=${reservationId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error(t("api.eqError"));
-                const data: EquipmentWithQuantity[] = await res.json();
-
-                const quantities: Record<number, number> = {};
-                data.forEach((er) => {
-                    quantities[er.equipmentId] = er.quantity;
-                });
-                setEquipmentQuantities(quantities);
-                if (Object.keys(quantities).length > 0) {
-                    setRentEquipment(true);
+                if (token) {
+                    const data = await getAllEquipmentsInReservation(reservationId, token);
+                    const quantities: Record<number, number> = {};
+                    data.forEach((er) => {
+                        quantities[er.equipmentId] = er.quantity;
+                    });
+                    setEquipmentQuantities(quantities);
+                    if (Object.keys(quantities).length > 0) {
+                        setRentEquipment(true);
+                    }
                 }
             } catch (e) {
                 console.error(e);
@@ -101,16 +94,6 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     useEffect(() => {
         const calculateCostAndCheckAvailability = async () => {
             if (!equipmentList.length) return;
-
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const durationInDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
-
-            if (isNaN(start.getTime()) || isNaN(end.getTime()) || durationInDays <= 0) {
-                return;
-            }
-
-            const baseCost = 0;
             const equipmentCost = Object.entries(equipmentQuantities)
                 .map(([id, qty]) => {
                     const equipment = equipmentList.find(e => e.id === Number(id));
@@ -119,7 +102,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 })
                 .reduce((sum, val) => sum + val, 0);
 
-            setCost(baseCost + equipmentCost);
+            setCost(equipmentCost);
         };
 
         calculateCostAndCheckAvailability();
@@ -240,10 +223,10 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage('Błąd: ' + error);
+                setMessage(t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage('Błąd: ' + err.message);
+            setMessage(t("universal.error") + err.message);
         }
     };
 

@@ -75,6 +75,7 @@ export type Client = {
     name: string;
     surname: string;
     phoneNumber: string;
+    emailConfirmed: boolean;
 };
 
 // Admin:

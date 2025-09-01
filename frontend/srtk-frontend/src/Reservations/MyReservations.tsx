@@ -7,6 +7,7 @@ import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservations from '../Filters/FilterReservations';
 import type { Reservation, Track, Status } from '../Types/Types';
+import { getUserReservations, getAllTracks, getAllStatuses } from '../Services/Api';
 import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
 
@@ -24,37 +25,28 @@ function MyReservations() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
-    // Pobieranie rezerwacji użytkownika:
     const fetchReservations = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`/api/reservations/user?userId=${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            if (!res.ok) {
-                throw new Error(t("api.reservationError"));
+            if (token && userId !== undefined) {
+                const data = await getUserReservations(userId, token);
+                setReservations(data);
             }
-            const data = await res.json();
-            setReservations(data);
         } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd');
+            setError(err.message || t("universal.error"));
         } finally {
             setLoading(false);
         }
     };
 
-    // Pobranie torów (do wyświetlenia nazwy):
     useEffect(() => {
         const fetchTracks = async () => {
             try {
-                const res = await fetch('/api/tracks', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error(t("api.tracksError"));
-                const data = await res.json();
-                setTracks(data);
+                if (token) {
+                    const data = await getAllTracks(token);
+                    setTracks(data);
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -63,16 +55,13 @@ function MyReservations() {
         fetchTracks();
     }, [token]);
 
-    // Pobranie statusów rezerwacji (do wyświetlenia nazwy):
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
-                const res = await fetch('/api/statuses', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error(t("api.statusError"));
-                const data = await res.json();
-                setStatuses(data);
+                if (token) {
+                    const data = await getAllStatuses(token);
+                    setStatuses(data);
+                }
             } catch (error) {
                 console.error(error);
             }
