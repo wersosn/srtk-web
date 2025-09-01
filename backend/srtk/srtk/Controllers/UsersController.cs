@@ -19,15 +19,13 @@ namespace srtk.Controllers
             this.service = service;
         }
 
-        // Pobranie wszystkich użytkowników:
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
+        public async Task<ActionResult<List<UserDto>>> GetAllUsers()
         {
             var users = await service.GetAll();
             return users;
         }
 
-        // Pobranie wszystkich klientów:
         [HttpGet("clients")]
         public async Task<List<Client>> GetAllClients()
         {
@@ -35,7 +33,6 @@ namespace srtk.Controllers
             return clients;
         }
 
-        // Pobranie wszystkich adminów:
         [HttpGet("admins")]
         public async Task<List<Admin>> GetAllAdmins()
         {
@@ -43,10 +40,9 @@ namespace srtk.Controllers
             return admins;
         }
 
-        // Pobranie użytkowników według roli:
-        [HttpGet("users/role/{roleId}")]
+        [HttpGet("role/{roleId}")]
         [Authorize]
-        public async Task<ActionResult<List<User>>> GetUsersByRole(int roleId)
+        public async Task<ActionResult<List<UserDto>>> GetUsersByRole(int roleId)
         {
             var users = await service.GetByRole(roleId);
             if (users == null)
@@ -56,9 +52,8 @@ namespace srtk.Controllers
             return users;
         }
 
-        // Pobranie konkretnego użytkownika:
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(int id)
+        public async Task<ActionResult<UserDto>> GetUserById(int id)
         {
             var user = await service.GetById(id);
             if (user == null)
@@ -68,9 +63,8 @@ namespace srtk.Controllers
             return user;
         }
 
-        // Pobranie konkretnego użytkownika po adresie e-mail:
         [HttpGet("email")]
-        public async Task<ActionResult<User>> GetUserByEmail(string email)
+        public async Task<ActionResult<UserDto>> GetUserByEmail(string email)
         {
             var user = await service.GetByEmail(email);
             if (user == null)
@@ -80,7 +74,6 @@ namespace srtk.Controllers
             return user;
         }
 
-        // Pobranie konkretnego klienta:
         [HttpGet("clients/{id}")]
         public async Task<ActionResult<Client>> GetClientById(int id)
         {
@@ -92,7 +85,6 @@ namespace srtk.Controllers
             return user;
         }
 
-        // Dodanie nowego użytkownika:
         [HttpPost]
         public async Task<ActionResult<User>> AddUser(User user)
         {
@@ -100,7 +92,6 @@ namespace srtk.Controllers
             return CreatedAtAction(nameof(GetUserById), new { id = u.Id }, u);
         }
 
-        // Edycja istniejącego użytkownika:
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDto dto)
@@ -113,7 +104,6 @@ namespace srtk.Controllers
             return Ok(user);
         }
 
-        // Edycja samego użytkownika:
         [HttpPut("clients/{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateClient(int id, [FromBody] UserDto dto)
@@ -132,7 +122,6 @@ namespace srtk.Controllers
             return Ok(user);
         }
 
-        // Usunięcie istniejącego użytkownika:
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<User>> DeleteUser(int id)

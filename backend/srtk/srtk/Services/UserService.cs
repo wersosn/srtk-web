@@ -15,49 +15,142 @@ namespace srtk.Services
             this.context = context;
         }
 
-        // Pobranie wszystkich użytkowników:
-        public async Task<List<User>> GetAll()
+        public async Task<List<UserDto>> GetAll()
         {
-            return await context.Users.ToListAsync();
+            var users = await context.Users.ToListAsync();
+            var list = new List<UserDto>();
+
+            foreach (var u in users)
+            {
+                var dto = new UserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    RoleId = u.RoleId
+                };
+
+                if (u is Client client)
+                {
+                    dto.Name = client.Name;
+                    dto.Surname = client.Surname;
+                    dto.PhoneNumber = client.PhoneNumber;
+                }
+
+                if (u is Admin admin)
+                {
+                    dto.FacilityId = admin.FacilityId;
+                }
+
+                list.Add(dto);
+            }
+            return list;
         }
 
-        // Pobranie wszystkich klientów:
         public async Task<List<Client>> GetAllClients()
         {
             return await context.Clients.ToListAsync();
         }
 
-        // Pobranie wszystkich adminów:
         public async Task<List<Admin>> GetAllAdmins()
         {
             return await context.Admins.ToListAsync();
         }
-
-        // Pobranie konkretnego użytkownika:
-        public async Task<User?> GetById(int id)
+        public async Task<UserDto?> GetById(int id)
         {
-            return await context.Users.FindAsync(id);
+            var user = await context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var dto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                RoleId = user.RoleId
+            };
+
+            if (user is Client client)
+            {
+                dto.Name = client.Name;
+                dto.Surname = client.Surname;
+                dto.PhoneNumber = client.PhoneNumber;
+            }
+
+            if (user is Admin admin)
+            {
+                dto.FacilityId = admin.FacilityId;
+            }
+
+            return dto;
+        }
+        public async Task<UserDto?> GetByEmail(string email)
+        {
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var dto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                RoleId = user.RoleId
+            };
+
+            if (user is Client client)
+            {
+                dto.Name = client.Name;
+                dto.Surname = client.Surname;
+                dto.PhoneNumber = client.PhoneNumber;
+            }
+
+            if (user is Admin admin)
+            {
+                dto.FacilityId = admin.FacilityId;
+            }
+
+            return dto;
         }
 
-        // Pobranie konkretnego użytkownika po adresie e-mail:
-        public async Task<User?> GetByEmail(string email)
-        {
-            return await context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        }
-
-        // Pobranie konkretnego klienta:
         public async Task<Client?> GetClientById(int id)
         {
             return await context.Clients.FindAsync(id);
         }
 
-        // Pobranie użytkowników według roli:
-        public async Task<List<User>> GetByRole(int roleId)
+
+        public async Task<List<UserDto>> GetByRole(int roleId)
         {
-            return await context.Users.Where(u => u.RoleId == roleId).ToListAsync();
+            var users = await context.Users.Where(u => u.RoleId == roleId).ToListAsync();
+            var list = new List<UserDto>();
+
+            foreach (var u in users)
+            {
+                var dto = new UserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    RoleId = u.RoleId
+                };
+
+                if (u is Client client)
+                {
+                    dto.Name = client.Name;
+                    dto.Surname = client.Surname;
+                    dto.PhoneNumber = client.PhoneNumber;
+                }
+
+                if (u is Admin admin)
+                {
+                    dto.FacilityId = admin.FacilityId;
+                }
+
+                list.Add(dto);
+            }
+            return list;
         }
 
-        // Dodanie nowego użytkownika:
         public async Task<User> Add(User user)
         {
             context.Users.Add(user);
@@ -65,7 +158,6 @@ namespace srtk.Services
             return user;
         }
 
-        // Edycja istniejącego użytkownika:
         public async Task<User?> Update(int id, [FromBody] UserDto dto)
         {
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -95,7 +187,7 @@ namespace srtk.Services
                         context.Admins.Remove(currentAdmin);
                     }
 
-                    if (dto.RoleId == 1) // Client
+                    if (dto.RoleId == 1) // Klient
                     {
                         var newClient = new Client
                         {
@@ -126,12 +218,22 @@ namespace srtk.Services
                 }
                 else
                 {
-                    // Aktualizacja pól jeśli nie zmieniamy typu
                     if (currentClient != null)
                     {
-                        if (dto.Name != null) currentClient.Name = dto.Name;
-                        if (dto.Surname != null) currentClient.Surname = dto.Surname;
-                        if (dto.PhoneNumber != null) currentClient.PhoneNumber = dto.PhoneNumber;
+                        if (dto.Name != null)
+                        {
+                            currentClient.Name = dto.Name;
+                        }
+
+                        if (dto.Surname != null)
+                        {
+                            currentClient.Surname = dto.Surname;
+                        }
+
+                        if (dto.PhoneNumber != null)
+                        {
+                            currentClient.PhoneNumber = dto.PhoneNumber;
+                        }
                     }
 
                     if (currentAdmin != null && dto.FacilityId.HasValue)
@@ -156,7 +258,6 @@ namespace srtk.Services
             }
         }
 
-        // Edycja istniejącego użytkownika:
         public async Task<User?> UpdateMyself(int id, [FromBody] UserDto dto)
         {
             var user = await context.Users.FindAsync(id);
@@ -192,7 +293,6 @@ namespace srtk.Services
             return user;
         }
 
-        // Usunięcie istniejącego użytkownika:
         public async Task<bool> Delete(int id)
         {
             var user = await context.Users.Include(r => r.ReservationList).FirstOrDefaultAsync(r => r.Id == id);

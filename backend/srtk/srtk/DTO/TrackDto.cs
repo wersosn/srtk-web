@@ -4,6 +4,7 @@ namespace srtk.DTO
 {
     public class TrackDto
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string TypeOfSurface { get; set; }
         public double Length { get; set; }

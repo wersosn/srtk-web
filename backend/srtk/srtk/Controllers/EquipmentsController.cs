@@ -19,19 +19,17 @@ namespace srtk.Controllers
             this.service = service;
         }
 
-        // Pobranie wszystkich sprzętów:
         [HttpGet]
-        public async Task<ActionResult<List<Equipment>>> GetAllEquipments()
+        public async Task<ActionResult<List<EquipmentDto>>> GetAllEquipments()
         {
             var equipments = await service.GetAll();
-            return equipments;
+            return Ok(equipments);
         }
 
-        // Pobieranie wszystkich sprzętów należących do konkretnego obiektu:
         [HttpGet("inFacility")]
-        public async Task<ActionResult<List<Equipment>>> GetAllEquipmentsInFacility([FromQuery] int? facilityId)
+        public async Task<ActionResult<List<EquipmentDto>>> GetAllEquipmentsInFacility([FromQuery] int? facilityId)
         {
-            List<Equipment> equipments;
+            List<EquipmentDto> equipments;
 
             if (facilityId.HasValue)
             {
@@ -45,10 +43,9 @@ namespace srtk.Controllers
                 {
                     equipments = await service.GetAll();
                 }
-                else if (int.TryParse(facilityIdClaim.Value, out int actualFacilityId))
+                else if (int.TryParse(facilityIdClaim.Value, out int adminFacilityId))
                 {
-                    Console.WriteLine($"FacilityId z tokena: {actualFacilityId}");
-                    equipments = await service.GetAllInFacility(actualFacilityId);
+                    equipments = await service.GetAllInFacility(adminFacilityId);
                 }
                 else
                 {
@@ -58,31 +55,28 @@ namespace srtk.Controllers
             return Ok(equipments);
         }
 
-        // Pobranie konkretnego sprzętu:
         [HttpGet("{id}")]
-        public async Task<ActionResult<Equipment>> GetEquipmentById(int id)
+        public async Task<ActionResult<EquipmentDto>> GetEquipmentById(int id)
         {
             var equipment = await service.GetById(id);
             if (equipment == null)
             {
                 return NotFound();
             }
-            return equipment;
+            return Ok(equipment);
         }
 
-        // Dodanie nowego sprzętu:
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Equipment>> AddEquipment(Equipment equipment)
+        public async Task<ActionResult<EquipmentDto>> AddEquipment(EquipmentDto equipment)
         {
             var eq = await service.Add(equipment);
             return CreatedAtAction(nameof(GetEquipmentById), new { id = eq.Id }, eq);
         }
 
-        // Edycja istniejącego sprzętu:
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Equipment>> UpdateEquipment(int id, [FromBody] EquipmentDto dto)
+        public async Task<ActionResult<EquipmentDto>> UpdateEquipment(int id, [FromBody] EquipmentDto dto)
         {
             var equipment = await service.Update(id, dto);
             if (equipment == null)
@@ -92,10 +86,9 @@ namespace srtk.Controllers
             return Ok(equipment);
         }
 
-        // Usunięcie istniejącego sprzętu:
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Equipment>> DeleteEquipment(int id)
+        public async Task<ActionResult> DeleteEquipment(int id)
         {
             var equipment = await service.Delete(id);
             if (!equipment)

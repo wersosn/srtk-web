@@ -18,39 +18,35 @@ namespace srtk.Controllers
             this.service = service;
         }
 
-        // Pobranie wszystkich statusów rezerwacji:
         [HttpGet]
-        public async Task<ActionResult<List<Status>>> GetAllStatuses()
+        public async Task<ActionResult<List<StatusDto>>> GetAllStatuses()
         {
             var statuses = await service.GetAll();
-            return statuses;
+            return Ok(statuses);
         }
 
-        // Pobranie konkretnego statusu rezerwacji:
         [HttpGet("{id}")]
-        public async Task<ActionResult<Status>> GetStatusById(int id)
+        public async Task<ActionResult<StatusDto>> GetStatusById(int id)
         {
             var status = await service.GetById(id);
             if (status == null)
             {
                 return NotFound();
             }
-            return status;
+            return Ok(status);
         }
 
-        // Dodanie nowego statusu rezerwacji:
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Status>> AddStatus(Status status)
+        public async Task<ActionResult<StatusDto>> AddStatus(StatusDto status)
         {
             var s = await service.Add(status);
-            return CreatedAtAction(nameof(GetStatusById), new { id = s.Id }, s);
+            return CreatedAtAction(nameof(GetStatusById), new { id = s.Id }, s); // Zwracam DTO, aby zachować separację warstw
         }
 
-        // Edycja istniejącego statusu rezerwacji:
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Status>> UpdateStatus(int id, [FromBody] StatusDto dto)
+        public async Task<ActionResult<StatusDto>> UpdateStatus(int id, [FromBody] StatusDto dto)
         {
             var status = await service.Update(id, dto);
             if (status == null)
@@ -60,10 +56,9 @@ namespace srtk.Controllers
             return Ok(status);
         }
 
-        // Usunięcie istniejącego statusu rezerwacji:
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Status>> DeleteStatus(int id)
+        public async Task<ActionResult> DeleteStatus(int id)
         {
             var status = await service.Delete(id);
             if (!status)

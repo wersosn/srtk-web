@@ -13,28 +13,47 @@ namespace srtk.Services
             this.context = context;
         }
 
-        // Pobranie wszystkich obiektów:
-        public async Task<List<Facility>> GetAll()
+        public async Task<List<FacilityDto>> GetAll()
         {
-            return await context.Facilities.ToListAsync();
+            var facilities = await context.Facilities.ToListAsync();
+            var list = facilities.Select(f => new FacilityDto
+            {
+                Id = f.Id,
+                Name = f.Name,
+                City = f.City,
+                Address = f.Address
+            }).ToList();
+            return list;
         }
 
-        // Pobranie konkretnego obiektu:
-        public async Task<Facility?> GetById(int id)
+        public async Task<FacilityDto?> GetById(int id)
         {
-            return await context.Facilities.FindAsync(id);
+            var facility = await context.Facilities.FindAsync(id);
+            if (facility == null)
+            {
+                return null;
+            }
+
+            var fDto = new FacilityDto
+            {
+                Id = facility.Id,
+                Name = facility.Name,
+                City = facility.City,
+                Address = facility.Address
+            };
+
+            return fDto;
         }
 
-        // Dodanie nowego obiektu:
-        public async Task<Facility> Add(Facility facility)
+        public async Task<FacilityDto> Add(FacilityDto dto)
         {
+            var facility = new Facility { Name = dto.Name, City = dto.City, Address = dto.Address };
             context.Facilities.Add(facility);
             await context.SaveChangesAsync();
-            return facility;
+            return new FacilityDto { Id = facility.Id, Name = facility.Name, City = facility.City, Address = facility.Address };
         }
 
-        // Edycja istniejącego obiektu:
-        public async Task<Facility?> Update(int id, FacilityDto dto)
+        public async Task<FacilityDto?> Update(int id, FacilityDto dto)
         {
             var facility = await context.Facilities.FindAsync(id);
             if (facility == null) 
@@ -45,10 +64,9 @@ namespace srtk.Services
             facility.City = dto.City;
             facility.Address = dto.Address;
             await context.SaveChangesAsync();
-            return facility;
+            return new FacilityDto { Id = facility.Id, Name = facility.Name, City = facility.City, Address = facility.Address };
         }
 
-        // Usunięcie istniejącego obiektu:
         public async Task<bool> Delete(int id)
         {
             var facility = await context.Facilities.FindAsync(id);

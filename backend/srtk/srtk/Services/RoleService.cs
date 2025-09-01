@@ -13,28 +13,43 @@ namespace srtk.Services
             this.context = context;
         }
 
-        // Pobranie wszystkich ról:
-        public async Task<List<Role>> GetAll()
+        public async Task<List<RoleDto>> GetAll()
         {
-            return await context.Roles.ToListAsync();
+            var roles = await context.Roles.ToListAsync();
+            var list = roles.Select(r => new RoleDto
+            {
+                Id = r.Id,
+                Name = r.Name
+            }).ToList();
+            return list;
         }
 
-        // Pobranie konkretnej roli:
-        public async Task<Role?> GetById(int id)
+        public async Task<RoleDto?> GetById(int id)
         {
-            return await context.Roles.FindAsync(id);
+            var role = await context.Roles.FindAsync(id);
+            if(role == null)
+            {
+                return null;
+            }
+
+            var rDto = new RoleDto
+            {
+                Id = role.Id,
+                Name = role.Name
+            };
+
+            return rDto;
         }
 
-        // Dodanie nowej roli:
-        public async Task<Role> Add(Role role)
+        public async Task<RoleDto> Add(RoleDto dto)
         {
+            var role = new Role { Name = dto.Name };
             context.Roles.Add(role);
             await context.SaveChangesAsync();
-            return role;
+            return new RoleDto { Id = role.Id, Name = role.Name };
         }
 
-        // Edycja istniejącej roli:
-        public async Task<Role?> Update(int id, RoleDto dto)
+        public async Task<RoleDto?> Update(int id, RoleDto dto)
         {
             var role = await context.Roles.FindAsync(id);
             if (role == null)
@@ -43,10 +58,9 @@ namespace srtk.Services
             }
             role.Name = dto.Name;
             await context.SaveChangesAsync();
-            return role;
+            return new RoleDto { Id = role.Id, Name = role.Name };
         }
 
-        // Usunięcie istniejącej roli:
         public async Task<bool> Delete(int id)
         {
             var role = await context.Roles.FindAsync(id);

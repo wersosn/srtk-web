@@ -7,6 +7,8 @@ using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using System.Globalization;
 using Track = srtk.Models.Track;
+using DocumentFormat.OpenXml.Office2019.Presentation;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace srtk.Services
 {
@@ -21,13 +23,35 @@ namespace srtk.Services
             this.emailService = emailService;
         }
 
-        // Pobranie wszystkich rezerwacji (ogółem):
-        public async Task<List<Reservation>> GetAll()
+        public async Task<List<ReservationDto>> GetAll()
         {
-            return await context.Reservations.ToListAsync();
+            return await context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Track)
+                .Include(r => r.Status)
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .Select(r => new ReservationDto
+                {
+                    Id = r.Id,
+                    Start = r.Start,
+                    End = r.End,
+                    Cost = r.Cost,
+                    TrackId = r.TrackId,
+                    TrackName = r.Track.Name,
+                    StatusId = r.StatusId,
+                    EquipmentReservations = r.EquipmentReservations
+                        .Select(er => new EquipmentReservationDto
+                        {
+                            EquipmentId = er.EquipmentId,
+                            Name = er.Equipment.Name,
+                            Quantity = er.Quantity
+                        })
+                        .ToList()
+                }).ToListAsync();
+
         }
 
-        // Pobieranie rezerwacji konkretnego toru:
         public async Task<List<ReservationDto>> GetAllInTrack(int trackId)
         {
             return await context.Reservations
@@ -55,9 +79,30 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji z konkretnym statusem rezerwacji:
-        public async Task<List<Reservation>> GetAllWithStatus(int statusId)
+        public async Task<List<ReservationDto>> GetAllWithStatus(int statusId)
         {
-            return await context.Reservations.Where(r => r.StatusId == statusId).ToListAsync();
+            return await context.Reservations
+                .Where(r => r.StatusId == statusId)
+                .Include(r => r.User)
+                .Include(r => r.Status)
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .Select(r => new ReservationDto
+                {
+                    Id = r.Id,
+                    Start = r.Start,
+                    End = r.End,
+                    Cost = r.Cost,
+                    TrackId = r.TrackId,
+                    TrackName = r.Track.Name,
+                    StatusId = r.StatusId,
+                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
+                    {
+                        EquipmentId = er.EquipmentId,
+                        Name = er.Equipment.Name,
+                        Quantity = er.Quantity
+                    }).ToList()
+                }).ToListAsync();
         }
 
         // Pobieranie rezerwacji konkretnego użytkownika:
@@ -104,18 +149,59 @@ namespace srtk.Services
         }
 
         // Pobieranie rezerwacji rozpoczynających się w określonym dniu i/lub godzinie:
-        public async Task<List<Reservation>> GetByStartDateAndHour(DateTime date, TimeSpan hour)
+        public async Task<List<ReservationDto>> GetByStartDateAndHour(DateTime date, TimeSpan hour)
         {
-            return await context.Reservations.Where(r => r.Start.Date == date.Date && r.Start.TimeOfDay == hour).ToListAsync();
+            return await context.Reservations
+                .Where(r => r.Start.Date == date.Date && r.Start.TimeOfDay == hour)
+                .Include(r => r.Track)
+                .Include(r => r.Status)
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .Select(r => new ReservationDto
+                {
+                    Id = r.Id,
+                    Start = r.Start,
+                    End = r.End,
+                    Cost = r.Cost,
+                    TrackId = r.TrackId,
+                    TrackName = r.Track.Name,
+                    StatusId = r.StatusId,
+                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
+                    {
+                        EquipmentId = er.EquipmentId,
+                        Name = er.Equipment.Name,
+                        Quantity = er.Quantity
+                    }).ToList()
+                }).ToListAsync();
         }
 
         // Pobieranie rezerwacji kończących się w określonym dniu:
-        public async Task<List<Reservation>> GetByEndDateAndHour(DateTime date, TimeSpan hour)
+        public async Task<List<ReservationDto>> GetByEndDateAndHour(DateTime date, TimeSpan hour)
         {
-            return await context.Reservations.Where(r => r.End.Date == date.Date && r.End.TimeOfDay == hour).ToListAsync();
+            return await context.Reservations
+                .Where(r => r.End.Date == date.Date && r.End.TimeOfDay == hour)
+                .Include(r => r.Track)
+                .Include(r => r.Status)
+                .Include(r => r.EquipmentReservations)
+                .ThenInclude(er => er.Equipment)
+                .Select(r => new ReservationDto
+                {
+                    Id = r.Id,
+                    Start = r.Start,
+                    End = r.End,
+                    Cost = r.Cost,
+                    TrackId = r.TrackId,
+                    TrackName = r.Track.Name,
+                    StatusId = r.StatusId,
+                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
+                    {
+                        EquipmentId = er.EquipmentId,
+                        Name = er.Equipment.Name,
+                        Quantity = er.Quantity
+                    }).ToList()
+                }).ToListAsync();
         }
 
-        // Pobieranie rezerwacji, które trwają w określonym przedziale czasowym - do znajdywania kolizji:
         public async virtual Task<bool> IsTrackAvailable(int trackId, DateTime start, DateTime end, int? reservationId = null)
         {
             start = start.ToUniversalTime();
@@ -130,7 +216,6 @@ namespace srtk.Services
                 );
         }
 
-        // Pobranie nadchodzących rezerwacji użytkownika (do powiadomień):
         public async virtual Task<List<ReservationDto>> GetUpcomingNotifications(int userId)
         {
             var now = DateTime.UtcNow;
@@ -148,7 +233,6 @@ namespace srtk.Services
                 }).ToListAsync();
         }
 
-        // Pobranie konkretnej rezerwacji:
         public async virtual Task<Reservation?> GetById(int id)
         {
             return await context.Reservations
@@ -159,7 +243,6 @@ namespace srtk.Services
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
-        // Dodanie nowej rezerwacji:
         public async virtual Task<Reservation> Add(Reservation reservation)
         {
             using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
@@ -252,7 +335,6 @@ namespace srtk.Services
             return reservation;
         }
 
-        // Edycja istniejącej rezerwacji:
         public async Task<Reservation?> Update(int id, [FromBody] ReservationDto dto, string currentUserRole)
         {
             await using var transaction = await context.Database.BeginTransactionAsync();
@@ -377,7 +459,6 @@ namespace srtk.Services
             }
         }
 
-        // Usunięcie istniejącej rezerwacji:
         public async Task<bool> Delete(int id)
         {
             var reservation = await context.Reservations.FindAsync(id);
@@ -390,7 +471,6 @@ namespace srtk.Services
             return true;
         }
 
-        // Eksport danych w formacie .xlsx:
         public async Task<byte[]> ExportToExcel(int trackId)
         {
             var reservations = await context.Reservations
@@ -441,8 +521,7 @@ namespace srtk.Services
             }
         }
 
-        // Eksport danych w formacie .pdf:
-        // TODO: Poprawić wygląd, aby ładniej wyglądało c:
+        // TODO: Poprawić wygląd, aby ładniej wyglądało 
         public async Task<byte[]> ExportToPdf(int reservationId)
         {
             var reservation = await context.Reservations

@@ -19,39 +19,35 @@ namespace srtk.Controllers
             this.service = service;
         }
 
-        // Pobranie wszystkich ról:
         [HttpGet]
-        public async Task<ActionResult<List<Role>>> GetAllRoles()
+        public async Task<ActionResult<List<RoleDto>>> GetAllRoles()
         {
             var roles = await service.GetAll();
-            return roles;
+            return Ok(roles);
         }
 
-        // Pobranie konkretnej roli:
         [HttpGet("{id}")]
-        public async Task<ActionResult<Role>> GetRoleById(int id)
+        public async Task<ActionResult<RoleDto>> GetRoleById(int id)
         {
             var role = await service.GetById(id);
             if (role == null)
             {
                 return NotFound();
             }
-            return role;
+            return Ok(role);
         }
 
-        // Dodanie nowej roli:
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Role>> AddRole(Role role)
+        public async Task<ActionResult<RoleDto>> AddRole(RoleDto role)
         {
             var r = await service.Add(role);
-            return CreatedAtAction(nameof(GetRoleById), new { id = r.Id }, r);
+            return CreatedAtAction(nameof(GetRoleById), new { id = r.Id }, r); // Zwracam DTO, aby zachować separację warstw
         }
 
-        // Edycja istniejącej roli:
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Role>> UpdateRole(int id, [FromBody] RoleDto dto)
+        public async Task<ActionResult<RoleDto>> UpdateRole(int id, [FromBody] RoleDto dto)
         {
             var role = await service.Update(id, dto);
             if (role == null)
@@ -61,10 +57,9 @@ namespace srtk.Controllers
             return Ok(role);
         }
 
-        // Usunięcie istniejącej roli:
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Role>> DeleteRole(int id)
+        public async Task<ActionResult> DeleteRole(int id)
         {
             var role = await service.Delete(id);
             if (!role)

@@ -19,17 +19,15 @@ namespace srtk.Controllers
             this.service = service;
         }
 
-        // Pobranie wszystkich obiektów:
         [HttpGet]
-        public async Task<ActionResult<List<Facility>>> GetAllFacilities()
+        public async Task<ActionResult<List<FacilityDto>>> GetAllFacilities()
         {
             var facilities = await service.GetAll();
             return facilities;
         }
 
-        // Pobranie konkretnego obiektu:
         [HttpGet("{id}")]
-        public async Task<ActionResult<Facility>> GetFacilityById(int id)
+        public async Task<ActionResult<FacilityDto>> GetFacilityById(int id)
         {
             var facility = await service.GetById(id);
             if (facility == null)
@@ -39,19 +37,17 @@ namespace srtk.Controllers
             return facility;
         }
 
-        // Dodanie nowego obiektu:
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Facility>> AddFacility(Facility facility)
+        public async Task<ActionResult<FacilityDto>> AddFacility(FacilityDto facility)
         {
             var f = await service.Add(facility);
             return CreatedAtAction(nameof(GetFacilityById), new { id = f.Id }, f);
         }
 
-        // Edycja istniejącego obiektu:
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateFacility(int id, [FromBody] FacilityDto dto)
+        public async Task<ActionResult<FacilityDto>> UpdateFacility(int id, [FromBody] FacilityDto dto)
         {
             var facility = await service.Update(id, dto);
             if (facility == null)
@@ -61,10 +57,9 @@ namespace srtk.Controllers
             return Ok(facility);
         }
 
-        // Usunięcie istniejącego obiektu:
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Facility>> DeleteFacility(int id)
+        public async Task<ActionResult> DeleteFacility(int id)
         {
             var facility = await service.Delete(id);
             if (!facility)

@@ -13,28 +13,43 @@ namespace srtk.Services
             this.context = context;
         }
 
-        // Pobranie wszystkich statusów rezerwacji:
-        public async Task<List<Status>> GetAll()
+        public async Task<List<StatusDto>> GetAll()
         {
-            return await context.Statuses.ToListAsync();
+            var statuses = await context.Statuses.ToListAsync();
+            var list = statuses.Select(s => new StatusDto
+            {
+                Id = s.Id,
+                Name = s.Name
+            }).ToList();
+            return list;
         }
 
-        // Pobranie konkretnego statusu rezerwacji:
-        public async Task<Status?> GetById(int id)
+        public async Task<StatusDto?> GetById(int id)
         {
-            return await context.Statuses.FindAsync(id);
+            var status = await context.Statuses.FindAsync(id);
+            if (status == null)
+            {
+                return null;
+            }
+
+            var sDto = new StatusDto
+            {
+                Id = status.Id,
+                Name = status.Name
+            };
+
+            return sDto;
         }
 
-        // Dodanie nowego statusu rezerwacji:
-        public async Task<Status> Add(Status status)
+        public async Task<StatusDto> Add(StatusDto dto)
         {
+            var status = new Status { Name = dto.Name };
             context.Statuses.Add(status);
             await context.SaveChangesAsync();
-            return status;
+            return new StatusDto { Id = status.Id, Name = status.Name };
         }
 
-        // Edycja istniejącego statusu rezerwacji:
-        public async Task<Status?> Update(int id, [FromBody] StatusDto dto)
+        public async Task<StatusDto?> Update(int id, StatusDto dto)
         {
             var status = await context.Statuses.FindAsync(id);
             if (status == null)
@@ -43,10 +58,9 @@ namespace srtk.Services
             }
             status.Name = dto.Name;
             await context.SaveChangesAsync();
-            return status;
+            return new StatusDto { Id = status.Id, Name = status.Name };
         }
 
-        // Usunięcie istniejącego statusu rezerwacji:
         public async Task<bool> Delete(int id)
         {
             var status = await context.Statuses.FindAsync(id);
