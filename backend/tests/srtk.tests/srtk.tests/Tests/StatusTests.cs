@@ -26,13 +26,13 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new StatusService(context);
-            var status = new Status
+            var status = new StatusDto
             {
                 Name = "Zarezerwowano"
             };
             await service.Add(status);
 
-            var status2 = new Status
+            var status2 = new StatusDto
             {
                 Name = "Anulowano"
             };
@@ -51,13 +51,13 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new StatusService(context);
-            var status = new Status
+            var status = new StatusDto
             {
                 Name = "Zarezerwowano"
             };
             await service.Add(status);
 
-            var status2 = new Status
+            var status2 = new StatusDto
             {
                 Name = "Anulowano"
             };
@@ -75,7 +75,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new StatusService(context);
-            var status = new Status
+            var status = new StatusDto
             {
                 Name = "Zarezerwowano"
             };
@@ -94,7 +94,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new StatusService(context);
-            var status = new Status
+            var status = new StatusDto
             {
                 Name = "Zarezerwowano"
             };
@@ -119,7 +119,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new StatusService(context);
-            var status = new Status
+            var status = new StatusDto
             {
                 Name = "Zarezerwowano"
             };

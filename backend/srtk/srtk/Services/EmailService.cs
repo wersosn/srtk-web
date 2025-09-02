@@ -32,7 +32,6 @@ namespace srtk.Services
                 throw new ArgumentException("Adres e-mail nie może być pusty", nameof(to));
             }
 
-            //to = to.Trim();
             var email = new MimeMessage();
 
             email.From.Add(new MailboxAddress(_settings.FromName, _settings.From));

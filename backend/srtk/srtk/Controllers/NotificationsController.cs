@@ -17,15 +17,13 @@ namespace srtk.Controllers
             this.service = service;
         }
 
-        // Pobranie wszystkich powiadomień (ogółem):
         [HttpGet]
-        public async Task<ActionResult<List<Notification>>> GetAllNotifications()
+        public async Task<ActionResult<List<NotificationDto>>> GetAllNotifications()
         {
             var notifications = await service.GetAll();
             return notifications;
         }
 
-        // Pobieranie powiadomień konkretnego użytkownika:
         [HttpGet("{userId}/all")]
         public async Task<ActionResult<List<NotificationDto>>> GetAllUserNotifications(int userId)
         {
@@ -33,25 +31,22 @@ namespace srtk.Controllers
             return notifications;
         }
 
-        // Pobieranie powiadomień nieprzeczytanych:
         [HttpGet("{userId}/unread")]
-        public async Task<ActionResult<List<Notification>>> GetAllUnReadNotifications(int userId)
+        public async Task<ActionResult<List<NotificationDto>>> GetAllUnReadNotifications(int userId)
         {
             var notifications = await service.GetAllUnRead(userId);
             return notifications;
         }
 
-        // Pobieranie powiadomień nprzeczytanych:
         [HttpGet("{userId}/read")]
-        public async Task<ActionResult<List<Notification>>> GetAllReadNotifications(int userId)
+        public async Task<ActionResult<List<NotificationDto>>> GetAllReadNotifications(int userId)
         {
             var notifications = await service.GetAllRead(userId);
             return notifications;
         }
 
-        // Pobranie konkretnego powiadomienia:
         [HttpGet("{id}")]
-        public async Task<ActionResult<Notification>> GetNotificationById(int id)
+        public async Task<ActionResult<NotificationDto>> GetNotificationById(int id)
         {
             var notification = await service.GetById(id);
             if (notification == null)
@@ -61,17 +56,15 @@ namespace srtk.Controllers
             return notification;
         }
 
-        // Dodanie nowego powiadomienia:
         [HttpPost]
-        public async Task<ActionResult<Notification>> AddNotification(Notification notification)
+        public async Task<ActionResult<NotificationDto>> AddNotification(NotificationDto notification)
         {
             var n = await service.Add(notification);
             return CreatedAtAction(nameof(GetNotificationById), new { id = n.Id }, n);
         }
 
-        // Usuwanie istniejącego powiadomienia:
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Notification>> DeleteNotification(int id)
+        public async Task<ActionResult> DeleteNotification(int id)
         {
             var notification = await service.Delete(id);
             if (!notification)

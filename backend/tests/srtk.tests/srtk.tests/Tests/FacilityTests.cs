@@ -23,7 +23,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new FacilityService(context);
-            var facility = new Facility
+            var facility = new FacilityDto
             {
                 Name = "Duży obiekt",
                 City = "Białystok",
@@ -31,7 +31,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(facility);
 
-            var facility2 = new Facility
+            var facility2 = new FacilityDto
             {
                 Name = "Mały obiekt",
                 City = "Kraków",
@@ -52,7 +52,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new FacilityService(context);
-            var facility = new Facility
+            var facility = new FacilityDto
             {
                 Name = "Duży obiekt",
                 City = "Białystok",
@@ -60,7 +60,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(facility);
 
-            var facility2 = new Facility
+            var facility2 = new FacilityDto
             {
                 Name = "Mały obiekt",
                 City = "Kraków",
@@ -80,7 +80,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new FacilityService(context);
-            var facility = new Facility
+            var facility = new FacilityDto
             {
                 Name = "Duży obiekt",
                 City = "Białystok",
@@ -103,7 +103,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new FacilityService(context);
-            var facility = new Facility
+            var facility = new FacilityDto
             {
                 Name = "Duży obiekt",
                 City = "Białystok",
@@ -134,7 +134,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new FacilityService(context);
-            var facility = new Facility
+            var facility = new FacilityDto
             {
                 Name = "Duży obiekt",
                 City = "Białystok",

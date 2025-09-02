@@ -11,7 +11,8 @@ namespace srtk.Resources
         {
             if (faceName == "Verdana#Regular")
             {
-                return File.ReadAllBytes("D:\\studia\\inzynierka\\web\\backend\\srtk\\srtk\\Resources\\Fonts\\VERDANA.TTF");
+                var fontPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Fonts", "VERDANA.TTF");
+                return File.ReadAllBytes(fontPath);
             }
             return null;
         }

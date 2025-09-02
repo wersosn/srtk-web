@@ -20,21 +20,27 @@ function EquipmentsManagement() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
+    useEffect(() => {
+        if (token) {
+            const decoded: any = jwtDecode(token);
+            if (decoded?.FacilityId) {
+                setFacilityId(parseInt(decoded.FacilityId, 10));
+            }
+        }
+    }, [token]);
+
     const fetchAllEqs = async () => {
         setLoading(true);
         setError(null);
         try {
-            if (token) {
-                const decoded: any = jwtDecode(token);
-                if (decoded && decoded.FacilityId) {
-                    setFacilityId(parseInt(decoded.FacilityId, 10));
-                }
-
-                if (facilityId !== undefined) {
-                    const data = await getAllEquipmentsForAdmin(facilityId, token);
-                    setEqs(data);
-                }
+            if (!token) {
+                return;
             }
+            const decoded: any = jwtDecode(token);
+            const facilityIdFromToken = decoded?.FacilityId ? parseInt(decoded.FacilityId, 10) : 0;
+
+            const data = await getAllEquipmentsForAdmin(facilityIdFromToken, token);
+            setEqs(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));
         } finally {

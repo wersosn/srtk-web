@@ -8,6 +8,7 @@ namespace srtk.Models
         public int Id { get; set; }
 
         [Required]
+        [StringLength(100)]
         public string Name { get; set; }
 
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();

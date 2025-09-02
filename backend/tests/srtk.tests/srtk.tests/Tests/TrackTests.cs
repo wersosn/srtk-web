@@ -26,7 +26,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new TrackService(context);
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -37,7 +37,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(track);
 
-            var track2 = new Track
+            var track2 = new TrackDto
             {
                 Name = "Tor 2",               
                 TypeOfSurface = "Asfalt",
@@ -62,7 +62,7 @@ namespace srtk.tests.Tests
             var context = DbContextHelper.GetDbContext();
             var facilityService = new FacilityService(context);
             var service = new TrackService(context);
-            var facility = new Facility
+            var facility = new FacilityDto
             {
                 Name = "Duży obiekt",
                 City = "Białystok",
@@ -70,7 +70,7 @@ namespace srtk.tests.Tests
             };
             await facilityService.Add(facility);
 
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -82,7 +82,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(track);
 
-            var track2 = new Track
+            var track2 = new TrackDto
             {
                 Name = "Tor 2",
                 TypeOfSurface = "Asfalt",
@@ -107,7 +107,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new TrackService(context);
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -118,7 +118,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(track);
 
-            var track2 = new Track
+            var track2 = new TrackDto
             {
                 Name = "Tor 2",
                 TypeOfSurface = "Asfalt",
@@ -141,7 +141,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new TrackService(context);
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -170,7 +170,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new TrackService(context);
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -208,7 +208,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new TrackService(context);
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",

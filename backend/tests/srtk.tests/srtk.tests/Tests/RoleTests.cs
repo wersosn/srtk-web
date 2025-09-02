@@ -27,13 +27,13 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new RoleService(context);
-            var role = new Role 
+            var role = new RoleDto
             {
                 Name = "Klient"
             };
             await service.Add(role);
 
-            var role2 = new Role
+            var role2 = new RoleDto
             {
                 Name = "Admin"
             };
@@ -52,13 +52,13 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new RoleService(context);
-            var role = new Role
+            var role = new RoleDto
             {
                 Name = "Klient"
             };
             await service.Add(role);
 
-            var role2 = new Role
+            var role2 = new RoleDto
             {
                 Name = "Admin"
             };
@@ -76,7 +76,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new RoleService(context);
-            var role = new Role
+            var role = new RoleDto
             {
                 Name = "Klient"
             };
@@ -95,7 +95,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new RoleService(context);
-            var role = new Role
+            var role = new RoleDto
             {
                 Name = "Klient"
             };
@@ -120,7 +120,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new RoleService(context);
-            var role = new Role
+            var role = new RoleDto
             {
                 Name = "Klient"
             };

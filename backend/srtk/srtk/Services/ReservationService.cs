@@ -49,7 +49,6 @@ namespace srtk.Services
                         })
                         .ToList()
                 }).ToListAsync();
-
         }
 
         public async Task<List<ReservationDto>> GetAllInTrack(int trackId)
@@ -78,7 +77,6 @@ namespace srtk.Services
                 }).ToListAsync();
         }
 
-        // Pobieranie rezerwacji z konkretnym statusem rezerwacji:
         public async Task<List<ReservationDto>> GetAllWithStatus(int statusId)
         {
             return await context.Reservations
@@ -105,7 +103,6 @@ namespace srtk.Services
                 }).ToListAsync();
         }
 
-        // Pobieranie rezerwacji konkretnego użytkownika:
         public async virtual Task<List<ReservationDto>> GetUserReservations(int userId)
         {
             return await context.Reservations
@@ -132,7 +129,6 @@ namespace srtk.Services
                 }).ToListAsync();
         }
 
-        // Pobieranie sprzętów z konkretnej rezerwacji:
         public async Task<List<EquipmentReservationDto>> GetEquipments(int reservationId)
         {
             return await context.EquipmentReservations
@@ -148,7 +144,6 @@ namespace srtk.Services
                 .ToListAsync();
         }
 
-        // Pobieranie rezerwacji rozpoczynających się w określonym dniu i/lub godzinie:
         public async Task<List<ReservationDto>> GetByStartDateAndHour(DateTime date, TimeSpan hour)
         {
             return await context.Reservations
@@ -175,7 +170,6 @@ namespace srtk.Services
                 }).ToListAsync();
         }
 
-        // Pobieranie rezerwacji kończących się w określonym dniu:
         public async Task<List<ReservationDto>> GetByEndDateAndHour(DateTime date, TimeSpan hour)
         {
             return await context.Reservations

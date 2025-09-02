@@ -82,7 +82,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor 1",
                 Length = 100,
@@ -133,7 +133,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var track = new Track 
+            var track = new TrackDto
             { 
                 Name = "Tor 1", 
                 Length = 100, 
@@ -144,7 +144,7 @@ namespace srtk.tests.Tests
             };
             await trackService.Add(track);
 
-            var track2 = new Track 
+            var track2 = new TrackDto
             { 
                 Name = "Tor 2", 
                 Length = 200, 
@@ -196,13 +196,13 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var status = new Status
+            var status = new StatusDto
             {
                 Name = "Zarezerwowano"
             };
             await statusService.Add(status);
 
-            var status2 = new Status
+            var status2 = new StatusDto
             {
                 Name = "Anulowano"
             };
@@ -386,7 +386,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -431,7 +431,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -485,7 +485,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
@@ -527,7 +527,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var track = new Track
+            var track = new TrackDto
             {
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",

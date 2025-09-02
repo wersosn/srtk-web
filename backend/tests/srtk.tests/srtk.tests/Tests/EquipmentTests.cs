@@ -26,7 +26,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new EquipmentService(context);
-            var eq = new Equipment
+            var eq = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "Górski",
@@ -34,7 +34,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(eq);
 
-            var eq2 = new Equipment
+            var eq2 = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "BMX",
@@ -56,7 +56,7 @@ namespace srtk.tests.Tests
             var context = DbContextHelper.GetDbContext();
             var facilityService = new FacilityService(context);
             var service = new EquipmentService(context);
-            var facility = new Facility
+            var facility = new FacilityDto
             {
                 Name = "Duży obiekt",
                 City = "Białystok",
@@ -64,15 +64,16 @@ namespace srtk.tests.Tests
             };
             await facilityService.Add(facility);
 
-            var eq = new Equipment
+            var eq = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "Górski",
                 Cost = 50,
+                FacilityId = 1234
             };
             await service.Add(eq);
 
-            var eq2 = new Equipment
+            var eq2 = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "BMX",
@@ -94,16 +95,18 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new EquipmentService(context);
-            var eq = new Equipment
+            var eq = new EquipmentDto
             {
+                Id = 33,
                 Name = "Rower",
                 Type = "Górski",
                 Cost = 50
             };
             await service.Add(eq);
 
-            var eq2 = new Equipment
+            var eq2 = new EquipmentDto
             {
+                Id = 1235,
                 Name = "Rower",
                 Type = "BMX",
                 Cost = 80
@@ -122,7 +125,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new EquipmentService(context);
-            var eq = new Equipment
+            var eq = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "Miejski",
@@ -145,7 +148,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new EquipmentService(context);
-            var eq = new Equipment
+            var eq = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "Miejski",
@@ -176,7 +179,7 @@ namespace srtk.tests.Tests
         {
             var context = DbContextHelper.GetDbContext();
             var service = new EquipmentService(context);
-            var eq = new Equipment
+            var eq = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "Miejski",

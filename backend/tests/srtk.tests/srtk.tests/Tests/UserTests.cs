@@ -118,7 +118,7 @@ namespace srtk.tests.Tests
             var context = DbContextHelper.GetDbContext();
             var roleService = new RoleService(context);
             var service = new UserService(context);
-            var role = new Role
+            var role = new RoleDto
             {
                 Name = "Klient"
             };

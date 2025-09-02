@@ -9,9 +9,11 @@ namespace srtk.Models
         public int Id { get; set; }
 
         [Required]
+        [StringLength(100)]
         public string Name { get; set; }
 
         [Required]
+        [StringLength(100)]
         public string Type { get; set; }
 
         public double Cost { get; set; }

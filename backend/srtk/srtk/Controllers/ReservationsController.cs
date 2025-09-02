@@ -150,7 +150,6 @@ namespace srtk.Controllers
             return Ok(new { message = "Rezerwacja została anulowana" });
         }
 
-        // Eksport danych w formacie .xlsx (dla administratora):
         [HttpGet("export")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<byte[]>> ExportReservationsToExcel(int trackId)
@@ -167,7 +166,6 @@ namespace srtk.Controllers
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
-        // Eksport danych w formacie .pdf (dla użytkownika):
         [HttpGet("exportPdf")]
         public async Task<ActionResult<byte[]>> ExportReservationToPdf(int reservationId)
         {

@@ -14,6 +14,7 @@ namespace srtk.Models
         public string Name { get; set; }
 
         [Required]
+        [StringLength(100)]
         public string TypeOfSurface { get; set; }
 
         [Required]
