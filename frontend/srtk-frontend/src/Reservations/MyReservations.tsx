@@ -6,24 +6,26 @@ import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservations from '../Filters/FilterReservations';
-import type { Reservation, Track, Status } from '../Types/Types';
-import { getUserReservations, getAllTracks, getAllStatuses } from '../Services/Api';
+import type { Reservation } from '../Types/Types';
+import { getUserReservations } from '../Services/Api';
 import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
+import { useStatuses } from '../Hooks/useStatuses';
+import { useTracks } from '../Hooks/useTracks';
 
 function MyReservations() {
+    const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>(reservations);
     const [userId, setUserId] = useState<number | undefined>(undefined);
-    const [tracks, setTracks] = useState<Track[]>([]);
-    const [statuses, setStatuses] = useState<Status[]>([]);
+    const { statuses } = useStatuses(token);
+    const { tracks } = useTracks(token);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
-    const token = localStorage.getItem('token');
-    const { t } = useTranslation();
 
     const fetchReservations = async () => {
         setLoading(true);
@@ -39,36 +41,6 @@ function MyReservations() {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        const fetchTracks = async () => {
-            try {
-                if (token) {
-                    const data = await getAllTracks(token);
-                    setTracks(data);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchTracks();
-    }, [token]);
-
-    useEffect(() => {
-        const fetchStatuses = async () => {
-            try {
-                if (token) {
-                    const data = await getAllStatuses(token);
-                    setStatuses(data);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchStatuses();
-    }, [token]);
 
     useEffect(() => {
         if (token) {

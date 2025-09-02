@@ -93,6 +93,6 @@ export type Notification = {
     title: string;
     description: string;
     isRead: boolean;
-    timeStamp: string;
+    timeStamp: Date;
     userId: number;
 }

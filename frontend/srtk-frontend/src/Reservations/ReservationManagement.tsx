@@ -6,35 +6,29 @@ import { jwtDecode } from 'jwt-decode';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
-import type { Reservation, Track, Status } from '../Types/Types';
-import { getReservationsInTrack, getAllTracks, getAllStatuses } from '../Services/Api';
+import type { Reservation } from '../Types/Types';
+import { getReservationsInTrack } from '../Services/Api';
 import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
+import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { useStatuses } from '../Hooks/useStatuses';
+import { useTracksAdmin } from '../Hooks/useTracksAdmin';
 
 function ReservationManagement() {
+    const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const [facilityId, setFacilityId] = useState<number | null>(null);
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const { statuses } = useStatuses(token);
+    const { tracks } = useTracksAdmin(token!, facilityId!);
+    
     const [reservationsByTrack, setReservationsByTrack] = useState<Record<number, Reservation[]>>({});
-    const [statuses, setStatuses] = useState<Status[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [filteredReservations, setFilteredReservations] = useState<Record<number, Reservation[]>>(reservationsByTrack);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
-    const { t } = useTranslation();
 
-    // Dynamiczne ustawianie odpowiedniej ikonki (w zależności od trybu (ciemny/jasny)):
-    const [isDark, setIsDark] = useState(false);
-    useEffect(() => {
-        const mq = window.matchMedia("(prefers-color-scheme: dark)");
-        setIsDark(mq.matches);
-
-        const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-        mq.addEventListener("change", handler);
-
-        return () => mq.removeEventListener("change", handler);
-    }, []);
+    const isDark = usePrefersDark();
     const icon = isDark ? downloadIconLight : downloadIcon;
 
     useEffect(() => {
@@ -50,43 +44,7 @@ function ReservationManagement() {
         }
     }, [token]);
 
-    useEffect(() => {
-        if (!facilityId) {
-            return;
-        }
 
-        const fetchTracks = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                if (token) {
-                    const data = await getAllTracks(token);
-                    setTracks(data);
-                }
-            } catch (err: any) {
-                setError(err.message || t("api.tracksError"));
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTracks();
-    }, [facilityId, token]);
-
-    useEffect(() => {
-        const fetchStatuses = async () => {
-            try {
-                if (token) {
-                    const data = await getAllStatuses(token);
-                    setStatuses(data);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchStatuses();
-    }, [token]);
 
     const fetchReservations = async () => {
         if (tracks.length === 0) return;
@@ -116,21 +74,7 @@ function ReservationManagement() {
         fetchReservations();
     }, [token, tracks]);
 
-    // Obsługa edycji rezerwacji:
-    const handleEdit = (updated: Reservation) => {
-        setReservationsByTrack(prev => {
-            const trackReservations = prev[updated.trackId];
-            const updatedReservation = trackReservations.map(r => r.id === updated.id ? updated : r);
-            return {
-                ...prev,
-                [updated.trackId]: updatedReservation,
-            };
-        });
-        setEditingReservation(null);
-    };
-
-    // Obsługa filtrowania:
-    const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
+     const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
         let result: Record<number, Reservation[]> = {};
 
         if (trackId) {
@@ -157,6 +101,18 @@ function ReservationManagement() {
     useEffect(() => {
         setFilteredReservations(reservationsByTrack);
     }, [reservationsByTrack]);
+
+    const handleEdit = (updated: Reservation) => {
+        setReservationsByTrack(prev => {
+            const trackReservations = prev[updated.trackId];
+            const updatedReservation = trackReservations.map(r => r.id === updated.id ? updated : r);
+            return {
+                ...prev,
+                [updated.trackId]: updatedReservation,
+            };
+        });
+        setEditingReservation(null);
+    };
 
     // Ustawienie nazwy statusu:
     const getStatusName = (statusId: number) => {

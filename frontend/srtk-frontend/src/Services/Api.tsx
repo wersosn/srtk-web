@@ -99,3 +99,9 @@ export const getAllStatuses = async (token: string): Promise<Status[]> => {
 export const getAllFacilities = async (token: string): Promise<Facility[]> => {
     return fetchWithAuth("/api/facilities", token);
 };
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+// POWIADOMIENIA:  
+export const getAllUserNotifications = async (userId: number, token: string): Promise<Notification[]> => {
+    return fetchWithAuth(`/api/notifications/${userId}/all`, token);
+};

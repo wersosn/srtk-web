@@ -9,6 +9,10 @@ import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
 
 function MakeReservation() {
+const token = localStorage.getItem('token');
+    const navigate = useNavigate();
+    const { t } = useTranslation();
+    
     const [tracks, setTracks] = useState<Track[]>([]);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
     const [trackInfo, setTrackInfo] = useState<string>("");
@@ -23,10 +27,6 @@ function MakeReservation() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [cost, setCost] = useState<number>(0);
-
-    const token = localStorage.getItem('token');
-    const navigate = useNavigate();
-    const { t } = useTranslation();
 
     const fetchAllTracks = async () => {
         setLoading(true);
