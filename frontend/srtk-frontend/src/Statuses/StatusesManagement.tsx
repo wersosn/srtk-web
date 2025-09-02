@@ -4,6 +4,7 @@ import AddStatus from './AddStatus';
 import EditStatus from './EditStatus';
 import DeleteStatus from './DeleteStatus';
 import type { Status } from '../Types/Types';
+import { getAllStatuses } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 function StatusesManagement() {
@@ -12,20 +13,11 @@ function StatusesManagement() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
+    const token = localStorage.getItem('token');
 
-    // Pobieranie wszystkich statusów z bazy:
     const fetchStatuses = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/statuses', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) {
-                throw new Error(t("api.statusError"));
-            }
-            const data = await res.json();
+            const data = await getAllStatuses(token!);
             setStatuses(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));

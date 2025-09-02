@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
 import type { Equipment, Track } from '../Types/Types';
-import { getTrackById, getAllEquipmentsInFacility, getAllEquipmentsInReservation } from '../Services/Api';
+import { getTrackById, getAllEquipmentsInFacility, getAllEquipmentsInReservation, getTrackAvailabilityEdit } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 interface EditReservationProps {
@@ -43,7 +43,6 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         fetchTrack();
     }, [trackId, token]);
 
-    // Pobieranie sprzętów należących do odpowiedniego obiektu (w zależności od toru):
     useEffect(() => {
         const fetchEquipment = async () => {
             if (!rentEquipment) {
@@ -63,7 +62,6 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         fetchEquipment();
     }, [rentEquipment, tr, trackId]);
 
-    // Pobieranie sprzętów przypisanych do edytowanej rezerwacji:
     useEffect(() => {
         if (!reservationId) return;
 
@@ -127,12 +125,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             }
 
             try {
-                const res = await fetch(`/api/reservations/isAvailable?${params.toString()}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                if (!res.ok) throw new Error(t("api.availabilityError"));
-                const data = await res.json();
+                const data = await getTrackAvailabilityEdit(params, token!);
                 setIsAvailable(data.isAvailable);
                 return data.isAvailable;
             } catch (err) {
@@ -245,7 +238,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                     <p className="text-danger">{t("makeReservations.noAvailable")}</p>
                 )}
                 {datesChanged && isAvailable === true && (
-                    <p className="text-success">{t("makeReservations.availabile")}</p>
+                    <p className="text-success">{t("makeReservations.available")}</p>
                 )}
 
                 <div className="flex items-center mb-4">

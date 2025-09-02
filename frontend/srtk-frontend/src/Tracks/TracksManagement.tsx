@@ -6,6 +6,7 @@ import DeleteTrack from './DeleteTrack';
 import FilterTracks from '../Filters/FilterTracks';
 import { jwtDecode } from 'jwt-decode';
 import type { Track } from '../Types/Types';
+import { getAllTracksForAdmin } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 function TrackManagement() {
@@ -16,40 +17,29 @@ function TrackManagement() {
     const [filteredTracks, setFilteredTracks] = useState<Track[]>(tracks);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
-    // Pobieranie wszystkich torów z bazy:
+    useEffect(() => {
+        if (token) {
+            const decoded: any = jwtDecode(token);
+            if (decoded?.FacilityId) {
+                setFacilityId(parseInt(decoded.FacilityId, 10));
+            }
+        }
+    }, [token]);
+
     const fetchAllTracks = async () => {
         setLoading(true);
         setError(null);
         try {
-            const token = localStorage.getItem('token');
-
-            if (token) {
-                const decoded: any = jwtDecode(token);
-                if (decoded && decoded.FacilityId) {
-                    setFacilityId(parseInt(decoded.FacilityId, 10));
-                }
+            if (!token) {
+                return;
             }
+            const decoded: any = jwtDecode(token);
+            const facilityIdFromToken = decoded?.FacilityId ? parseInt(decoded.FacilityId, 10) : 0;
 
-            let url: string;
-
-            if (!facilityId || facilityId === 0) {
-                url = '/api/tracks';  // Wszystkie tory
-            } else {
-                url = `/api/tracks/inFacility?facilityId=${facilityId}`;  // Tory w danym obiekcie
-            }
-
-            const res = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (!res.ok) {
-                throw new Error(t("api.tracksError"));
-            }
-            const data = await res.json();
+            const data = await getAllTracksForAdmin(facilityIdFromToken, token);
             setTracks(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));

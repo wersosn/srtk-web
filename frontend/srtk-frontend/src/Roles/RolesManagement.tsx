@@ -4,6 +4,7 @@ import EditRole from './EditRole';
 import DeleteRole from './DeleteRole';
 import editIcon from '../assets/edit.png';
 import type { Role } from '../Types/Types';
+import { getAllRoles } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 function RoleManagement() {
@@ -12,20 +13,11 @@ function RoleManagement() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { t } = useTranslation();
+    const token = localStorage.getItem('token');
 
-    // Pobieranie wszystkich ról z bazy:
     const fetchRoles = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/roles', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) {
-                throw new Error(t("api.roleError"));
-            }
-            const data = await res.json();
+            const data = await getAllRoles(token!);
             setRoles(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));

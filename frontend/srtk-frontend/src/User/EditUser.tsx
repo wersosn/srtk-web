@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import type { Facility, Role } from '../Types/Types';
+import { getAllFacilities, getAllRoles } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 interface EditUserProps {
@@ -43,12 +44,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
 
         const fetchFacilities = async () => {
             try {
-                const res = await fetch('/api/facilities', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const data = await res.json();
+                const data = await getAllFacilities(token!);
                 setFacilities(data);
             } catch (err) {
                 console.error(t("api.facilityError"));
@@ -56,12 +52,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
         };
         const fetchRoles = async () => {
             try {
-                const res = await fetch('/api/roles', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const data = await res.json();
+                const data = await getAllRoles(token!);
                 setRoles(data);
             } catch (err) {
                 console.error(t("api.roleError"));
@@ -105,10 +96,10 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage('Błąd: ' + error);
+                setMessage( t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage('Błąd: ' + err.message);
+            setMessage( t("universal.error") + err.message);
         }
     };
 

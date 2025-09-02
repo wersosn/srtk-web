@@ -1,6 +1,7 @@
 import React, { useState, useEffect, type FormEvent } from "react";
 import { jwtDecode } from 'jwt-decode';
 import type { Track, Facility } from '../Types/Types';
+import { getAllFacilities } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 
 interface AddTrackProps {
@@ -36,13 +37,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
 
         const fetchFacilities = async () => {
             try {
-                const res = await fetch('/api/facilities', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    }
-                });
-                if (!res.ok) throw new Error(t("api.facilityError"));
-                const data = await res.json();
+                const data = await getAllFacilities(token!);
                 setFacilities(data);
             } catch (err: any) {
                 setMessage(err.message || t("api.facilityError"));

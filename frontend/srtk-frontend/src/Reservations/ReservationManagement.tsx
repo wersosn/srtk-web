@@ -7,6 +7,7 @@ import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
 import type { Reservation, Track, Status } from '../Types/Types';
+import { getReservationsInTrack, getAllTracks, getAllStatuses } from '../Services/Api';
 import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
 
@@ -36,7 +37,6 @@ function ReservationManagement() {
     }, []);
     const icon = isDark ? downloadIconLight : downloadIcon;
 
-    // Pobieranie facilityId z tokena
     useEffect(() => {
         if (token) {
             try {
@@ -50,31 +50,19 @@ function ReservationManagement() {
         }
     }, [token]);
 
-    // Pobranie torów:
     useEffect(() => {
-        if (facilityId === null) return;
+        if (!facilityId) {
+            return;
+        }
 
         const fetchTracks = async () => {
             setLoading(true);
             setError(null);
             try {
-                let url: string;
-                if (!facilityId || facilityId === 0) {
-                    url = '/api/tracks';  // Wszystkie tory
-                } else {
-                    url = `/api/tracks/inFacility?facilityId=${facilityId}`;  // Tory w danym obiekcie
+                if (token) {
+                    const data = await getAllTracks(token);
+                    setTracks(data);
                 }
-
-                const res = await fetch(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!res.ok) {
-                    throw new Error(t("api.tracksError"));
-                }
-                const data = await res.json();
-                setTracks(data);
             } catch (err: any) {
                 setError(err.message || t("api.tracksError"));
             } finally {
@@ -85,16 +73,13 @@ function ReservationManagement() {
         fetchTracks();
     }, [facilityId, token]);
 
-    // Pobranie statusów rezerwacji (do wyświetlenia nazwy):
     useEffect(() => {
         const fetchStatuses = async () => {
             try {
-                const res = await fetch('/api/statuses', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error(t("api.statusError"));
-                const data = await res.json();
-                setStatuses(data);
+                if (token) {
+                    const data = await getAllStatuses(token);
+                    setStatuses(data);
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -103,21 +88,13 @@ function ReservationManagement() {
         fetchStatuses();
     }, [token]);
 
-    // Pobieranie rezerwacji (wszystkich lub w danym obiekcie):
     const fetchReservations = async () => {
         if (tracks.length === 0) return;
         setLoading(true);
         setError(null);
         try {
             const reservationsPromises = tracks.map(async (track) => {
-                const res = await fetch(`/api/reservations/inTrack?trackId=${track.id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) {
-                    throw new Error(`${t("api.reservationForTrackError")} ${track.name}`);
-                }
-                const data = await res.json();
-                console.log(data);
+                const data = await getReservationsInTrack(track.id, token!);
                 return { trackId: track.id, reservations: data };
             });
 
@@ -150,7 +127,6 @@ function ReservationManagement() {
             };
         });
         setEditingReservation(null);
-        // TODO: Wysyłanie powiadomień o zmianach do użytkownika
     };
 
     // Obsługa filtrowania:

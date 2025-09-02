@@ -12,37 +12,57 @@ const fetchWithAuth = async (url: string, token: string) => {
     return res.json();
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // UŻYTKOWNICY:
 export const getUserInfo = async (userId: number, token: string): Promise<Client> => {
     return fetchWithAuth(`/api/users/clients/${userId}`, token);
 };
 
-
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // REZERWACJE:
 export const getUserReservations = async (userId: number, token: string): Promise<Reservation[]> => {
     return fetchWithAuth(`/api/reservations/user?userId=${userId}`, token);
-};
-
-export interface TrackAvailabilityResponse {
-  isAvailable: boolean;
-}
-export const getTrackAvailability = async (trackId: number, startDate: string, endDate: string,  token: string): Promise<TrackAvailabilityResponse> => {
-    return fetchWithAuth(`/api/reservations/isAvailable?trackId=${trackId}&start=${new Date(startDate).toISOString()}&end=${new Date(endDate).toISOString()}`, token);
 };
 
 export const getReservationsInTrack = async (trackId: number, token: string): Promise<Reservation[]> => {
     return fetchWithAuth(`/api/reservations/inTrack?trackId=${trackId}`, token);
 };
 
+export interface TrackAvailabilityResponse {
+  isAvailable: boolean;
+}
+
+// Ten fetch jest potrzebny przy tworzeniu nowej rezerwacji:
+export const getTrackAvailability = async (trackId: number, startDate: string, endDate: string,  token: string): Promise<TrackAvailabilityResponse> => {
+    return fetchWithAuth(`/api/reservations/isAvailable?trackId=${trackId}&start=${new Date(startDate).toISOString()}&end=${new Date(endDate).toISOString()}`, token);
+};
+
+// Natomiast ten fetch potrzebny jest w przypadku edycji, gdyż posiada dodatkowy parametr 'reservationId', aby umożliwić zmianę godziny np. z 10:15 na 10:00 (ta sama rezerwacja)
+export const getTrackAvailabilityEdit = async (params: URLSearchParams,  token: string): Promise<TrackAvailabilityResponse> => {
+    return fetchWithAuth(`/api/reservations/isAvailable?${params.toString()}`, token);
+};
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // TORY:
 export const getAllTracks = async (token: string): Promise<Track[]> => {
     return fetchWithAuth(`/api/tracks`, token);
+};
+
+export const getAllTracksForAdmin = async (facilityId: number, token: string): Promise<Track[]> => {
+    let url: string;
+    if (!facilityId || facilityId === 0) {
+        url = `/api/tracks`;  // Wszystkie tory
+    } else {
+        url = `/api/tracks/inFacility?facilityId=${facilityId}`;  // Tory w danym obiekcie
+    }
+    return fetchWithAuth(url, token);
 };
 
 export const getTrackById = async (trackId: number, token: string): Promise<Track> => { 
     return fetchWithAuth(`/api/tracks/${trackId}`, token);
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // SPRZĘTY:
 export const getAllEquipmentsForAdmin = async (facilityId: number, token: string): Promise<Equipment[]> => {
     let url: string;
@@ -62,18 +82,19 @@ export const getAllEquipmentsInReservation = async (reservationId: number, token
     return fetchWithAuth(`/api/reservations/equipments?reservationId=${reservationId}`, token);
 };
 
-
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // ROLE:
 export const getAllRoles = async (token: string): Promise<Role[]> => {
     return fetchWithAuth("/api/roles", token);
 };
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // STATUSY:
 export const getAllStatuses = async (token: string): Promise<Status[]> => {
     return fetchWithAuth("/api/statuses", token);
 };
 
-
+//--------------------------------------------------------------------------------------------------------------------------------------------
 // OBIEKTY:
 export const getAllFacilities = async (token: string): Promise<Facility[]> => {
     return fetchWithAuth("/api/facilities", token);
