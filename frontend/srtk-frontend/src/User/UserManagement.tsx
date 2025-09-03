@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
 import EditUser from './EditUser';
 import DeleteUser from './DeleteUser';
-import { jwtDecode } from 'jwt-decode';
 import type { Client, Admin } from '../Types/Types';
 import { useTranslation } from "react-i18next";
+import { useAuth } from './AuthContext';
 
 function UserManagement() {
+    const token = localStorage.getItem('token');
     const [clients, setClients] = useState<Client[]>([]);
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [editingUser, setEditingUser] = useState<Client | Admin | null>(null);
@@ -14,31 +15,10 @@ function UserManagement() {
     const [loadingClients, setLoadingClients] = useState(true);
     const [loadingAdmins, setLoadingAdmins] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [facilityId, setFacilityId] = useState<number | null>(null);
+    const { facilityId } = useAuth();
     const { t } = useTranslation();
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            const decoded: any = jwtDecode(token);
-            const id = parseInt(decoded.FacilityId);
-            if (!isNaN(id)) {
-                setFacilityId(id);
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchClients();
-    }, []);
-
-    useEffect(() => {
-        fetchAdmins();
-    }, [facilityId]);
-
-    // Ładowanie klientów:
     const fetchClients = () => {
-        const token = localStorage.getItem('token');
         setLoadingClients(true);
         fetch('/api/users/clients', {
             headers: { Authorization: `Bearer ${token}` },
@@ -52,10 +32,11 @@ function UserManagement() {
             .finally(() => setLoadingClients(false));
     };
 
-    // Ładowanie adminów:
     const fetchAdmins = () => {
-        if (facilityId === null) return;
-        const token = localStorage.getItem('token');
+        if (facilityId === null) {
+            return;
+        }
+
         setLoadingAdmins(true);
         fetch('/api/users/admins', {
             headers: { Authorization: `Bearer ${token}` },
@@ -70,6 +51,14 @@ function UserManagement() {
             .catch(err => setError(err.message))
             .finally(() => setLoadingAdmins(false));
     };
+
+    useEffect(() => {
+        fetchClients();
+    }, []);
+
+    useEffect(() => {
+        fetchAdmins();
+    }, [facilityId]);
 
     // Edycja użytkownika:
     const handleEdit = (updated: Client | Admin) => {

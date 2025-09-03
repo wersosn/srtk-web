@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import type { Facility, Role } from '../Types/Types';
 import { getAllFacilities, getAllRoles } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useAuth } from './AuthContext';
 
 interface EditUserProps {
     userId: number;
@@ -22,7 +22,8 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
     const [surname, setSurname] = useState(currentSurname);
     const [phoneNumber, setPhoneNumber] = useState(currentPhoneNumber);
     const [roleId, setRoleId] = useState(currentRoleId);
-    const [facilityId, setFacilityId] = useState(currentFacilityId);
+    const { facilityId } = useAuth();
+    const [facilityID, setFacilityId] = useState(currentFacilityId);
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
@@ -32,12 +33,10 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
 
     useEffect(() => {
         if (token) {
-            const decoded: any = jwtDecode(token);
-            const id = parseInt(decoded.FacilityId);
-            if (!isNaN(id)) {
-                setAdminInFacility(id);
-                if (id !== 0) {
-                    setFacilityId(id);
+            if (!isNaN(facilityId!)) {
+                setAdminInFacility(facilityId);
+                if (facilityId !== 0) {
+                    setFacilityId(facilityId!);
                 }
             }
         }
@@ -141,7 +140,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                         adminInFacility === 0 ? (
                             <div>
                                 <label>{t("user.facility")}</label>
-                                <select id="facilitySelect" value={facilityId} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
+                                <select id="facilitySelect" value={facilityID} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
                                     <option value="">{t("user.selectFacility")}</option>
                                     {facilities.map((f) => (
                                         <option key={f.id} value={f.id}>

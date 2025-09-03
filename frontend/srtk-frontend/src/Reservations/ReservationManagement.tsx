@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
 import downloadIconLight from '../assets/download-light.png';
-import { jwtDecode } from 'jwt-decode';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
@@ -13,14 +12,14 @@ import { useTranslation } from "react-i18next";
 import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { useStatuses } from '../Hooks/useStatuses';
 import { useTracksAdmin } from '../Hooks/useTracksAdmin';
+import { useAuth } from '../User/AuthContext';
 
 function ReservationManagement() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
-    const [facilityId, setFacilityId] = useState<number | null>(null);
+    const { facilityId } = useAuth();
     const { statuses } = useStatuses(token);
     const { tracks } = useTracksAdmin(token!, facilityId!);
-    
     const [reservationsByTrack, setReservationsByTrack] = useState<Record<number, Reservation[]>>({});
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [filteredReservations, setFilteredReservations] = useState<Record<number, Reservation[]>>(reservationsByTrack);
@@ -31,23 +30,11 @@ function ReservationManagement() {
     const isDark = usePrefersDark();
     const icon = isDark ? downloadIconLight : downloadIcon;
 
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                if (decoded && decoded.FacilityId !== undefined) {
-                    setFacilityId(parseInt(decoded.FacilityId, 10));
-                }
-            } catch {
-                setFacilityId(null);
-            }
-        }
-    }, [token]);
-
-
-
     const fetchReservations = async () => {
-        if (tracks.length === 0) return;
+        if (tracks.length === 0) {
+            return;
+        }
+        
         setLoading(true);
         setError(null);
         try {

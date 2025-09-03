@@ -21,5 +21,5 @@ export const useEquipmentsInFacility = (token: string | null, facilityId: number
             .finally(() => setLoading(false));
     }, [token, facilityId]);
 
-    return { equipmentList, loading, error };
+    return { equipmentList, setEquipmentList, loading, error };
 };

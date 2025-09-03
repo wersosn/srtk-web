@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from "react-i18next";
-import type { Equipment, Facility } from '../Types/Types';
+import type { Equipment } from '../Types/Types';
+import { useFacilities } from '../Hooks/useFacilities';
 
 interface FilterEquipmentsProps {
     equipments: Equipment[];
@@ -9,36 +10,9 @@ interface FilterEquipmentsProps {
 
 const FilterEquipments: React.FC<FilterEquipmentsProps> = ({ onFilterChange }) => {
     const [selectedFacilityId, setSelectedFacilityId] = useState<number | undefined>(undefined);
-    const [facilities, setFacilities] = useState<Facility[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
-
-    // Pobieranie wszystkich obiektów z bazy:
-    const fetchFacilities = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/facilities', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) {
-                throw new Error(t("api.facilityError"));
-            }
-            const data = await res.json();
-            setFacilities(data);
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchFacilities();
-    }, []);
+    const { facilities } = useFacilities(token);
 
     // Filtr torów po obiekcie:
     const handleFacilityChange = (value: string) => {

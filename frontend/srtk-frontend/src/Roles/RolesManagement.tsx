@@ -1,34 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AddRole from './AddRole';
 import EditRole from './EditRole';
 import DeleteRole from './DeleteRole';
 import editIcon from '../assets/edit.png';
 import type { Role } from '../Types/Types';
-import { getAllRoles } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useRoles } from '../Hooks/useRoles';
 
 function RoleManagement() {
-    const [roles, setRoles] = useState<Role[]>([]);
-    const [editingRole, setEditingRole] = useState<Role | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const { t } = useTranslation();
     const token = localStorage.getItem('token');
-
-    const fetchRoles = async () => {
-        try {
-            const data = await getAllRoles(token!);
-            setRoles(data);
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchRoles();
-    }, []);
+    const { roles, setRoles, loading, error } = useRoles(token);
+    const [editingRole, setEditingRole] = useState<Role | null>(null);
+    const { t } = useTranslation();
 
     // Obsługa dodawania roli:
     const handleAdd = (newRole: Role) => {
@@ -62,7 +45,7 @@ function RoleManagement() {
                                     <button onClick={() => setEditingRole(role)} disabled={loading} className="icon-button">
                                         <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                     </button>
-                                    <DeleteRole roleId={role.id} onDeleted={fetchRoles} />
+                                    <DeleteRole roleId={role.id} onDeleted={() => setRoles(prev => prev.filter(r => r.id !== role.id))} />
                                 </div>
                             </li>
                         ))}

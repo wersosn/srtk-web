@@ -1,45 +1,22 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { jwtDecode } from 'jwt-decode';
 import type { Notification } from "../Types/Types";
 import bellIconLight from '../assets/bell-light.png'
 import bellIconDark from '../assets/bell-dark.png'
 import './NotificationBell.css';
+import { useAuth } from "../User/AuthContext";
+import { usePrefersDark } from "../Hooks/usePrefersDark";
 
 function NotificationBell() {
-    const [userId, setUserId] = useState<number | undefined>(undefined);
-    const [isDark, setIsDark] = useState(false);
+    const { userId } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const { t } = useTranslation();
     const token = localStorage.getItem('token');
 
-    // Dynamiczne ustawianie odpowiedniej ikonki (w zależności od trybu (ciemny/jasny)):
-    useEffect(() => {
-        const mq = window.matchMedia("(prefers-color-scheme: dark)");
-        setIsDark(mq.matches);
-
-        const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-        mq.addEventListener("change", handler);
-
-        return () => mq.removeEventListener("change", handler);
-    }, []);
+    const isDark = usePrefersDark();
     const icon = isDark ? bellIconLight : bellIconDark;
-
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                const userIdFromToken = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-                if (userIdFromToken) {
-                    setUserId(parseInt(userIdFromToken, 10));
-                }
-            } catch {
-                setUserId(undefined);
-            }
-        }
-    }, []);
 
     const loadNotifications = async () => {
         setLoading(true);

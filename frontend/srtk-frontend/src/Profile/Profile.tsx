@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import { useTranslation } from "react-i18next";
 import i18n from "../Locales/i18next";
 import type { Client } from '../Types/Types';
@@ -7,9 +6,10 @@ import { getUserInfo } from '../Services/Api';
 import EditMyInfo from './EditMyInfo';
 import profileImage from '../assets/profile.svg';
 import './Profile.css';
+import { useAuth } from '../User/AuthContext';
 
 function Profile() {
-    const [userId, setUserId] = useState<number>();
+    const { userId } = useAuth();
     const [user, setUser] = useState<Client>();
     const [email, setEmail] = useState<string>("");
     const [emailConfirmed, setEmailConfirmed] = useState<boolean | null>(null);
@@ -38,20 +38,6 @@ function Profile() {
           setLoading(false);
       }
     }, [userId, token]);
-
-    useEffect(() => {
-      if (token) {
-        try {
-            const decoded: any = jwtDecode(token);
-            const userIdFromToken = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-            if (userIdFromToken) {
-                setUserId(parseInt(userIdFromToken, 10));
-            }
-        } catch {
-            setUserId(undefined);
-        }
-      }
-    }, [token]);
 
     useEffect(() => {
         if (userId) {

@@ -4,53 +4,19 @@ import AddTrack from './AddTrack';
 import EditTrack from './EditTrack';
 import DeleteTrack from './DeleteTrack';
 import FilterTracks from '../Filters/FilterTracks';
-import { jwtDecode } from 'jwt-decode';
 import type { Track } from '../Types/Types';
-import { getAllTracksForAdmin } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useAuth } from '../User/AuthContext';
+import { useTracksAdmin } from '../Hooks/useTracksAdmin';
 
 function TrackManagement() {
-    const [tracks, setTracks] = useState<Track[]>([]);
-    const [facilityId, setFacilityId] = useState<number | undefined>();
+    const token = localStorage.getItem('token');
+    const { facilityId } = useAuth();
+    const {tracks, setTracks, loading, error } = useTracksAdmin(token!, facilityId!);
     const [editingTrack, setEditingTrack] = useState<Track | null>(null);
     const [showDetails, setShowDetails] = useState<Track | null>(null);
     const [filteredTracks, setFilteredTracks] = useState<Track[]>(tracks);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
-
-    useEffect(() => {
-        if (token) {
-            const decoded: any = jwtDecode(token);
-            if (decoded?.FacilityId) {
-                setFacilityId(parseInt(decoded.FacilityId, 10));
-            }
-        }
-    }, [token]);
-
-    const fetchAllTracks = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            if (!token) {
-                return;
-            }
-            const decoded: any = jwtDecode(token);
-            const facilityIdFromToken = decoded?.FacilityId ? parseInt(decoded.FacilityId, 10) : 0;
-
-            const data = await getAllTracksForAdmin(facilityIdFromToken, token);
-            setTracks(data);
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchAllTracks()
-    }, []);
 
     // Obsługa dodawania toru:
     const handleAdd = (newTrack: Track) => {
@@ -104,7 +70,7 @@ function TrackManagement() {
                                         <button onClick={() => setEditingTrack(track)} disabled={loading} className="icon-button">
                                             <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                         </button>
-                                        <DeleteTrack trackId={track.id} onDeleted={fetchAllTracks} />
+                                        <DeleteTrack trackId={track.id} onDeleted={() => setTracks(prev => prev.filter(r => r.id !== track.id))} />
                                     </div>
                                 </div>
 

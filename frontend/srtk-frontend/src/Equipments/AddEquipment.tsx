@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import type { Equipment, Facility } from '../Types/Types';
 import { getAllFacilities } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../User/AuthContext";
 
 interface AddEquipmentProps {
     onAddEquipment: (newEquipment: Equipment) => void;
@@ -12,6 +13,7 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
     const [name, setName] = useState<string>("");
     const [type, setType] = useState<string>("");
     const [cost, setCost] = useState<number | "">("");
+    const { facilityId } = useAuth();
     const [facilityID, setFacilityId] = useState<number | "">("");
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [message, setMessage] = useState<string>("");
@@ -21,12 +23,10 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
 
     useEffect(() => {
         if (token) {
-            const decoded: any = jwtDecode(token);
-            const id = parseInt(decoded.FacilityId);
-            if (!isNaN(id)) {
-                setAdminInFacility(id);
-                if (id !== 0) {
-                    setFacilityId(id);
+            if (!isNaN(facilityId!)) {
+                setAdminInFacility(facilityId);
+                if (facilityId !== 0) {
+                    setFacilityId(facilityId!);
                 }
             }
         }

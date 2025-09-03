@@ -25,32 +25,34 @@ import BlobBackground from "./BlobBackground";
 import MakeReservation from "./Reservations/MakeReservation";
 import MyReservations from "./Reservations/MyReservations";
 import ReservationManagement from "./Reservations/ReservationManagement";
+import { useAuth } from "./User/AuthContext";
 
 function App() {
+  const { logout } = useAuth();
   useEffect(() => {
     const token = localStorage.getItem('token');
 
     const isTokenValid = () => {
       if (!token) {
-        return false;
+          return false;
       }
 
       try {
-        const decoded = jwtDecode(token);
-        const currentTime = Date.now() / 1000;
+          const decoded = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
 
-        const exp = decoded?.exp;
-        if (!exp) {
-          return false; 
-        }
-        return exp > currentTime;
+          const exp = decoded?.exp;
+          if (!exp) {
+             return false; 
+          }
+          return exp > currentTime;
       } catch (error) {
-        return false;
+          return false;
       }
     };
 
     if (!isTokenValid()) {
-      localStorage.removeItem('token');
+        logout();
     }
   }, []);
 

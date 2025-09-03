@@ -12,17 +12,18 @@ import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
 import { useStatuses } from '../Hooks/useStatuses';
 import { useTracks } from '../Hooks/useTracks';
+import { useAuth } from '../User/AuthContext';
 
 function MyReservations() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
+    const { userId } = useAuth();
+    const { statuses } = useStatuses(token);
+    const { tracks } = useTracks(token);
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>(reservations);
-    const [userId, setUserId] = useState<number | undefined>(undefined);
-    const { statuses } = useStatuses(token);
-    const { tracks } = useTracks(token);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
@@ -32,7 +33,7 @@ function MyReservations() {
         setError(null);
         try {
             if (token && userId !== undefined) {
-                const data = await getUserReservations(userId, token);
+                const data = await getUserReservations(userId!, token);
                 setReservations(data);
             }
         } catch (err: any) {
@@ -41,20 +42,6 @@ function MyReservations() {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                const userIdFromToken = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-                if (userIdFromToken) {
-                    setUserId(parseInt(userIdFromToken, 10));
-                }
-            } catch {
-                setUserId(undefined);
-            }
-        }
-    }, []);
 
     useEffect(() => {
         if (userId) {

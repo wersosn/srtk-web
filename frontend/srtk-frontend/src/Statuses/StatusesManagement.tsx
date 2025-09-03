@@ -1,34 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import editIcon from '../assets/edit.png';
 import AddStatus from './AddStatus';
 import EditStatus from './EditStatus';
 import DeleteStatus from './DeleteStatus';
 import type { Status } from '../Types/Types';
-import { getAllStatuses } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useStatuses } from '../Hooks/useStatuses';
 
 function StatusesManagement() {
-    const [statuses, setStatuses] = useState<Status[]>([]);
-    const [editingStatus, setEditingStatus] = useState<Status | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const { t } = useTranslation();
     const token = localStorage.getItem('token');
-
-    const fetchStatuses = async () => {
-        try {
-            const data = await getAllStatuses(token!);
-            setStatuses(data);
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchStatuses();
-    }, []);
+    const { statuses, setStatuses, loading, error } = useStatuses(token);
+    const [editingStatus, setEditingStatus] = useState<Status | null>(null);
+    const { t } = useTranslation();
 
     // Obsługa dodawania statusu:
     const handleAdd = (newStatus: Status) => {
@@ -62,7 +45,7 @@ function StatusesManagement() {
                                     <button onClick={() => setEditingStatus(status)} disabled={loading} className="icon-button">
                                         <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }}/>
                                     </button>
-                                    <DeleteStatus statusId={status.id} onDeleted={fetchStatuses} />
+                                    <DeleteStatus statusId={status.id} onDeleted={() => setStatuses(prev => prev.filter(r => r.id !== status.id))} />
                                 </div>
                             </li>
                         ))}

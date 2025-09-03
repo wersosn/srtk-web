@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from "react-i18next";
-import type { Client, Admin, Role } from '../Types/Types';
+import type { Client, Admin } from '../Types/Types';
+import { useRoles } from '../Hooks/useRoles';
 
 interface FilterUsersProps {
     clients: Client[];
@@ -10,36 +11,9 @@ interface FilterUsersProps {
 
 const FilterUsers: React.FC<FilterUsersProps> = ({ onFilterChange }) => {
     const [selectedRoleId, setSelectedRoleId] = useState<number | undefined>(undefined);
-    const [roles, setRoles] = useState<Role[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
-
-    // Pobieranie wszystkich ról z bazy:
-    const fetchRoles = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch('/api/roles', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) {
-                throw new Error(t("api.roleError"));
-            }
-            const data = await res.json();
-            setRoles(data);
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchRoles();
-    }, []);
+    const { roles } = useRoles(token);
 
     // Filtr torów po obiekcie:
     const handleRoleChange = (value: string) => {

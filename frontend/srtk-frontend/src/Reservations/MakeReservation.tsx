@@ -9,7 +9,7 @@ import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
 
 function MakeReservation() {
-const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const navigate = useNavigate();
     const { t } = useTranslation();
     

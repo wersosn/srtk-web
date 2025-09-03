@@ -4,14 +4,14 @@ import AddEquipment from './AddEquipment';
 import EditEquipment from './EditEquipment';
 import DeleteEquipment from './DeleteEquipment';
 import FilterEquipments from '../Filters/FilterEquipment';
-import { jwtDecode } from 'jwt-decode';
 import type { Equipment } from '../Types/Types';
 import { getAllEquipmentsForAdmin } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useAuth } from '../User/AuthContext';
 
 function EquipmentsManagement() {
     const [eqs, setEqs] = useState<Equipment[]>([]);
-    const [facilityId, setFacilityId] = useState<number | undefined>();
+    const { facilityId } = useAuth();
     const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
     const [showDetails, setShowDetails] = useState<Equipment | null>(null);
     const [filteredEqs, setFilteredEqs] = useState<Equipment[]>(eqs);
@@ -20,15 +20,6 @@ function EquipmentsManagement() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
-    useEffect(() => {
-        if (token) {
-            const decoded: any = jwtDecode(token);
-            if (decoded?.FacilityId) {
-                setFacilityId(parseInt(decoded.FacilityId, 10));
-            }
-        }
-    }, [token]);
-
     const fetchAllEqs = async () => {
         setLoading(true);
         setError(null);
@@ -36,10 +27,7 @@ function EquipmentsManagement() {
             if (!token) {
                 return;
             }
-            const decoded: any = jwtDecode(token);
-            const facilityIdFromToken = decoded?.FacilityId ? parseInt(decoded.FacilityId, 10) : 0;
-
-            const data = await getAllEquipmentsForAdmin(facilityIdFromToken, token);
+            const data = await getAllEquipmentsForAdmin(facilityId!, token);
             setEqs(data);
         } catch (err: any) {
             setError(err.message || t("universal.error"));

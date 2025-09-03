@@ -119,7 +119,6 @@ namespace srtk.Services
             return await context.Clients.FindAsync(id);
         }
 
-
         public async Task<List<UserDto>> GetByRole(int roleId)
         {
             var users = await context.Users.Where(u => u.RoleId == roleId).ToListAsync();

@@ -144,8 +144,9 @@ namespace srtk.Services
             }
 
             // Usunięcie nadchodzących rezerwacji na usuwany tor:
+            var now = DateTime.UtcNow;
             var upcomingReservations = await context.Reservations
-                .Where(r => r.TrackId == id && r.Start >= DateTime.Now)
+                .Where(r => r.TrackId == id && r.Start >= now)
                 .ToListAsync();
             context.Reservations.RemoveRange(upcomingReservations);
 

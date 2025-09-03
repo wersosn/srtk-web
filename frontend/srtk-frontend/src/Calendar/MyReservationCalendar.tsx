@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -12,10 +11,11 @@ import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
 import { getUserReservations } from "../Services/Api";
 import { useTranslation } from "react-i18next";
+import { useAuth } from '../User/AuthContext';
 
 function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
-    const [userId, setUserId] = useState<number | undefined>(undefined);
+    const { userId } = useAuth();
     const [events, setEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -24,13 +24,12 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     const locale = lang == "pl" ? plLocale : enLocale;
     const { t } = useTranslation();
 
-    // Pobieranie rezerwacji użytkownika:
     const fetchReservations = async () => {
         setLoading(true);
         setError(null);
         try {
             if(token && userId !== undefined) {
-                const data = await getUserReservations(userId, token);
+                const data = await getUserReservations(userId!, token);
                 setReservationList(data);
             }
         } catch (err: any) {
@@ -39,20 +38,6 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                const userIdFromToken = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-                if (userIdFromToken) {
-                    setUserId(parseInt(userIdFromToken, 10));
-                }
-            } catch {
-                setUserId(undefined);
-            }
-        }
-    }, []);
 
     useEffect(() => {
         if (userId) {

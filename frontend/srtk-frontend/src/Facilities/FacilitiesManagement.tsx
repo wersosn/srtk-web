@@ -16,7 +16,6 @@ function FacilitiesManagement() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
-    // Pobieranie wszystkich obiektów z bazy:
     const fetchFacilities = async () => {
         try {
             if (token) {

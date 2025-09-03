@@ -1,8 +1,8 @@
 import React, { useState, useEffect, type FormEvent } from "react";
-import { jwtDecode } from 'jwt-decode';
 import type { Track, Facility } from '../Types/Types';
 import { getAllFacilities } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../User/AuthContext";
 
 interface AddTrackProps {
     onAddTrack: (newTrack: Track) => void;
@@ -16,6 +16,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const [closingHour, setClosingHour] = useState<string>("");
     const [availableDays, setAvailableDays] = useState<string[]>([]);
     const allDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];
+    const { facilityId } = useAuth();
     const [facilityID, setFacilityId] = useState<number | "">("");
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [message, setMessage] = useState<string>("");
@@ -25,12 +26,10 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
 
     useEffect(() => {
         if (token) {
-            const decoded: any = jwtDecode(token);
-            const id = parseInt(decoded.FacilityId);
-            if (!isNaN(id)) {
-                setAdminInFacility(id);
-                if (id !== 0) {
-                    setFacilityId(id);
+            if (!isNaN(facilityId!)) {
+                setAdminInFacility(facilityId);
+                if (facilityId !== 0) {
+                    setFacilityId(facilityId!);
                 }
             }
         }

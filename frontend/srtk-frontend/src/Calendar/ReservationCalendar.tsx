@@ -7,37 +7,23 @@ import plLocale from '@fullcalendar/core/locales/pl';
 import enLocale from '@fullcalendar/core/locales/en-gb';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
-import type { Reservation, Track } from '../Types/Types';
+import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
-import { getAllTracks, getReservationsInTrack } from "../Services/Api";
+import { getReservationsInTrack } from "../Services/Api";
 import { useTranslation } from "react-i18next";
+import { useTracks } from '../Hooks/useTracks';
 
 function ReservationCalendar() {
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const token = localStorage.getItem('token');
+    const { tracks } = useTracks(token!);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
     const [events, setEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
     const lang = localStorage.getItem('language');
     const locale = lang == "pl" ? plLocale : enLocale;
     const { t } = useTranslation();
-
-    const fetchTracks = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            if(token) {
-                const data = await getAllTracks(token);
-                setTracks(data);
-            }
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const fetchReservationsInTrack = async () => {
         setLoading(true);
@@ -54,9 +40,9 @@ function ReservationCalendar() {
         if (!track) return;
 
         try {
-             if(token) {
+            if (token) {
                 const data = await getReservationsInTrack(selectedTrackId, token);
-                 setReservationList(data);
+                setReservationList(data);
             }
         } catch (err: any) {
             setError(err.message || t("universal.error"));
@@ -64,10 +50,6 @@ function ReservationCalendar() {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchTracks();
-    }, []);
 
     useEffect(() => {
         fetchReservationsInTrack();
@@ -107,17 +89,20 @@ function ReservationCalendar() {
 
     return (
         <>
-        <div className="cldr">
+            <div className="cldr">
                 <div className="selectTrack">
                     <h2>{t("home.choseTrackTitle")}</h2>
-                    <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
-                        <option value="">{t("home.choseTrack")}</option>
-                        {tracks.map(track => (
-                            <option key={track.id} value={track.id}>
-                                {track.name}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="d-flex gap-4">
+                        <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
+                            <option value="">{t("home.choseTrack")}</option>
+                            {tracks.map(track => (
+                                <option key={track.id} value={track.id}>
+                                    {track.name}
+                                </option>
+                            ))}
+                        </select>
+                        <p>xd</p>
+                    </div>
                 </div>
 
                 <div className="calendar-container">

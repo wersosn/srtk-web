@@ -18,6 +18,14 @@ export const getUserInfo = async (userId: number, token: string): Promise<Client
     return fetchWithAuth(`/api/users/clients/${userId}`, token);
 };
 
+export const getAllClients = async (token: string): Promise<Client[]> => {
+    return fetchWithAuth(`/api/users/clients`, token);
+};
+
+export const getAllAdmins = async (token: string): Promise<Admin[]> => {
+    return fetchWithAuth(`/api/users/admins`, token);
+};
+
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // REZERWACJE:
 export const getUserReservations = async (userId: number, token: string): Promise<Reservation[]> => {

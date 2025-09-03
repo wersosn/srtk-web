@@ -21,5 +21,5 @@ export const useTracksAdmin = (token: string | null, facilityId: number | null) 
             .finally(() => setLoading(false));
     }, [token, facilityId]);
 
-    return { tracks, loading, error };
+    return { tracks, setTracks, loading, error };
 };
