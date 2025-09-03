@@ -5,14 +5,17 @@
     "errorFetching": "Error occured while fetching data",
     "saveChanges": "Save changes",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
   },
 
   "home": {
     "title": "Reservation system for a cycle track",
     "reserve": "Reserve a track",
     "choseTrackTitle": "Select the track you want to check the occupancy of:",
-    "choseTrack": "Select track"
+    "choseTrack": "Select track",
+    "refresh": "Refresh"
   },
 
   "navbar": {
@@ -150,7 +153,9 @@
     "deleteAlert": "Are you sure you want to delete this reservation?",
     "deleteError": "Failed to delete the reservation",
     "reservationManagement": "Reservation management",
-    "emptyList": "No reservations"
+    "emptyList": "No reservations",
+    "cancelAlert": "Are you sure you want to cancel this reservation?",
+    "cancelInfo": "Reservation has been cancelled"
   },
 
   "admin": {

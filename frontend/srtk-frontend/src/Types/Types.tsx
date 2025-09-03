@@ -7,6 +7,7 @@ export type Reservation = {
     userId: number;
     trackId: number;
     statusId: number;
+    statusName: string;
     equipmentReservations: EquipmentWithQuantity[];
 };
 

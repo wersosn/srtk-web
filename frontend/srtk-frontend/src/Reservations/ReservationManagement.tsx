@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
 import downloadIconLight from '../assets/download-light.png';
+import cancelIcon from "../assets/cancel.png";
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
@@ -34,7 +35,7 @@ function ReservationManagement() {
         if (tracks.length === 0) {
             return;
         }
-        
+
         setLoading(true);
         setError(null);
         try {
@@ -61,7 +62,8 @@ function ReservationManagement() {
         fetchReservations();
     }, [token, tracks]);
 
-     const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
+    // Obsługa filtrowania:
+    const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
         let result: Record<number, Reservation[]> = {};
 
         if (trackId) {
@@ -89,6 +91,7 @@ function ReservationManagement() {
         setFilteredReservations(reservationsByTrack);
     }, [reservationsByTrack]);
 
+    // Obsługa edycji:
     const handleEdit = (updated: Reservation) => {
         setReservationsByTrack(prev => {
             const trackReservations = prev[updated.trackId];
@@ -100,6 +103,30 @@ function ReservationManagement() {
         });
         setEditingReservation(null);
     };
+
+    // Obsługa anulowania rezerwacji:
+    const handleCancel = async (reservationId: number) => {
+        if (!window.confirm(t("reservation.cancelAlert"))) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/reservations/${reservationId}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            });
+            if (response.ok) {
+                fetchReservations();
+            } else {
+                const error = await response.text();
+                setError(t("universal.error") + error);
+            }
+        } catch (err: any) {
+            setError(t("universal.error") + err.message);
+        }
+    }
 
     // Ustawienie nazwy statusu:
     const getStatusName = (statusId: number) => {
@@ -155,9 +182,16 @@ function ReservationManagement() {
                                                     <div onClick={() => setShowDetails(prev => (prev?.id === reservation.id ? null : reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                                         {t("reservation.reserv")} {formatToDatetimeLocal(reservation.start)} - {formatToDatetimeLocal(reservation.end)}
                                                         <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
-                                                            <button onClick={() => setEditingReservation(reservation)} disabled={loading} className="icon-button">
-                                                                <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
-                                                            </button>
+                                                            {reservation.statusName !== "Anulowano" && (
+                                                                <>
+                                                                    <button onClick={() => setEditingReservation(reservation)} disabled={loading} className="icon-button" title={t("universal.edit")}>
+                                                                        <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
+                                                                    </button>
+                                                                    <button onClick={() => handleCancel(reservation.id)} disabled={loading} className="icon-button" title={t("universal.cancel")}>
+                                                                        <img src={cancelIcon} alt="Cancel" style={{ width: '16px', height: '16px' }} />
+                                                                    </button>
+                                                                </>
+                                                            )}
                                                             <DeleteReservation reservationId={reservation.id} onDeleted={() => { fetchReservations(); }} />
                                                         </div>
                                                     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
+import cancelIcon from "../assets/cancel.png";
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
@@ -79,6 +79,30 @@ function MyReservations() {
         setFilteredReservations(reservations);
     }, [reservations]);
 
+    // Obsługa anulowania rezerwacji:
+    const handleCancel = async (reservationId: number) => {
+        if (!window.confirm(t("reservation.cancelAlert"))) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/reservations/${reservationId}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            });
+            if (response.ok) {
+                fetchReservations();
+            } else {
+                const error = await response.text();
+                setError(t("universal.error") + error);
+            }
+        } catch (err: any) {
+            setError(t("universal.error") + err.message);
+        }
+    }
+
     // Ustawienie nazwy toru:
     const getTrackName = (trackId: number) => {
         const track = tracks.find(t => t.id === trackId);
@@ -130,9 +154,16 @@ function MyReservations() {
                                                 <button onClick={() => handleExport(Number(Reservation.id))} className="icon-button" title={t("reservation.export")}>
                                                     <img src={downloadIcon} alt="Eksport" style={{ width: '16px', height: '16px' }} />
                                                 </button>
-                                                <button onClick={() => setEditingReservation(Reservation)} disabled={loading} className="icon-button">
-                                                    <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
-                                                </button>
+                                                {Reservation.statusName !== "Anulowano" && (
+                                                    <>
+                                                        <button onClick={() => setEditingReservation(Reservation)} disabled={loading} className="icon-button" title={t("universal.edit")}>
+                                                            <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
+                                                        </button>
+                                                        <button onClick={() => handleCancel(Reservation.id)} disabled={loading} className="icon-button" title={t("universal.cancel")}>
+                                                            <img src={cancelIcon} alt="Cancel" style={{ width: '16px', height: '16px' }} />
+                                                        </button>
+                                                    </>
+                                                )}
                                                 <DeleteReservation reservationId={Reservation.id} onDeleted={fetchReservations} />
                                             </div>
                                         </div>

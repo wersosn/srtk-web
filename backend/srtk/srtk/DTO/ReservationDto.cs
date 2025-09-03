@@ -22,5 +22,6 @@ namespace srtk.DTO
 
         [Required(ErrorMessage = "Id statusu jest wymagane")]
         public int StatusId { get; set; }
+        public string StatusName { get; set; } = string.Empty;
     }
 }

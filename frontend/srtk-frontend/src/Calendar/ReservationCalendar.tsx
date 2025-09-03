@@ -12,6 +12,9 @@ import { formatToDatetimeLocal } from '../Reservations/DateHelper';
 import { getReservationsInTrack } from "../Services/Api";
 import { useTranslation } from "react-i18next";
 import { useTracks } from '../Hooks/useTracks';
+import refreshIconDark from "../assets/refresh.png";
+import refreshIconLight from "../assets/refreshLight.png";
+import { usePrefersDark } from '../Hooks/usePrefersDark';
 
 function ReservationCalendar() {
     const token = localStorage.getItem('token');
@@ -24,6 +27,9 @@ function ReservationCalendar() {
     const lang = localStorage.getItem('language');
     const locale = lang == "pl" ? plLocale : enLocale;
     const { t } = useTranslation();
+
+    const isDark = usePrefersDark();
+    const icon = isDark ? refreshIconLight : refreshIconDark;
 
     const fetchReservationsInTrack = async () => {
         setLoading(true);
@@ -42,7 +48,8 @@ function ReservationCalendar() {
         try {
             if (token) {
                 const data = await getReservationsInTrack(selectedTrackId, token);
-                setReservationList(data);
+                const filtered = data.filter((reservation: any) => reservation.statusName !== "Anulowano");
+                setReservationList(filtered);
             }
         } catch (err: any) {
             setError(err.message || t("universal.error"));
@@ -87,12 +94,16 @@ function ReservationCalendar() {
         }
     }
 
+    const refreshReservations = async () => {
+        fetchReservationsInTrack();
+    }
+
     return (
         <>
             <div className="cldr">
                 <div className="selectTrack">
                     <h2>{t("home.choseTrackTitle")}</h2>
-                    <div className="d-flex gap-4">
+                    <div className="d-flex gap-3">
                         <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
                             <option value="">{t("home.choseTrack")}</option>
                             {tracks.map(track => (
@@ -101,12 +112,13 @@ function ReservationCalendar() {
                                 </option>
                             ))}
                         </select>
-                        <p>xd</p>
+                        <button className="icon-button" onClick={refreshReservations} style={{ width: '24px', height: '40px' }} title={t("home.refresh")}>
+                            <img src={icon} alt="Edytuj" style={{ width: '24px', height: '24px' }}/>
+                        </button>
                     </div>
                 </div>
 
                 <div className="calendar-container">
-                    {loading && <p>{t("universal.loading")}</p>}
                     {error && <p style={{ color: 'red' }}>{error}</p>}
 
                     <FullCalendar

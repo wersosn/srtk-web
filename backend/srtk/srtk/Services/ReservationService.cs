@@ -40,6 +40,7 @@ namespace srtk.Services
                     TrackId = r.TrackId,
                     TrackName = r.Track.Name,
                     StatusId = r.StatusId,
+                    StatusName = r.Status.Name,
                     EquipmentReservations = r.EquipmentReservations
                         .Select(er => new EquipmentReservationDto
                         {
@@ -68,6 +69,7 @@ namespace srtk.Services
                     TrackId = r.TrackId,
                     TrackName = r.Track.Name,
                     StatusId = r.StatusId,
+                    StatusName = r.Status.Name,
                     EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
                     {
                         EquipmentId = er.EquipmentId,
@@ -94,6 +96,7 @@ namespace srtk.Services
                     TrackId = r.TrackId,
                     TrackName = r.Track.Name,
                     StatusId = r.StatusId,
+                    StatusName = r.Status.Name,
                     EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
                     {
                         EquipmentId = er.EquipmentId,
@@ -120,6 +123,7 @@ namespace srtk.Services
                     TrackId = r.TrackId,
                     TrackName = r.Track.Name,
                     StatusId = r.StatusId,
+                    StatusName = r.Status.Name,
                     EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
                     {
                         EquipmentId = er.EquipmentId,
@@ -161,6 +165,7 @@ namespace srtk.Services
                     TrackId = r.TrackId,
                     TrackName = r.Track.Name,
                     StatusId = r.StatusId,
+                    StatusName = r.Status.Name,
                     EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
                     {
                         EquipmentId = er.EquipmentId,
@@ -187,6 +192,7 @@ namespace srtk.Services
                     TrackId = r.TrackId,
                     TrackName = r.Track.Name,
                     StatusId = r.StatusId,
+                    StatusName = r.Status.Name,
                     EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
                     {
                         EquipmentId = er.EquipmentId,
@@ -223,7 +229,8 @@ namespace srtk.Services
                     End = r.End,
                     Cost = r.Cost,
                     TrackId = r.TrackId,
-                    TrackName = r.Track.Name
+                    TrackName = r.Track.Name,
+                    StatusName = r.Status.Name
                 }).ToListAsync();
         }
 

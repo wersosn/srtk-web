@@ -30,7 +30,8 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
         try {
             if(token && userId !== undefined) {
                 const data = await getUserReservations(userId!, token);
-                setReservationList(data);
+                const filtered = data.filter((reservation: any) => reservation.statusName !== "Anulowano");
+                setReservationList(filtered);
             }
         } catch (err: any) {
             setError(err.message || t("universal.error"));

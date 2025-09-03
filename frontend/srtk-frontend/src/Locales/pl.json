@@ -5,14 +5,17 @@
     "errorFetching": "Wystąpił błąd podczas pobierania danych",
     "saveChanges": "Zapisz zmiany",
     "save": "Zapisz",
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "edit": "Edytuj",
+    "delete": "Usuń"
   },
 
   "home": {
     "title": "System rezerwacji toru kolarskiego",
     "reserve": "Zarezerwuj tor",
     "choseTrackTitle": "Wybierz tor, którego obłożenie chcesz sprawdzić:",
-    "choseTrack": "Wybierz tor"
+    "choseTrack": "Wybierz tor",
+    "refresh": "Odśwież"
   },
 
   "navbar": {
@@ -146,7 +149,9 @@
     "deleteAlert": "Czy na pewno chcesz usunąć tę rezerwację?",
     "deleteError": "Nie udało się usunąć rezerwacji",
     "reservationManagement": "Zarządzanie rezerwacjami",
-    "emptyList": "Brak rezerwacji"
+    "emptyList": "Brak rezerwacji",
+    "cancelAlert": "Czy na pewno chcesz anulować tę rezerwację?",
+    "cancelInfo": "Anulowano rezerwację"
   },
 
   "admin": {

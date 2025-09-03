@@ -151,7 +151,6 @@ namespace srtk.Controllers
         }
 
         [HttpGet("export")]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<byte[]>> ExportReservationsToExcel(int trackId)
         {
             var track = await trackService.GetById(trackId);

@@ -211,7 +211,6 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             });
             if (response.ok) {
                 const updatedReservation = await response.json();
-                console.log(updatedReservation);
                 onUpdated(updatedReservation);
                 setMessage('');
             } else {

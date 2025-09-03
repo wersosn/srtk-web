@@ -43,7 +43,7 @@ const DeleteReservation: React.FC<DeleteReservationProps> = ({ reservationId, on
 
     return (
         <>
-            <button onClick={handleDelete} disabled={loading} className="icon-button">
+            <button onClick={handleDelete} disabled={loading} className="icon-button" title={t("universal.delete")}>
                 <img src={deleteIcon} alt="Usuń" style={{ width: '16px', height: '16px' }}/>
             </button>
             {error && <div className="text-danger mt-1">{error}</div>}

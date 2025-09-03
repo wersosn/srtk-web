@@ -52,7 +52,6 @@ const Home: React.FC = () => {
           <ReservationCalendar />
         </div>
       </div>
-      );
     </>
   );
 };
