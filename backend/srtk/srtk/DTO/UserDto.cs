@@ -11,7 +11,6 @@ namespace srtk.DTO
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Id roli jest wymagane")]
-        [Range(1, int.MaxValue, ErrorMessage = "Id roli musi być większe od 0")]
         public int RoleId { get; set; }
 
         // Pola dla klienta:
