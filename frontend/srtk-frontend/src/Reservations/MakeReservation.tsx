@@ -137,7 +137,7 @@ function MakeReservation() {
         trackDetails();
     }, [selectedTrackId]);
 
-    const addNotification = async (title: string, description: string) => {
+    const addNotificationPl = async (title: string, description: string) => {
         if (!userId) return;
 
         try {
@@ -152,6 +152,35 @@ function MakeReservation() {
                     Description: description,
                     TimeStamp: new Date().toISOString(),
                     IsRead: false,
+                    Language: "pl",
+                    UserId: userId
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error(t("notification.notificationAddError"));
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const addNotificationEn = async (title: string, description: string) => {
+        if (!userId) return;
+
+        try {
+            const res = await fetch('/api/notifications', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    Title: title,
+                    Description: description,
+                    TimeStamp: new Date().toISOString(),
+                    IsRead: false,
+                    Language: "en",
                     UserId: userId
                 }),
             });
@@ -237,9 +266,14 @@ function MakeReservation() {
             if (!res.ok) throw new Error(t("makeReservations.reservationError"));
             alert(t("makeReservations.reservationPositive"));
 
-            await addNotification(
-                `${t("notification.resTitle")} ${track?.name}`,
-                `${t("notification.resDesc")}  ${new Date(startDate).toLocaleString()}`
+            await addNotificationPl(
+                `Zarezerwowano tor ${track?.name}`,
+                `Twoja rezerwacja zaczyna się w dniu  ${new Date(startDate).toLocaleString()}`
+            );
+
+            await addNotificationEn(
+                `Track reserved ${track?.name}`,
+                `Your reservation starts on ${new Date(startDate).toLocaleString()}`
             );
 
             navigate('/');

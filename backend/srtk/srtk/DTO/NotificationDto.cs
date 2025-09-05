@@ -16,6 +16,7 @@ namespace srtk.DTO
 
         public DateTime TimeStamp { get; set; }
         public bool IsRead { get; set; }
+        public string Language { get; set; }
 
         [Required(ErrorMessage = "Id użytkownika jest wymagane")]
         [Range(1, int.MaxValue, ErrorMessage = "Id użytkownika musi być większe od 0!")]

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
@@ -21,6 +23,20 @@ namespace srtk.Controllers
         public async Task<ActionResult<List<NotificationDto>>> GetAllNotifications()
         {
             var notifications = await service.GetAll();
+            return notifications;
+        }
+
+        [HttpGet("{userId}/pl")]
+        public async Task<ActionResult<List<NotificationDto>>> GetAllPolishForUser(int userId)
+        {
+            var notifications = await service.GetPolishForUser(userId);
+            return notifications;
+        }
+
+        [HttpGet("{userId}/en")]
+        public async Task<ActionResult<List<NotificationDto>>> GetAllEnglishForUser(int userId)
+        {
+            var notifications = await service.GetEnglishForUser(userId);
             return notifications;
         }
 
@@ -54,6 +70,14 @@ namespace srtk.Controllers
                 return NotFound();
             }
             return notification;
+        }
+
+        [HttpPut("{userId}/markAllRead")]
+        [Authorize]
+        public async Task<IActionResult> MarkAllAsReadForUser(int userId)
+        {
+            await service.MarkAllAsRead(userId);
+            return NoContent();
         }
 
         [HttpPost]

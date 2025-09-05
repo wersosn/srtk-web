@@ -1,5 +1,6 @@
 ﻿using srtk.Models;
 using srtk.Services;
+using srtk.DTO;
 using srtk.tests.Helpers;
 using System;
 using System.Collections.Generic;
@@ -34,11 +35,11 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var notif = new Notification
+            var notif = new NotificationDto
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
-                UserId = user.Id
+                UserId = user.Id,
             };
             await service.Add(notif);
 
@@ -64,7 +65,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var notif = new Notification
+            var notif = new NotificationDto
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
@@ -94,7 +95,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var notif = new Notification
+            var notif = new NotificationDto
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
@@ -103,7 +104,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(notif);
 
-            var notif2 = new Notification
+            var notif2 = new NotificationDto
             {
                 Title = "Anulowano rezerwację",
                 Description = "Anulowano rezerwację na tor kolarski",
@@ -133,7 +134,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var notif = new Notification
+            var notif = new NotificationDto
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
@@ -142,7 +143,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(notif);
 
-            var notif2 = new Notification
+            var notif2 = new NotificationDto
             {
                 Title = "Anulowano rezerwację",
                 Description = "Anulowano rezerwację na tor kolarski",
@@ -173,7 +174,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var notif = new Notification
+            var notif = new NotificationDto
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
@@ -182,7 +183,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(notif);
 
-            var notif2 = new Notification
+            var notif2 = new NotificationDto
             {
                 Title = "Anulowano rezerwację",
                 Description = "Anulowano rezerwację na tor kolarski",
@@ -212,7 +213,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var notif = new Notification
+            var notif = new NotificationDto
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
@@ -228,7 +229,7 @@ namespace srtk.tests.Tests
             Assert.Equal(user.Id, result.UserId);
             Assert.True(result.IsRead);
             Assert.Single(context.Notifications);
-            output.WriteLine($"Wynik: Dodano nowe powiadomienie dla użytkownika: {result.User.Email}");
+            output.WriteLine($"Wynik: Dodano nowe powiadomienie dla użytkownika: {result.UserId}");
         }
 
         // Test - usuwanie powiadomienia:
@@ -246,7 +247,7 @@ namespace srtk.tests.Tests
             };
             await userService.Add(user);
 
-            var notif = new Notification
+            var notif = new NotificationDto
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",

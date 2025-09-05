@@ -14,6 +14,7 @@ function NotificationBell() {
     const [loading, setLoading] = useState(true);
     const { t } = useTranslation();
     const token = localStorage.getItem('token');
+    const lang = localStorage.getItem('language');
 
     const isDark = usePrefersDark();
     const icon = isDark ? bellIconLight : bellIconDark;
@@ -24,17 +25,49 @@ function NotificationBell() {
             return;
         }
 
+        if (lang == "en") {
+            try {
+                const res = await fetch(`/api/notifications/${userId}/en`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error(t("api.notificationError"));
+                const data = await res.json();
+                setNotifications(data);
+            } catch (error) {
+                throw new Error(t("api.notificationError"));
+            } finally {
+                setLoading(false);
+            }
+        }
+        else if (lang == "pl") {
+            try {
+                const res = await fetch(`/api/notifications/${userId}/pl`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error(t("api.notificationError"));
+                const data = await res.json();
+                setNotifications(data);
+            } catch (error) {
+                throw new Error(t("api.notificationError"));
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const markAllAsRead = async () => {
+        if (!userId) return;
         try {
-            const res = await fetch(`/api/notifications/${userId}/all`, {
+            const res = await fetch(`/api/notifications/${userId}/markAllRead`, {
+                method: 'PUT',
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (!res.ok) throw new Error(t("api.notificationError"));
-            const data = await res.json();
-            setNotifications(data);
-        } catch (error) {
-            throw new Error(t("api.notificationError"));
-        } finally {
-            setLoading(false);
+            setNotifications(prev =>
+                prev.map(n => ({ ...n, isRead: true }))
+            );
+        } catch (err) {
+            console.error(t("api.notificationError"), err);
         }
     };
 
@@ -43,6 +76,9 @@ function NotificationBell() {
             await loadNotifications();
         }
         setIsOpen(prev => !prev);
+        if (!isOpen) {
+            await markAllAsRead();
+        }
     };
 
     useEffect(() => {
@@ -57,35 +93,6 @@ function NotificationBell() {
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
-    /*const addNotification = async (title: string, description: string) => {
-        if (!userId) return;
-
-        try {
-            const res = await fetch('/api/notifications', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    Title: title,
-                    Description: description,
-                    TimeStamp: new Date().toISOString(),
-                    IsRead: false,
-                    UserId: userId
-                }),
-            });
-
-            if (!res.ok) {
-                throw new Error(`Nie udało się dodać powiadomienia`);
-            }
-
-            const savedNotification: Notification = await res.json();
-            setNotifications(prev => [savedNotification, ...prev]);
-        } catch (err) {
-            console.error("Błąd dodawania powiadomienia:", err);
-        }
-    };*/
 
     /*useEffect(() => {
         if (!userId) {

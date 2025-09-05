@@ -21,6 +21,8 @@ namespace srtk.Models
 
         public bool IsRead { get; set; } = false;
 
+        public string Language { get; set; }
+
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }
         public User? User { get; set; }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using srtk.Models;
 using srtk.DTO;
 using System.Data;
+using Microsoft.AspNetCore.SignalR;
 
 namespace srtk.Services
 {
@@ -28,6 +29,38 @@ namespace srtk.Services
                 UserId = n.UserId
             }).ToList();
             return list;
+        }
+
+        public async Task<List<NotificationDto>> GetPolishForUser(int userId)
+        {
+            var notifications = await context.Notifications
+                .Where(n => n.UserId == userId && n.Language == "pl")
+                .Select(n => new NotificationDto
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Description = n.Description,
+                    TimeStamp = n.TimeStamp,
+                    IsRead = n.IsRead
+                })
+                .ToListAsync();
+            return notifications;
+        }
+
+        public async Task<List<NotificationDto>> GetEnglishForUser(int userId)
+        {
+            var notifications = await context.Notifications
+                .Where(n => n.UserId == userId && n.Language == "en")
+                .Select(n => new NotificationDto
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Description = n.Description,
+                    TimeStamp = n.TimeStamp,
+                    IsRead = n.IsRead
+                })
+                .ToListAsync();
+            return notifications;
         }
 
         public async Task<List<NotificationDto>> GetAllForUser(int userId)
@@ -98,6 +131,16 @@ namespace srtk.Services
             return dto;
         }
 
+        public async Task MarkAllAsRead(int userId)
+        {
+            var notifications = await context.Notifications
+                .Where(n => n.UserId == userId && !n.IsRead)
+                .ToListAsync();
+
+            notifications.ForEach(n => n.IsRead = true);
+            await context.SaveChangesAsync();
+        }
+
         public async Task<NotificationDto> Add(NotificationDto dto)
         {
             var notification = new Notification
@@ -106,6 +149,7 @@ namespace srtk.Services
                 Description = dto.Description,
                 TimeStamp = dto.TimeStamp,
                 IsRead = dto.IsRead,
+                Language = dto.Language,
                 UserId = dto.UserId
             };
             context.Notifications.Add(notification);
@@ -117,6 +161,7 @@ namespace srtk.Services
                 Description = notification.Description,
                 TimeStamp = notification.TimeStamp,
                 IsRead = notification.IsRead,
+                Language = notification.Language,
                 UserId = notification.UserId
             };
         }
