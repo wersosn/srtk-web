@@ -5,56 +5,34 @@ import EditEquipment from './EditEquipment';
 import DeleteEquipment from './DeleteEquipment';
 import FilterEquipments from '../Filters/FilterEquipment';
 import type { Equipment } from '../Types/Types';
-import { getAllEquipmentsForAdmin } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 import { useAuth } from '../User/AuthContext';
+import { useEquipmentsAdmin } from '../Hooks/useEquipmentsAdmin';
 
 function EquipmentsManagement() {
-    const [eqs, setEqs] = useState<Equipment[]>([]);
-    const { facilityId } = useAuth();
-    const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
-    const [showDetails, setShowDetails] = useState<Equipment | null>(null);
-    const [filteredEqs, setFilteredEqs] = useState<Equipment[]>(eqs);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
-
-    const fetchAllEqs = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            if (!token) {
-                return;
-            }
-            const data = await getAllEquipmentsForAdmin(facilityId!, token);
-            setEqs(data);
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchAllEqs();
-    }, []);
+    const { facilityId } = useAuth();
+    const { equipmentList, setEquipmentList, loading, error } = useEquipmentsAdmin(facilityId!, token!);
+    const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+    const [showDetails, setShowDetails] = useState<Equipment | null>(null);
+    const [filteredEqs, setFilteredEqs] = useState<Equipment[]>(equipmentList);
 
     // Obsługa dodawania sprzętu:
     const handleAdd = (newEquipment: Equipment) => {
-        setEqs(prev => [...prev, newEquipment]);
+        setEquipmentList(prev => [...prev, newEquipment]);
     };
 
     // Obsługa edycji sprzętu:
     const handleEdit = (updated: Equipment) => {
-        const updatedEquipment = eqs.map(r => r.id === updated.id ? updated : r);
-        setEqs(updatedEquipment);
+        const updatedEquipment = equipmentList.map(r => r.id === updated.id ? updated : r);
+        setEquipmentList(updatedEquipment);
         setEditingEquipment(null);
     };
 
     // Obsługa filtrowania:
     const handleFilterChange = (facilityId?: number) => {
-        let result = eqs;
+        let result = equipmentList;
         if (facilityId) {
             result = result.filter(t => t.facilityId === facilityId);
         }
@@ -62,8 +40,8 @@ function EquipmentsManagement() {
     };
 
     useEffect(() => {
-        setFilteredEqs(eqs);
-    }, [eqs]);
+        setFilteredEqs(equipmentList);
+    }, [equipmentList]);
 
     return (
         <div className="admin-content p-4">
@@ -72,7 +50,7 @@ function EquipmentsManagement() {
             {(facilityId == 0 || !facilityId) && (
                 <>
                     <h5 className="mt-4">{t("filters.title")}</h5>
-                    <FilterEquipments equipments={eqs} onFilterChange={handleFilterChange} />
+                    <FilterEquipments equipments={equipmentList} onFilterChange={handleFilterChange} />
                 </>
             )}
 
@@ -92,7 +70,7 @@ function EquipmentsManagement() {
                                         <button onClick={() => setEditingEquipment(Equipment)} disabled={loading} className="icon-button">
                                             <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                         </button>
-                                        <DeleteEquipment equipmentId={Equipment.id} onDeleted={fetchAllEqs} />
+                                        <DeleteEquipment equipmentId={Equipment.id} onDeleted={() => setEquipmentList(prev => prev.filter(r => r.id !== Equipment.id))} />
                                     </div>
                                 </div>
 

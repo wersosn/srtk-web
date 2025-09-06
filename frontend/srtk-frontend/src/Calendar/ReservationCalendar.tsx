@@ -22,7 +22,6 @@ function ReservationCalendar() {
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
     const [events, setEvents] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const lang = localStorage.getItem('language');
     const locale = lang == "pl" ? plLocale : enLocale;
@@ -32,13 +31,11 @@ function ReservationCalendar() {
     const icon = isDark ? refreshIconLight : refreshIconDark;
 
     const fetchReservationsInTrack = async () => {
-        setLoading(true);
         setError(null);
 
         if (!selectedTrackId) {
             setReservationList([]);
             setEvents([]);
-            setLoading(false);
             return;
         }
 
@@ -53,8 +50,6 @@ function ReservationCalendar() {
             }
         } catch (err: any) {
             setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
         }
     };
 

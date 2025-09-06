@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useStatuses } from '../Hooks/useStatuses';
 import { useTracks } from '../Hooks/useTracks';
 import { useAuth } from '../User/AuthContext';
+import { useReservations } from '../Hooks/useUserReservations';
 
 function MyReservations() {
     const token = localStorage.getItem('token');
@@ -20,34 +21,11 @@ function MyReservations() {
     const { userId } = useAuth();
     const { statuses } = useStatuses(token);
     const { tracks } = useTracks(token);
-    const [reservations, setReservations] = useState<Reservation[]>([]);
+    const { reservations, setReservations, loading, error, setError, refreshReservations } = useReservations(userId!, token, t);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const [filteredReservations, setFilteredReservations] = useState<Reservation[]>(reservations);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
-
-    const fetchReservations = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            if (token && userId !== undefined) {
-                const data = await getUserReservations(userId!, token);
-                setReservations(data);
-            }
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (userId) {
-            fetchReservations();
-        }
-    }, [userId]);
 
     // Obsługa edycji rezerwacji:
     const handleEdit = (updated: Reservation) => {
@@ -93,7 +71,7 @@ function MyReservations() {
                 },
             });
             if (response.ok) {
-                fetchReservations();
+                refreshReservations();
             } else {
                 const error = await response.text();
                 setError(t("universal.error") + error);
@@ -164,7 +142,7 @@ function MyReservations() {
                                                         </button>
                                                     </>
                                                 )}
-                                                <DeleteReservation reservationId={Reservation.id} onDeleted={fetchReservations} />
+                                                <DeleteReservation reservationId={Reservation.id} onDeleted={() => setReservations(prev => prev.filter(r => r.id !== Reservation.id))} />
                                             </div>
                                         </div>
 

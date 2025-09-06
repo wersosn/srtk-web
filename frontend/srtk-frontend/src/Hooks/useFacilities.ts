@@ -21,5 +21,5 @@ export const useFacilities = (token: string | null) => {
             .finally(() => setLoading(false));
     }, [token]);
 
-    return { facilities, loading, error };
+    return { facilities, setFacilities, loading, error };
 };

@@ -3,7 +3,7 @@ import type { Facility } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 
 interface AddFacilityProps {
-  onAddFacility: (newFacility: Facility) => void;
+    onAddFacility: (newFacility: Facility) => void;
 }
 
 const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
@@ -21,53 +21,53 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
 
         try {
             const response = await fetch("/api/facilities", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-              },
-              body: JSON.stringify(newFacility)
-          });
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(newFacility)
+            });
 
-          if (response.ok) {
-              const createdFacility: Facility = await response.json();
-              setMessage(t("facility.facilityAdded"));
-              setName("");
-              setCity("");
-              setAddress("");
-              onAddFacility(createdFacility);
-          } else {
-              let errorText = await response.text();
-              try {
-                  const errorData = JSON.parse(errorText);
-                  setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
-              } catch {
-                  setMessage(t("universal.error") + (errorText));
-              }
-          }
+            if (response.ok) {
+                const createdFacility: Facility = await response.json();
+                setMessage(t("facility.facilityAdded"));
+                setName("");
+                setCity("");
+                setAddress("");
+                onAddFacility(createdFacility);
+            } else {
+                let errorText = await response.text();
+                try {
+                    const errorData = JSON.parse(errorText);
+                    setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
+                } catch {
+                    setMessage(t("universal.error") + (errorText));
+                }
+            }
         } catch (error: any) {
             setMessage(t("universal.error") + error.message);
         }
     };
 
-  return (
-    <>
-          <form onSubmit={handleSubmit}>
-              <div>
-                  <label htmlFor="facilityName">{t("facility.name")}</label>
-                  <input id="facilityName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
+    return (
+        <>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label htmlFor="facilityName">{t("facility.name")}</label>
+                    <input id="facilityName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
 
-                  <label htmlFor="facilityCity">{t("facility.city")}</label>
-                  <input id="facilityCity" value={city} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
+                    <label htmlFor="facilityCity">{t("facility.city")}</label>
+                    <input id="facilityCity" value={city} onChange={e => setCity(e.target.value)} required maxLength={50} className="info-input" />
 
-                  <label htmlFor="facilityAddress">{t("facility.address")}</label>
-                  <input id="facilityAddress" value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
-              </div>
-              <button type="submit">{t("universal.save")}</button>
-              <div>{message}</div>
-          </form>
-      </>
-  );
+                    <label htmlFor="facilityAddress">{t("facility.address")}</label>
+                    <input id="facilityAddress" value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
+                </div>
+                <button type="submit">{t("universal.save")}</button>
+                <div>{message}</div>
+            </form>
+        </>
+    );
 };
 
 export default AddFacility;

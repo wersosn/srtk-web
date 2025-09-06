@@ -1,141 +1,32 @@
-import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
-import { parseAvailableDays, isValidDateTime, dayMap } from './DateHelper';
-import type { Equipment, Track } from '../Types/Types';
-import { getAllTracks, getAllEquipmentsInFacility, getTrackAvailability } from '../Services/Api';
+import { parseAvailableDays, isValidDateTime } from './DateHelper';
 import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
+import { useTracks } from '../Hooks/useTracks';
+import { useAuth } from '../User/AuthContext';
+import { useEquipment } from '../Hooks/useEquipment';
+import { useTrackAvailability } from '../Hooks/useTrackAvailability';
+import { useCost } from '../Hooks/useCost';
+import { useTrackDetails } from '../Hooks/useTrackDetails';
 
 function MakeReservation() {
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
     const { t } = useTranslation();
     
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const { userId } = useAuth();
+    const { tracks, loading, error } = useTracks(token!);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
-    const [trackInfo, setTrackInfo] = useState<string>("");
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [rentEquipment, setRentEquipment] = useState(false);
-    const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
+    const { equipmentList } = useEquipment(selectedTrackId, rentEquipment, tracks, token);
     const [equipmentQuantities, setEquipmentQuantities] = useState<Record<number, number>>({});
-    const [userId, setUserId] = useState<number | undefined>(undefined);
-    const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [cost, setCost] = useState<number>(0);
-
-    const fetchAllTracks = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            if(token) {
-                const data = await getAllTracks(token);
-                setTracks(data);
-            }
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchEquipment = async () => {
-        if (!selectedTrackId || !rentEquipment) {
-            setEquipmentList([]);
-            return;
-        }
-
-        const track = tracks.find(t => t.id === selectedTrackId);
-        if (!track) return;
-
-        try {
-            if(token) {
-                const data = await getAllEquipmentsInFacility(track.facilityId, token);
-                setEquipmentList(data);
-            }
-        } catch (err: any) {
-            console.error(err);
-        }
-    };
-
-    // Obliczanie kosztów:
-    const calculateCost = async () => {
-        const equipmentCost = Object.entries(equipmentQuantities)
-            .map(([id, qty]) => {
-                const equipment = equipmentList.find(e => e.id === parseInt(id));
-                return (equipment?.cost || 0) * qty;
-            })
-            .reduce((sum, val) => sum + val, 0);
-
-        setCost(equipmentCost);
-    };
-
-    // Sprawdzenie, czy tor jest dostępny do zarezerwowania (tzn. nie ma innej rezerwacji w wybranym czasie):
-    const checkTrackAvailability = async () => {
-        if (!selectedTrackId || !startDate || !endDate) {
-            setIsAvailable(null);
-            return null;
-        }
-
-        try {
-            if(token) {
-                const data = await getTrackAvailability(selectedTrackId, startDate, endDate, token);
-                setIsAvailable(data.isAvailable);
-                return data.isAvailable;
-            }
-        } catch (err) {
-            console.error(err);
-            setIsAvailable(null);
-            return null;
-        }
-    };
-
-    // Ustawienie szczegółów:
-    const trackDetails = async () => {
-        const track = tracks.find(t => t.id === selectedTrackId);
-        if (!track) {
-            return null;
-        }
-        const allowedDays = parseAvailableDays(track.availableDays).map(d => Object.keys(dayMap).find(key => dayMap[key] === d)).join(', ');
-        const openingHour = track?.openingHour || '00:00';
-        const closingHour = track?.closingHour || '23:59';
-        setTrackInfo(t("makeReservations.trackHours") + openingHour + " - " + closingHour + t("makeReservations.trackDays") + allowedDays);
-    }
-
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                const userIdFromToken = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-                if (userIdFromToken) {
-                    setUserId(parseInt(userIdFromToken, 10));
-                }
-            } catch {
-                setUserId(undefined);
-            }
-        }
-        fetchAllTracks();
-    }, []);
-
-    useEffect(() => {
-        fetchEquipment();
-    }, [selectedTrackId, rentEquipment]);
-
-    useEffect(() => {
-        calculateCost();
-    }, [startDate, endDate, equipmentQuantities, equipmentList]);
-
-    useEffect(() => {
-        checkTrackAvailability();
-    }, [selectedTrackId, startDate, endDate]);
-
-    useEffect(() => {
-        trackDetails();
-    }, [selectedTrackId]);
+    const isAvailable = useTrackAvailability(selectedTrackId, startDate, endDate, token);
+    const cost = useCost(equipmentQuantities, equipmentList);
+    const trackInfo = useTrackDetails(selectedTrackId, tracks, t);
 
     const addNotificationPl = async (title: string, description: string) => {
         if (!userId) return;

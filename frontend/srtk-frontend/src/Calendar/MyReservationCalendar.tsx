@@ -17,7 +17,6 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
     const { userId } = useAuth();
     const [events, setEvents] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
     const lang = localStorage.getItem('language');
@@ -25,7 +24,6 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     const { t } = useTranslation();
 
     const fetchReservations = async () => {
-        setLoading(true);
         setError(null);
         try {
             if(token && userId !== undefined) {
@@ -35,8 +33,6 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
             }
         } catch (err: any) {
             setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -76,7 +72,6 @@ function MyReservationCalendar({ refreshTrigger }: { refreshTrigger: number }) {
     return (
         <>
             <div className="my-calendar-container">
-                {loading && <p>{t("universal.loading")}</p>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 
                 <FullCalendar

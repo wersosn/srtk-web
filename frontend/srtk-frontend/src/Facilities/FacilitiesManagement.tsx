@@ -6,32 +6,14 @@ import DeleteFacility from './DeleteFacility';
 import type { Facility } from '../Types/Types';
 import { getAllFacilities } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useFacilities } from '../Hooks/useFacilities';
 
 function FacilitiesManagement() {
-    const [facilities, setFacilities] = useState<Facility[]>([]);
-    const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
-    const [showDetails, setShowDetails] = useState<Facility | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
-
-    const fetchFacilities = async () => {
-        try {
-            if (token) {
-                const data = await getAllFacilities(token);
-                setFacilities(data);
-            }
-        } catch (err: any) {
-            setError(err.message || t("universal.error"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchFacilities();
-    }, []);
+    const { facilities, setFacilities, loading, error } = useFacilities(token);
+    const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
+    const [showDetails, setShowDetails] = useState<Facility | null>(null);
 
     // Obsługa dodawania obiektu:
     const handleAdd = (newFacility: Facility) => {
@@ -66,7 +48,7 @@ function FacilitiesManagement() {
                                         <button onClick={() => setEditingFacility(facility)} disabled={loading} className="icon-button">
                                             <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                         </button>
-                                        <DeleteFacility facilityId={facility.id} onDeleted={fetchFacilities} />
+                                        <DeleteFacility facilityId={facility.id} onDeleted={() => setFacilities(prev => prev.filter(r => r.id !== facility.id))} />
                                     </div>
                                 </div>
 

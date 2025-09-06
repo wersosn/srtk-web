@@ -4,7 +4,7 @@ import { getAllClients } from "../Services/Api";
 
 export const useClients = (token: string | null) => {
     const [clients, setClients] = useState<Client[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loadingClients, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -21,5 +21,5 @@ export const useClients = (token: string | null) => {
             .finally(() => setLoading(false));
     }, [token]);
 
-    return { clients, setClients, loading, error };
+    return { clients, setClients, loadingClients, error };
 };

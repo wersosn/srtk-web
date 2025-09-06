@@ -7,13 +7,13 @@ import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
 import type { Reservation } from '../Types/Types';
-import { getReservationsInTrack } from '../Services/Api';
 import { formatToDatetimeLocal } from './DateHelper';
 import { useTranslation } from "react-i18next";
 import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { useStatuses } from '../Hooks/useStatuses';
 import { useTracksAdmin } from '../Hooks/useTracksAdmin';
 import { useAuth } from '../User/AuthContext';
+import { useAdminReservations } from '../Hooks/useAdminReservations';
 
 function ReservationManagement() {
     const token = localStorage.getItem('token');
@@ -21,46 +21,13 @@ function ReservationManagement() {
     const { facilityId } = useAuth();
     const { statuses } = useStatuses(token);
     const { tracks } = useTracksAdmin(token!, facilityId!);
-    const [reservationsByTrack, setReservationsByTrack] = useState<Record<number, Reservation[]>>({});
+    const { reservationsByTrack, setReservationsByTrack, loading, error, setError, refreshReservations } = useAdminReservations(tracks, token, t);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [filteredReservations, setFilteredReservations] = useState<Record<number, Reservation[]>>(reservationsByTrack);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     const isDark = usePrefersDark();
     const icon = isDark ? downloadIconLight : downloadIcon;
-
-    const fetchReservations = async () => {
-        if (tracks.length === 0) {
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-        try {
-            const reservationsPromises = tracks.map(async (track) => {
-                const data = await getReservationsInTrack(track.id, token!);
-                return { trackId: track.id, reservations: data };
-            });
-
-            const results = await Promise.all(reservationsPromises);
-            const grouped: Record<number, Reservation[]> = {};
-            results.forEach(({ trackId, reservations }) => {
-                grouped[trackId] = reservations;
-            });
-
-            setReservationsByTrack(grouped);
-        } catch (err: any) {
-            setError(err.message || t("api.reservationError"));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchReservations();
-    }, [token, tracks]);
 
     // Obsługa filtrowania:
     const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
@@ -118,7 +85,7 @@ function ReservationManagement() {
                 },
             });
             if (response.ok) {
-                fetchReservations();
+                refreshReservations();
             } else {
                 const error = await response.text();
                 setError(t("universal.error") + error);
@@ -192,7 +159,7 @@ function ReservationManagement() {
                                                                     </button>
                                                                 </>
                                                             )}
-                                                            <DeleteReservation reservationId={reservation.id} onDeleted={() => { fetchReservations(); }} />
+                                                            <DeleteReservation reservationId={reservation.id} onDeleted={() => refreshReservations()} />
                                                         </div>
                                                     </div>
 

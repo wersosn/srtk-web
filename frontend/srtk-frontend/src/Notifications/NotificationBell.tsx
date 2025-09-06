@@ -93,37 +93,6 @@ function NotificationBell() {
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
-
-    /*useEffect(() => {
-        if (!userId) {
-            return;
-        }
-
-        const checkUpcomingReservations = async () => {
-            try {
-                const res = await fetch(`/api/reservations/upcoming/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error(t("api.reservationError"));
-                const reservations: Reservation[] = await res.json();
-
-                for (const r of reservations) {
-                    const trackName = getTrackName(r.trackId);
-                    await addNotification(
-                        `Przypomnienie o rezerwacji toru ${trackName}`,
-                        `Twoja rezerwacja zaczyna się o ${new Date(r.start).toLocaleTimeString()}`
-                    );
-                }
-            } catch (err) {
-                throw new Error(t("api.reservationError") + err);
-            }
-        };
-
-        checkUpcomingReservations();
-        const interval = setInterval(checkUpcomingReservations, 60000);
-        return () => clearInterval(interval);
-    }, [userId, tracks]);*/
-
     return (
         <>
             <button id="notification-bell" className="icon-button me-3" onClick={toggleNotifications} title={t("navbar.notification")}>

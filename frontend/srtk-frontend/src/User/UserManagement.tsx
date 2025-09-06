@@ -1,64 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import editIcon from '../assets/edit.png';
 import EditUser from './EditUser';
 import DeleteUser from './DeleteUser';
 import type { Client, Admin } from '../Types/Types';
 import { useTranslation } from "react-i18next";
-import { useAuth } from './AuthContext';
+import { useClients } from '../Hooks/useClients';
+import { useAdmins } from '../Hooks/useAdmins';
 
 function UserManagement() {
     const token = localStorage.getItem('token');
-    const [clients, setClients] = useState<Client[]>([]);
-    const [admins, setAdmins] = useState<Admin[]>([]);
     const [editingUser, setEditingUser] = useState<Client | Admin | null>(null);
     const [showDetails, setShowDetails] = useState<Client | Admin | null>(null);
-    const [loadingClients, setLoadingClients] = useState(true);
-    const [loadingAdmins, setLoadingAdmins] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const { facilityId } = useAuth();
+    const { clients, setClients, loadingClients, error } = useClients(token);
+    const { admins, setAdmins, loadingAdmins, errorAdmin } = useAdmins(token);
     const { t } = useTranslation();
-
-    const fetchClients = () => {
-        setLoadingClients(true);
-        fetch('/api/users/clients', {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => {
-                if (!res.ok) throw new Error(t("api.clientsError"));
-                return res.json();
-            })
-            .then(data => setClients(data))
-            .catch(err => setError(err.message))
-            .finally(() => setLoadingClients(false));
-    };
-
-    const fetchAdmins = () => {
-        if (facilityId === null) {
-            return;
-        }
-
-        setLoadingAdmins(true);
-        fetch('/api/users/admins', {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => {
-                if (!res.ok) throw new Error(t("api.adminsError"));
-                return res.json();
-            })
-            .then(data => {
-                setAdmins(facilityId === 0 ? data : data.filter((admin: { facilityId: number }) => admin.facilityId === facilityId));
-            })
-            .catch(err => setError(err.message))
-            .finally(() => setLoadingAdmins(false));
-    };
-
-    useEffect(() => {
-        fetchClients();
-    }, []);
-
-    useEffect(() => {
-        fetchAdmins();
-    }, [facilityId]);
 
     // Edycja użytkownika:
     const handleEdit = (updated: Client | Admin) => {
@@ -84,8 +39,6 @@ function UserManagement() {
             });
         }
 
-        fetchClients();
-        fetchAdmins();
         if (showDetails?.id === updated.id) {
             setShowDetails({ ...updated });
         }
@@ -109,9 +62,10 @@ function UserManagement() {
             <hr />
             <>
                 {error && <p className="text-danger">{error}</p>}
+                {errorAdmin && <p className="text-danger">{errorAdmin}</p>}
 
                 <h5 className="mt-4">{t("user.clients")}</h5>
-                {loadingClients ? (
+                {loadingClients? (
                     <p>{t("admin.clientsLoading")}.</p>
                 ) : (
                     <ul className="list-group mb-4">
