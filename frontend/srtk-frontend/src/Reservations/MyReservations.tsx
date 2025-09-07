@@ -90,6 +90,7 @@ function MyReservations() {
             });
             if (response.ok) {
                 refreshReservations();
+                setRefreshCalendarCounter(prev => prev + 1);
             } else {
                 const error = await response.text();
                 setError(t("universal.error") + error);

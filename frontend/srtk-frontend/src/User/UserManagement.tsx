@@ -25,12 +25,15 @@ function UserManagement() {
 
     // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
+
+    // Lista klientów:
     const [currentClientPage, setCurrentClientPage] = useState<number>(1);
     const startIndexC = (currentClientPage - 1) * elementsPerPage;
     const endIndexC = startIndexC + elementsPerPage;
     const paginatedClients = clients.slice(startIndexC, endIndexC);
     const totalClientPages = Math.ceil(clients.length / elementsPerPage);
 
+    // Lista adminów:
     const [currentAdminPage, setCurrentAdminPage] = useState<number>(1);
     const startIndexA = (currentAdminPage - 1) * elementsPerPage;
     const endIndexA = startIndexA + elementsPerPage;
