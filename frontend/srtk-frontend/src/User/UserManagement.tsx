@@ -1,19 +1,45 @@
 import { useState } from 'react';
 import editIcon from '../assets/edit.png';
+import arrowLeftIcon from "../assets/arrow-left.png";
+import arrowLeftLightIcon from "../assets/arrow-left-light.png";
+import arrowRightIcon from "../assets/arrow-right.png";
+import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import EditUser from './EditUser';
 import DeleteUser from './DeleteUser';
 import type { Client, Admin } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 import { useClients } from '../Hooks/useClients';
 import { useAdmins } from '../Hooks/useAdmins';
+import { useAuth } from './AuthContext';
+import { useUserPreferences } from '../Hooks/useUserPreferences';
+import { usePrefersDark } from '../Hooks/usePrefersDark';
 
 function UserManagement() {
     const token = localStorage.getItem('token');
+    const { userId } = useAuth();
     const [editingUser, setEditingUser] = useState<Client | Admin | null>(null);
     const [showDetails, setShowDetails] = useState<Client | Admin | null>(null);
     const { clients, setClients, loadingClients, error } = useClients(token);
     const { admins, setAdmins, loadingAdmins, errorAdmin } = useAdmins(token);
     const { t } = useTranslation();
+
+    // Obsługa ilości elementów na stronie:
+    const { elementsPerPage } = useUserPreferences(userId!, token, t);
+    const [currentClientPage, setCurrentClientPage] = useState<number>(1);
+    const startIndexC = (currentClientPage - 1) * elementsPerPage;
+    const endIndexC = startIndexC + elementsPerPage;
+    const paginatedClients = clients.slice(startIndexC, endIndexC);
+    const totalClientPages = Math.ceil(clients.length / elementsPerPage);
+
+    const [currentAdminPage, setCurrentAdminPage] = useState<number>(1);
+    const startIndexA = (currentAdminPage - 1) * elementsPerPage;
+    const endIndexA = startIndexA + elementsPerPage;
+    const paginatedAdmins = admins.slice(startIndexA, endIndexA);
+    const totalAdminPages = Math.ceil(admins.length / elementsPerPage);
+
+    const isDark = usePrefersDark();
+    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
+    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
 
     // Edycja użytkownika:
     const handleEdit = (updated: Client | Admin) => {
@@ -65,65 +91,104 @@ function UserManagement() {
                 {errorAdmin && <p className="text-danger">{errorAdmin}</p>}
 
                 <h5 className="mt-4">{t("user.clients")}</h5>
-                {loadingClients? (
+                {loadingClients ? (
                     <p>{t("admin.clientsLoading")}.</p>
                 ) : (
-                    <ul className="list-group mb-4">
-                        {clients.map(client => (
-                            <li key={client.id} className="list-group-item p-0">
-                                <div
-                                    onClick={() => setShowDetails(prev => (prev?.id === client.id ? null : client))}
-                                    className="d-flex justify-content-between align-items-center px-3 py-2"
-                                >
-                                    {client.email}
-                                    <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
-                                        <button onClick={() => setEditingUser(client)} className="icon-button">
-                                            <img src={editIcon} alt="Edytuj" style={{ width: 16, height: 16 }} />
-                                        </button>
-                                        <DeleteUser userId={client.id} onDeleted={() => handleDelete(client.id, 1)} />
+                    <>
+                        <ul className="list-group mb-4">
+                            {paginatedClients.map(client => (
+                                <li key={client.id} className="list-group-item p-0">
+                                    <div
+                                        onClick={() => setShowDetails(prev => (prev?.id === client.id ? null : client))}
+                                        className="d-flex justify-content-between align-items-center px-3 py-2"
+                                    >
+                                        {client.email}
+                                        <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
+                                            <button onClick={() => setEditingUser(client)} className="icon-button">
+                                                <img src={editIcon} alt="Edytuj" style={{ width: 16, height: 16 }} />
+                                            </button>
+                                            <DeleteUser userId={client.id} onDeleted={() => handleDelete(client.id, 1)} />
+                                        </div>
                                     </div>
-                                </div>
 
-                                {showDetails?.id === client.id && (
-                                    <div className="mt-2 ps-2 details">
-                                        <strong>{t("user.name")}:</strong> {client.name} <br />
-                                        <strong>{t("user.surname")}:</strong> {client.surname} <br />
-                                        <strong>{t("user.phoneNumber")}:</strong> {client.phoneNumber}
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+                                    {showDetails?.id === client.id && (
+                                        <div className="mt-2 ps-2 details">
+                                            <strong>{t("user.name")}:</strong> {client.name} <br />
+                                            <strong>{t("user.surname")}:</strong> {client.surname} <br />
+                                            <strong>{t("user.phoneNumber")}:</strong> {client.phoneNumber}
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="pagination-container">
+                            <button onClick={() => setCurrentClientPage(prev => Math.max(prev - 1, 1))} disabled={currentClientPage === 1} className="icon-button" title={t("universal.prev")}>
+                                <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
+                            </button>
+                            <span className="page-info">
+                                {currentClientPage}
+                            </span>
+                            <span className="page-info">
+                                /
+                            </span>
+                            <span className="page-info">
+                                {totalClientPages}
+                            </span>
+                            <button onClick={() => setCurrentClientPage(prev => Math.min(prev + 1, totalClientPages))} disabled={currentClientPage === totalClientPages} className="icon-button" title={t("universal.next")}>
+                                <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
+                            </button>
+                        </div>
+                    </>
                 )}
-
+                <br/>
+                
                 <h5>{t("user.admins")}</h5>
                 {loadingAdmins ? (
                     <p>{t("admin.adminsLoading")}</p>
                 ) : (
-                    <ul className="list-group">
-                        {admins.map(admin => (
-                            <li key={admin.id} className="list-group-item p-0">
-                                <div
-                                    onClick={() => setShowDetails(prev => (prev?.id === admin.id ? null : admin))}
-                                    className="d-flex justify-content-between align-items-center px-3 py-2">
-                                    {admin.email}
-                                    <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
-                                        <button onClick={() => setEditingUser(admin)} className="icon-button">
-                                            <img src={editIcon} alt="Edytuj" style={{ width: 16, height: 16 }} />
-                                        </button>
-                                        <DeleteUser userId={admin.id} onDeleted={() => handleDelete(admin.id, admin.roleId)} />
+                    <>
+                        <ul className="list-group">
+                            {paginatedAdmins.map(admin => (
+                                <li key={admin.id} className="list-group-item p-0">
+                                    <div
+                                        onClick={() => setShowDetails(prev => (prev?.id === admin.id ? null : admin))}
+                                        className="d-flex justify-content-between align-items-center px-3 py-2">
+                                        {admin.email}
+                                        <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
+                                            <button onClick={() => setEditingUser(admin)} className="icon-button">
+                                                <img src={editIcon} alt="Edytuj" style={{ width: 16, height: 16 }} />
+                                            </button>
+                                            <DeleteUser userId={admin.id} onDeleted={() => handleDelete(admin.id, admin.roleId)} />
+                                        </div>
                                     </div>
-                                </div>
 
-                                {showDetails?.id === admin.id && (
-                                    <div className="mt-2 ps-2 details">
-                                        <em>Admin</em> <br />
-                                        <strong>{t("user.faclityId")}:</strong> {admin.facilityId}
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+                                    {showDetails?.id === admin.id && (
+                                        <div className="mt-2 ps-2 details">
+                                            <em>Admin</em> <br />
+                                            <strong>{t("user.faclityId")}:</strong> {admin.facilityId}
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="pagination-container">
+                            <button onClick={() => setCurrentAdminPage(prev => Math.max(prev - 1, 1))} disabled={currentAdminPage === 1} className="icon-button" title={t("universal.prev")}>
+                                <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
+                            </button>
+                            <span className="page-info">
+                                {currentAdminPage}
+                            </span>
+                            <span className="page-info">
+                                /
+                            </span>
+                            <span className="page-info">
+                                {totalAdminPages}
+                            </span>
+                            <button onClick={() => setCurrentAdminPage(prev => Math.min(prev + 1, totalAdminPages))} disabled={currentAdminPage === totalAdminPages} className="icon-button" title={t("universal.next")}>
+                                <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
+                            </button>
+                        </div>
+                    </>
                 )}
 
                 <hr />
