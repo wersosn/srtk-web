@@ -186,5 +186,29 @@ label {
   z-index: 0;
 }
 
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 1rem;
+}
 
+.pagination-container .icon-button {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+}
+
+.pagination-container .icon-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-weight: bold;
+    font-size: 1rem;
+}
 

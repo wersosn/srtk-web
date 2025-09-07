@@ -7,21 +7,26 @@ import EditMyInfo from './EditMyInfo';
 import profileImage from '../assets/profile.svg';
 import './Profile.css';
 import { useAuth } from '../User/AuthContext';
+import { useUserPreferences } from '../Hooks/useUserPreferences';
 
 function Profile() {
+    const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const { userId } = useAuth();
     const [user, setUser] = useState<Client>();
     const [email, setEmail] = useState<string>("");
     const [emailConfirmed, setEmailConfirmed] = useState<boolean | null>(null);
+    const { elementsPerPage, setElementsPerPage } = useUserPreferences(userId!, token, t);
     const [language, setLanguage] = useState(i18n.language);
-    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
 
     // Pobieranie danych użytkownika:
     const fetchUserInfo = useCallback(async () => {
-        if (!userId) return;
+        if (!userId) {
+            return;
+        }
+
         setLoading(true);
         setError(null);
         try {
@@ -30,7 +35,6 @@ function Profile() {
               setUser(data);
               setEmail(data.email);
               setEmailConfirmed(data.emailConfirmed);
-              console.log(data.emailConfirmed);
           }
       } catch (err: any) {
           setError(err.message || t("profile.userFetchError"));
@@ -85,6 +89,35 @@ function Profile() {
         }
     };
 
+    // Obsługa zmiany ilości elementów na listach (np. rezerwacji itp.):
+    const handleUpdatingElementsPerPage = async () => {
+        if (elementsPerPage <= 0) {
+            alert(t("profile.invalidElements"));
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/users/${userId}/preferences`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ elementsPerPage })
+            });
+
+            if (!response.ok) {
+                const errorMsg = await response.text();
+                console.log(errorMsg);
+                throw new Error(errorMsg);
+            }
+
+            alert(t("profile.preferencesUpdated"));
+        } catch (err: any) {
+            setError(err.message);
+        }
+    };
+
     return (
       <>
         <div className="profile-container">
@@ -118,15 +151,24 @@ function Profile() {
                     <hr />
                     <h5>{t("profile.settings")}</h5>
                     <div className="setting-item">
-                      <label htmlFor="language">{t("profile.language")}</label>
-                      <select id="language" name="language" value={language} onChange={(e) => handleLanguageChange(e.target.value)} className="info-input">
-                        <option value="pl">Polski</option>
-                        <option value="en">English</option>
-                      </select>
+                        <label htmlFor="language">{t("profile.language")}</label>
+                        <select id="language" name="language" value={language} onChange={(e) => handleLanguageChange(e.target.value)} className="info-input">
+                            <option value="pl">Polski</option>
+                            <option value="en">English</option>
+                        </select>
                     </div>
+
+                    <div className="setting-item">
+                        <label htmlFor="elementsPerPage">{t("profile.elementsPerPage")}</label>
+                        <div className="d-flex gap-2">
+                          <input id="elementsPerPage" name="elementsPerPage" value={elementsPerPage} type="number" onChange={(e) => setElementsPerPage(parseInt(e.target.value))} min={1} className="info-input"/>
+                          <button onClick={handleUpdatingElementsPerPage} className="btn-filter">{t("universal.save")}</button>
+                        </div>
+                    </div>
+
                     {emailConfirmed !== null && emailConfirmed === false && (
                       <div className="setting-item">
-                        <button onClick={handleSendingEmail}>{t("profile.confirmation")}</button>
+                          <button onClick={handleSendingEmail}>{t("profile.confirmation")}</button>
                       </div>
                     )}
                   </>

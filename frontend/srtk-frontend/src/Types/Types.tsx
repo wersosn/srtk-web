@@ -97,3 +97,9 @@ export type Notification = {
     timeStamp: Date;
     userId: number;
 }
+
+// Preferencje użytkownika:
+export type UserPreference = {
+    userId: number;
+    elementsPerPage: number;
+}

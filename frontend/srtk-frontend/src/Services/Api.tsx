@@ -1,4 +1,4 @@
-import type { Reservation, Track, Equipment, EquipmentWithQuantity, Facility, Role, Status, User, Client, Admin } from "../Types/Types";
+import type { Reservation, Track, Equipment, EquipmentWithQuantity, Facility, Role, Status, User, Client, Admin, UserPreference } from "../Types/Types";
 
 // Ogólny fetch GET z tokenem:
 const fetchWithAuth = async (url: string, token: string) => {
@@ -25,6 +25,10 @@ export const getAllClients = async (token: string): Promise<Client[]> => {
 export const getAllAdmins = async (token: string): Promise<Admin[]> => {
     return fetchWithAuth(`/api/users/admins`, token);
 };
+
+export const getUserPreferences = async (userId: number, token: string): Promise<UserPreference> => {
+    return fetchWithAuth(`/api/users/${userId}/preferences`, token);
+}; 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // REZERWACJE:

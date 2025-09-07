@@ -7,7 +7,9 @@
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "prev": "Previous",
+    "next": "Next"
   },
 
   "home": {
@@ -117,7 +119,10 @@
     "phoneNum": "Phone number",
     "saveChanges": "Save changes",
     "confirmation": "Email address confirmation",
-    "sendConfirmation": "Confirmation link has been sent to your email address"
+    "sendConfirmation": "Confirmation link has been sent to your email address",
+    "elementsPerPage": "Elements per page",
+    "preferencesUpdated": "Preferences updated successfully",
+    "invalidElements": "Elements per page must be greater than 0"
   },
 
   "user": {

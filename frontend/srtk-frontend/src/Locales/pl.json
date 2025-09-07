@@ -7,7 +7,9 @@
     "save": "Zapisz",
     "cancel": "Anuluj",
     "edit": "Edytuj",
-    "delete": "Usuń"
+    "delete": "Usuń",
+    "prev": "Poprzednia",
+    "next": "Następna"
   },
 
   "home": {
@@ -113,7 +115,10 @@
     "noToken": "Brak tokena – zaloguj się ponownie!",
     "saveChanges": "Zapisz zmiany",
     "confirmation": "Potwierdzenie adresu e-mail",
-    "sendConfirmation": "Wysłano link do potwierdzenia na adres e-mail"
+    "sendConfirmation": "Wysłano link do potwierdzenia na adres e-mail",
+    "elementsPerPage": "Ilość elementów na stronie",
+    "preferencesUpdated": "Ilość elementów na stronie została zaktualizowana",
+    "invalidElements": "Ilość elementów na stronie musi być większa od 0"
   },
 
   "user": {

@@ -123,6 +123,32 @@ namespace srtk.Controllers
             return Ok(user);
         }
 
+        [HttpGet("{id}/preferences")]
+        [Authorize]
+        public async Task<ActionResult<UserPreferenceDto?>> GetElementsPerPage(int id)
+        {
+            var currentUserId = int.Parse(User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+            if (currentUserId != id)
+            {
+                return Forbid("Nie możesz pobrać preferencji innego użytkownika");
+            }
+            var userPreference = await service.GetElementsPerPage(id);
+            return Ok(userPreference);
+        }
+
+        [HttpPut("{id}/preferences")]
+        [Authorize]
+        public async Task<ActionResult<UserPreferenceDto?>> UpdateElementsPerPage(int id, [FromBody] UserPreferenceDto dto)
+        {
+            var currentUserId = int.Parse(User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value);
+            if (currentUserId != id)
+            {
+                return Forbid("Nie możesz edytować preferencji innego użytkownika");
+            }
+            var userPreference = await service.UpdateElementsPerPage(id, dto.ElementsPerPage);
+            return Ok(userPreference);
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<User>> DeleteUser(int id)

@@ -1,7 +1,9 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
+using srtk.Migrations;
 using srtk.Models;
 
 namespace srtk.Services
@@ -55,6 +57,7 @@ namespace srtk.Services
         {
             return await context.Admins.ToListAsync();
         }
+
         public async Task<UserDto?> GetById(int id)
         {
             var user = await context.Users.FindAsync(id);
@@ -292,6 +295,55 @@ namespace srtk.Services
             return user;
         }
 
+        public async Task<UserPreferenceDto?> GetElementsPerPage(int userId)
+        {
+            var userPreference = await context.UserPreferences.FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (userPreference == null)
+            {
+                return new UserPreferenceDto
+                {
+                    ElementsPerPage = 10
+                };
+            }
+            return new UserPreferenceDto
+            {
+                UserId = userPreference.UserId,
+                ElementsPerPage = userPreference.ElementsPerPage
+            };
+        }
+
+        public async Task<UserPreferenceDto?> UpdateElementsPerPage(int userId, int elementsPerPage)
+        {
+            if (elementsPerPage <= 0)
+            {
+                throw new ArgumentException("Ilość elementów musi być > 0");
+            }
+
+            var userPreference = await context.UserPreferences.FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (userPreference == null)
+            {
+                userPreference = new UserPreference
+                {
+                    UserId = userId,
+                    ElementsPerPage = elementsPerPage
+                };
+                context.UserPreferences.Add(userPreference);
+            }
+            else
+            {
+                userPreference.ElementsPerPage = elementsPerPage;
+            }
+
+            await context.SaveChangesAsync();
+            return new UserPreferenceDto
+            {
+                UserId = userPreference.UserId,
+                ElementsPerPage = userPreference.ElementsPerPage
+            };
+        }
+
         public async Task<bool> Delete(int id)
         {
             var user = await context.Users.Include(r => r.ReservationList).FirstOrDefaultAsync(r => r.Id == id);
@@ -303,6 +355,6 @@ namespace srtk.Services
             context.Users.Remove(user);
             await context.SaveChangesAsync();
             return true;
-        }   
+        }
     }
 }

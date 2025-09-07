@@ -3,6 +3,10 @@ import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
 import downloadIconLight from '../assets/download-light.png';
 import cancelIcon from "../assets/cancel.png";
+import arrowLeftIcon from "../assets/arrow-left.png";
+import arrowLeftLightIcon from "../assets/arrow-left-light.png";
+import arrowRightIcon from "../assets/arrow-right.png";
+import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
@@ -14,10 +18,12 @@ import { useStatuses } from '../Hooks/useStatuses';
 import { useTracksAdmin } from '../Hooks/useTracksAdmin';
 import { useAuth } from '../User/AuthContext';
 import { useAdminReservations } from '../Hooks/useAdminReservations';
+import { useUserPreferences } from '../Hooks/useUserPreferences';
 
 function ReservationManagement() {
     const token = localStorage.getItem('token');
     const { t } = useTranslation();
+    const { userId } = useAuth();
     const { facilityId } = useAuth();
     const { statuses } = useStatuses(token);
     const { tracks } = useTracksAdmin(token!, facilityId!);
@@ -26,8 +32,14 @@ function ReservationManagement() {
     const [filteredReservations, setFilteredReservations] = useState<Record<number, Reservation[]>>(reservationsByTrack);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
 
+    // Obsługa ilości elementów na stronie:
+    const { elementsPerPage } = useUserPreferences(userId!, token, t);
+    const [currentPages, setCurrentPages] = useState<Record<number, number>>({});
+
     const isDark = usePrefersDark();
     const icon = isDark ? downloadIconLight : downloadIcon;
+    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
+    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
 
     // Obsługa filtrowania:
     const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
@@ -106,6 +118,11 @@ function ReservationManagement() {
         window.location.href = `/api/reservations/export?trackId=${trackId}`;
     };
 
+    // Obsługa zmiany strony (dla rezerwacji z każdego toru oddzielnie):
+    const handlePageChange = (trackId: number, newPage: number, totalPages: number) => {
+        setCurrentPages(prev => ({ ...prev, [trackId]: Math.max(1, Math.min(newPage, totalPages)) }));
+    };
+
     return (
         <>
             <div className="admin-content p-4">
@@ -128,6 +145,12 @@ function ReservationManagement() {
                         <h5 className="mt-4">{t("reservation.list")}</h5>
                         {Object.entries(filteredReservations).map(([trackId, reservations]) => {
                             const track = tracks.find(t => t.id === Number(trackId));
+                            const currentPage = currentPages[track!.id] || 1;
+                            const startIndex = (currentPage - 1) * elementsPerPage;
+                            const endIndex = startIndex + elementsPerPage;
+                            const paginatedReservations = reservations.slice(startIndex, endIndex);
+                            const totalPages = Math.ceil(reservations.length / elementsPerPage);
+
                             return (
                                 <div key={trackId} style={{ marginBottom: '2rem' }}>
                                     <div className="d-flex flex-nowrap justify-content-between align-items-center mb-2">
@@ -141,10 +164,10 @@ function ReservationManagement() {
                                         )}
                                     </div>
                                     <ul className="list-group">
-                                        {reservations.length === 0 ? (
+                                        {paginatedReservations.length === 0 ? (
                                             <li className="list-group-item">{t("reservation.emptyList")}</li>
                                         ) : (
-                                            reservations.map(reservation => (
+                                            paginatedReservations.map(reservation => (
                                                 <li key={reservation.id} className="list-group-item p-0">
                                                     <div onClick={() => setShowDetails(prev => (prev?.id === reservation.id ? null : reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                                         {t("reservation.reserv")} {formatToDatetimeLocal(reservation.start)} - {formatToDatetimeLocal(reservation.end)}
@@ -178,6 +201,23 @@ function ReservationManagement() {
                                             ))
                                         )}
                                     </ul>
+                                    <div className="pagination-container">
+                                        <button onClick={() => handlePageChange(Number(trackId), currentPage - 1, totalPages)} disabled={currentPage === 1} className="icon-button" title={t("universal.prev")}>
+                                            <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
+                                        </button>
+                                        <span className="page-info">
+                                            {currentPage}
+                                        </span>
+                                        <span className="page-info">
+                                            /
+                                        </span>
+                                        <span className="page-info">
+                                            {totalPages}
+                                        </span>
+                                        <button onClick={() => handlePageChange(Number(trackId), currentPage + 1, totalPages)} disabled={currentPage === totalPages} className="icon-button" title={t("universal.next")}>
+                                            <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
+                                        </button>
+                                    </div>
                                 </div>
                             );
                         })}
