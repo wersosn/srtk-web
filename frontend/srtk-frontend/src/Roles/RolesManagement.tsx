@@ -13,6 +13,7 @@ import { useRoles } from '../Hooks/useRoles';
 import { useAuth } from '../User/AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { usePagination } from '../Hooks/usePagination';
 
 function RoleManagement() {
     const token = localStorage.getItem('token');
@@ -20,14 +21,8 @@ function RoleManagement() {
     const [editingRole, setEditingRole] = useState<Role | null>(null);
     const { t } = useTranslation();
     const { userId } = useAuth();
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const startIndex = (currentPage - 1) * elementsPerPage;
-    const endIndex = startIndex + elementsPerPage;
-    const paginatedRoles = roles.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(roles.length / elementsPerPage);
+    const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(roles, elementsPerPage);
 
     const isDark = usePrefersDark();
     const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
@@ -58,7 +53,7 @@ function RoleManagement() {
                 <>
                     <h5 className="mt-4">{t("role.list")}</h5>
                     <ul className="list-group">
-                        {paginatedRoles.map((role) => (
+                        {paginatedItems.map((role) => (
                             <li key={role.id} className="list-group-item d-flex justify-content-between align-items-center">
                                 {role.name}
                                 <div className="d-flex gap-2">

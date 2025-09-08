@@ -14,6 +14,8 @@ import { useAuth } from '../User/AuthContext';
 import { useTracksAdmin } from '../Hooks/useTracksAdmin';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { useFilteredTracks } from '../Hooks/useFilteredTracks';
+import { usePagination } from '../Hooks/usePagination';
 
 function TrackManagement() {
     const token = localStorage.getItem('token');
@@ -21,16 +23,10 @@ function TrackManagement() {
     const { tracks, setTracks, loading, error } = useTracksAdmin(token!, facilityId!);
     const [editingTrack, setEditingTrack] = useState<Track | null>(null);
     const [showDetails, setShowDetails] = useState<Track | null>(null);
-    const [filteredTracks, setFilteredTracks] = useState<Track[]>(tracks);
     const { t } = useTranslation();
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const startIndex = (currentPage - 1) * elementsPerPage;
-    const endIndex = startIndex + elementsPerPage;
-    const paginatedTracks = filteredTracks.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(filteredTracks.length / elementsPerPage);
+    const { filteredTracks, setFilteredTracks } = useFilteredTracks(tracks);
+    const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredTracks, elementsPerPage);
 
     const isDark = usePrefersDark();
     const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
@@ -81,7 +77,7 @@ function TrackManagement() {
                 <>
                     <h5 className="mt-4">{t("track.list")}</h5>
                     <ul className="list-group">
-                        {paginatedTracks.map((track) => (
+                        {paginatedItems.map((track) => (
                             <li key={track.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === track.id ? null : track))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {track.name}

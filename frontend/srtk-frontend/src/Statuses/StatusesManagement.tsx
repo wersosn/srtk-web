@@ -13,6 +13,7 @@ import { useStatuses } from '../Hooks/useStatuses';
 import { useAuth } from '../User/AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { usePagination } from '../Hooks/usePagination';
 
 function StatusesManagement() {
     const token = localStorage.getItem('token');
@@ -20,14 +21,8 @@ function StatusesManagement() {
     const [editingStatus, setEditingStatus] = useState<Status | null>(null);
     const { t } = useTranslation();
     const { userId } = useAuth();
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const startIndex = (currentPage - 1) * elementsPerPage;
-    const endIndex = startIndex + elementsPerPage;
-    const paginatedStatuses = statuses.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(statuses.length / elementsPerPage);
+    const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(statuses, elementsPerPage);
 
     const isDark = usePrefersDark();
     const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
@@ -58,7 +53,7 @@ function StatusesManagement() {
                 <>
                     <h5 className="mt-4">{t("status.list")}</h5>
                     <ul className="list-group">
-                        {paginatedStatuses.map((status) => (
+                        {paginatedItems.map((status) => (
                             <li key={status.id} className="list-group-item d-flex justify-content-between align-items-center">
                                 {status.name}
                                 <div className="d-flex gap-2">

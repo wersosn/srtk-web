@@ -13,6 +13,7 @@ import { useAdmins } from '../Hooks/useAdmins';
 import { useAuth } from './AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { usePagination } from '../Hooks/usePagination';
 
 function UserManagement() {
     const token = localStorage.getItem('token');
@@ -22,23 +23,21 @@ function UserManagement() {
     const { clients, setClients, loadingClients, error } = useClients(token);
     const { admins, setAdmins, loadingAdmins, errorAdmin } = useAdmins(token);
     const { t } = useTranslation();
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
 
-    // Lista klientów:
-    const [currentClientPage, setCurrentClientPage] = useState<number>(1);
-    const startIndexC = (currentClientPage - 1) * elementsPerPage;
-    const endIndexC = startIndexC + elementsPerPage;
-    const paginatedClients = clients.slice(startIndexC, endIndexC);
-    const totalClientPages = Math.ceil(clients.length / elementsPerPage);
+    const {
+        currentPage: currentClientPage,
+        totalPages: totalClientPages,
+        paginatedItems: paginatedClients,
+        setCurrentPage: setCurrentClientPage
+    } = usePagination(clients, elementsPerPage);
 
-    // Lista adminów:
-    const [currentAdminPage, setCurrentAdminPage] = useState<number>(1);
-    const startIndexA = (currentAdminPage - 1) * elementsPerPage;
-    const endIndexA = startIndexA + elementsPerPage;
-    const paginatedAdmins = admins.slice(startIndexA, endIndexA);
-    const totalAdminPages = Math.ceil(admins.length / elementsPerPage);
+    const {
+        currentPage: currentAdminPage,
+        totalPages: totalAdminPages,
+        paginatedItems: paginatedAdmins,
+        setCurrentPage: setCurrentAdminPage
+    } = usePagination(admins, elementsPerPage);
 
     const isDark = usePrefersDark();
     const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
@@ -143,8 +142,8 @@ function UserManagement() {
                         </div>
                     </>
                 )}
-                <br/>
-                
+                <br />
+
                 <h5>{t("user.admins")}</h5>
                 {loadingAdmins ? (
                     <p>{t("admin.adminsLoading")}</p>

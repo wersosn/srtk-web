@@ -14,6 +14,8 @@ import { useAuth } from '../User/AuthContext';
 import { useEquipmentsAdmin } from '../Hooks/useEquipmentsAdmin';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
+import { useFilteredEquipments } from '../Hooks/useFilteredEquipments';
+import { usePagination } from '../Hooks/usePagination';
 
 function EquipmentsManagement() {
     const token = localStorage.getItem('token');
@@ -22,15 +24,9 @@ function EquipmentsManagement() {
     const { equipmentList, setEquipmentList, loading, error } = useEquipmentsAdmin(facilityId!, token!);
     const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
     const [showDetails, setShowDetails] = useState<Equipment | null>(null);
-    const [filteredEqs, setFilteredEqs] = useState<Equipment[]>(equipmentList);
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const startIndex = (currentPage - 1) * elementsPerPage;
-    const endIndex = startIndex + elementsPerPage;
-    const paginatedEqs = filteredEqs.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(filteredEqs.length / elementsPerPage);
+    const { filteredEquipments, setFilteredEquipments } = useFilteredEquipments(equipmentList);
+    const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredEquipments, elementsPerPage);
 
     const isDark = usePrefersDark();
     const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
@@ -54,12 +50,12 @@ function EquipmentsManagement() {
         if (facilityId) {
             result = result.filter(t => t.facilityId === facilityId);
         }
-        setFilteredEqs(result);
+        setFilteredEquipments(result);
         setCurrentPage(1);
     };
 
     useEffect(() => {
-        setFilteredEqs(equipmentList);
+        setFilteredEquipments(equipmentList);
     }, [equipmentList]);
 
     return (
@@ -81,7 +77,7 @@ function EquipmentsManagement() {
                 <>
                     <h5 className="mt-4">{t("eq.list")}</h5>
                     <ul className="list-group">
-                        {paginatedEqs.map((Equipment) => (
+                        {paginatedItems.map((Equipment) => (
                             <li key={Equipment.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === Equipment.id ? null : Equipment))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {Equipment.name}

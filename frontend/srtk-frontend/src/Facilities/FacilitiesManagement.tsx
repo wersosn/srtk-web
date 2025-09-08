@@ -13,6 +13,7 @@ import { useFacilities } from '../Hooks/useFacilities';
 import { useAuth } from '../User/AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { usePagination } from '../Hooks/usePagination';
 
 function FacilitiesManagement() {
     const token = localStorage.getItem('token');
@@ -24,11 +25,7 @@ function FacilitiesManagement() {
 
     // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const startIndex = (currentPage - 1) * elementsPerPage;
-    const endIndex = startIndex + elementsPerPage;
-    const paginatedFacilities = facilities.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(facilities.length / elementsPerPage);
+    const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(facilities, elementsPerPage);
 
     const isDark = usePrefersDark();
     const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
@@ -60,7 +57,7 @@ function FacilitiesManagement() {
                 <>
                     <h5 className="mt-4">{t("facility.list")}</h5>
                     <ul className="list-group">
-                        {paginatedFacilities.map((facility) => (
+                        {paginatedItems.map((facility) => (
                             <li key={facility.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === facility.id ? null : facility))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {facility.name}

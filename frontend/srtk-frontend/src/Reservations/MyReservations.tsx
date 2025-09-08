@@ -19,6 +19,8 @@ import { useAuth } from '../User/AuthContext';
 import { useReservations } from '../Hooks/useUserReservations';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { useFilteredReservations } from '../Hooks/useFilteredReservations';
+import { usePagination } from '../Hooks/usePagination';
 
 function MyReservations() {
     const token = localStorage.getItem('token');
@@ -29,16 +31,10 @@ function MyReservations() {
     const { reservations, setReservations, loading, error, setError, refreshReservations } = useReservations(userId!, token, t);
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
-    const [filteredReservations, setFilteredReservations] = useState<Reservation[]>(reservations);
     const [refreshCalendarCounter, setRefreshCalendarCounter] = useState(0);
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const startIndex = (currentPage - 1) * elementsPerPage;
-    const endIndex = startIndex + elementsPerPage;
-    const paginatedReservations = filteredReservations.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(filteredReservations.length / elementsPerPage);
+    const { filteredReservations, setFilteredReservations } = useFilteredReservations(reservations);
+    const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredReservations, elementsPerPage);
 
     const isDark = usePrefersDark();
     const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
@@ -138,7 +134,7 @@ function MyReservations() {
                         <>
                             <h5 className="mt-4">{t("reservation.list")}</h5>
                             <ul className="list-group">
-                                {paginatedReservations.map((Reservation) => (
+                                {paginatedItems.map((Reservation) => (
                                     <li key={Reservation.id} className="list-group-item p-0">
                                         <div onClick={() => setShowDetails(prev => (prev?.id === Reservation.id ? null : Reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                             <div className="d-flex align-items-center gap-1">
