@@ -24,6 +24,7 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 - JWT (do autentykacji)
 - CORS (dostęp do API dla frontendu)
 - xUnit (testy jednostkowe)
+- Serilog (logi)
 
 *Frontend*:
 - React + Vite
