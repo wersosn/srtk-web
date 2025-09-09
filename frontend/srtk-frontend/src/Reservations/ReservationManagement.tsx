@@ -31,8 +31,6 @@ function ReservationManagement() {
     const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
     const [filteredReservations, setFilteredReservations] = useState<Record<number, Reservation[]>>(reservationsByTrack);
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const [currentPages, setCurrentPages] = useState<Record<number, number>>({});
 

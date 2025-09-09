@@ -13,9 +13,11 @@ namespace srtk.Controllers
     public class StatusesController : ControllerBase
     {
         private readonly StatusService service;
-        public StatusesController(StatusService service)
+        private readonly ILogger<StatusesController> logger;
+        public StatusesController(StatusService service, ILogger<StatusesController> logger)
         {
             this.service = service;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -40,6 +42,7 @@ namespace srtk.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<StatusDto>> AddStatus(StatusDto status)
         {
+            logger.LogInformation("Nowy status: {@Status}", status);
             var s = await service.Add(status);
             return CreatedAtAction(nameof(GetStatusById), new { id = s.Id }, s); // Zwracam DTO, aby zachować separację warstw
         }

@@ -6,6 +6,7 @@ using srtk.Services;
 using System.Security.Claims;
 using PdfSharp.Fonts;
 using srtk.Resources;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,14 @@ builder.Services.AddScoped<TrackService>();
 // Serwisy do wysy³ania maila:
 builder.Services.Configure<Email>(builder.Configuration.GetSection("Email"));
 builder.Services.AddTransient<EmailService>();
+
+// Logi:
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+builder.Host.UseSerilog();
 
 // Rejestracja fontów do generowania pdf:
 GlobalFontSettings.FontResolver = new CustomFontResolver();
