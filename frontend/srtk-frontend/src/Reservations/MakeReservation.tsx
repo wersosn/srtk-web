@@ -10,12 +10,12 @@ import { useEquipment } from '../Hooks/useEquipment';
 import { useTrackAvailability } from '../Hooks/useTrackAvailability';
 import { useCost } from '../Hooks/useCost';
 import { useTrackDetails } from '../Hooks/useTrackDetails';
+import { useNotifications } from '../Hooks/useNotifications';
 
 function MakeReservation() {
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
-    const { t } = useTranslation();
-    
+    const { t } = useTranslation(); 
     const { userId } = useAuth();
     const { tracks, loading, error } = useTracks(token!);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
@@ -27,62 +27,7 @@ function MakeReservation() {
     const isAvailable = useTrackAvailability(selectedTrackId, startDate, endDate, token);
     const cost = useCost(equipmentQuantities, equipmentList);
     const trackInfo = useTrackDetails(selectedTrackId, tracks, t);
-
-    const addNotificationPl = async (title: string, description: string) => {
-        if (!userId) return;
-
-        try {
-            const res = await fetch('/api/notifications', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    Title: title,
-                    Description: description,
-                    TimeStamp: new Date().toISOString(),
-                    IsRead: false,
-                    Language: "pl",
-                    UserId: userId
-                }),
-            });
-
-            if (!res.ok) {
-                throw new Error(t("notification.notificationAddError"));
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const addNotificationEn = async (title: string, description: string) => {
-        if (!userId) return;
-
-        try {
-            const res = await fetch('/api/notifications', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    Title: title,
-                    Description: description,
-                    TimeStamp: new Date().toISOString(),
-                    IsRead: false,
-                    Language: "en",
-                    UserId: userId
-                }),
-            });
-
-            if (!res.ok) {
-                throw new Error(t("notification.notificationAddError"));
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
+    const { addNotification } = useNotifications(token, userId!, t);
 
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
@@ -157,14 +102,16 @@ function MakeReservation() {
             if (!res.ok) throw new Error(t("makeReservations.reservationError"));
             alert(t("makeReservations.reservationPositive"));
 
-            await addNotificationPl(
+            await addNotification(
                 `Zarezerwowano tor ${track?.name}`,
-                `Twoja rezerwacja zaczyna się w dniu  ${new Date(startDate).toLocaleString()}`
+                `Twoja rezerwacja zaczyna się w dniu  ${new Date(startDate).toLocaleString()}`,
+                "pl"
             );
 
-            await addNotificationEn(
+            await addNotification(
                 `Track reserved ${track?.name}`,
-                `Your reservation starts on ${new Date(startDate).toLocaleString()}`
+                `Your reservation starts on ${new Date(startDate).toLocaleString()}`,
+                "en"
             );
 
             navigate('/');
