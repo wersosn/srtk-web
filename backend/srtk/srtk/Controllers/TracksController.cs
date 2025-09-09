@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
@@ -13,16 +14,19 @@ namespace srtk.Controllers
     public class TracksController : ControllerBase
     {
         private readonly TrackService service;
+        private readonly ILogger<TracksController> logger;
 
-        public TracksController(TrackService service)
+        public TracksController(TrackService service, ILogger<TracksController> logger)
         {
             this.service = service;
+            this.logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<TrackDto>>> GetAllTracks()
         {
             var tracks = await service.GetAll();
+            logger.LogInformation("Pobrano wszystkie tory, ilość: {Count}", tracks.Count);
             return Ok(tracks);
         }
 
@@ -49,9 +53,11 @@ namespace srtk.Controllers
                 }
                 else
                 {
+                    logger.LogWarning("Nieprawidłowy FacilityId w tokenie");
                     return BadRequest("Nieprawidłowy FacilityId w tokenie");
                 }
             }
+            logger.LogInformation("Pobrano wszystkie tory w obiekcie z Id: {FacilityId}, ilość: {Count}", facilityId, tracks.Count);
             return Ok(tracks);
         }
 
@@ -61,17 +67,20 @@ namespace srtk.Controllers
             var track = await service.GetById(id);
             if (track == null)
             {
+                logger.LogWarning("Nie znaleziono toru z Id {Id}", id);
                 return NotFound();
             }
+            logger.LogInformation("Znaleziono tor z Id {Id}: {Name}", id, track.Name);
             return Ok(track);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<TrackDto>> AddTrack(TrackDto track)
+        public async Task<ActionResult<TrackDto>> AddTrack(TrackDto dto)
         {
-            var t = await service.Add(track);
-            return CreatedAtAction(nameof(GetTrackById), new { id = t.Id }, t);
+            var track = await service.Add(dto);
+            logger.LogInformation("Dodano nowy tor: {Name}", track.Name);
+            return CreatedAtAction(nameof(GetTrackById), new { id = track.Id }, track);
         }
 
         [HttpPut("{id}")]
@@ -81,8 +90,10 @@ namespace srtk.Controllers
             var track = await service.Update(id, dto);
             if (track == null)
             {
+                logger.LogWarning("Nie znaleziono toru z Id {Id}", id);
                 return NotFound("Tor nie istnieje");
             }
+            logger.LogInformation("Zmodyfikowano tor z Id {Id}: {Name}", id, dto.Name);
             return Ok(track);
         }
 
@@ -93,8 +104,10 @@ namespace srtk.Controllers
             var track = await service.Delete(id);
             if (!track)
             {
+                logger.LogWarning("Nie udało się usunąć toru z Id {Id}", id);
                 return NotFound();
             }
+            logger.LogInformation("Usunięto tor z Id {Id}", id);
             return Ok(new { message = "Tor został usunięty" });
         }
     }

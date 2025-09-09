@@ -24,6 +24,7 @@ namespace srtk.Controllers
         public async Task<ActionResult<List<StatusDto>>> GetAllStatuses()
         {
             var statuses = await service.GetAll();
+            logger.LogInformation("Pobrano wszystkie statusy, ilość: {Count}", statuses.Count);
             return Ok(statuses);
         }
 
@@ -33,18 +34,20 @@ namespace srtk.Controllers
             var status = await service.GetById(id);
             if (status == null)
             {
+                logger.LogWarning("Nie znaleziono statusu z Id {Id}", id);
                 return NotFound();
             }
+            logger.LogInformation("Znaleziono status z Id {Id}: {Name}", id, status.Name);
             return Ok(status);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<StatusDto>> AddStatus(StatusDto status)
+        public async Task<ActionResult<StatusDto>> AddStatus(StatusDto dto)
         {
-            logger.LogInformation("Nowy status: {@Status}", status);
-            var s = await service.Add(status);
-            return CreatedAtAction(nameof(GetStatusById), new { id = s.Id }, s); // Zwracam DTO, aby zachować separację warstw
+            var status = await service.Add(dto);
+            logger.LogInformation("Dodano nowy status: {Name}", status.Name);
+            return CreatedAtAction(nameof(GetStatusById), new { id = status.Id }, status); // Zwracam DTO, aby zachować separację warstw
         }
 
         [HttpPut("{id}")]
@@ -54,8 +57,10 @@ namespace srtk.Controllers
             var status = await service.Update(id, dto);
             if (status == null)
             {
+                logger.LogWarning("Nie znaleziono statusu z Id {Id}", id);
                 return NotFound("Status nie istnieje");
             }
+            logger.LogInformation("Zmodyfikowano status z Id {Id}: {Name}", id, dto.Name);
             return Ok(status);
         }
 
@@ -66,8 +71,10 @@ namespace srtk.Controllers
             var status = await service.Delete(id);
             if (!status)
             {
+                logger.LogWarning("Nie udało się usunąć statusu z Id {Id}", id);
                 return NotFound();
             }
+            logger.LogInformation("Usunięto status z Id {Id}", id);
             return Ok(new { message = "Status został usunięty" });
         }
     }

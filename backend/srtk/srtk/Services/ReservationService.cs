@@ -217,7 +217,7 @@ namespace srtk.Services
                 );
         }
 
-        public async virtual Task<List<ReservationDto>> GetUpcomingNotifications(int userId)
+        public async virtual Task<List<ReservationDto>> GetUpcomingReservations(int userId)
         {
             var now = DateTime.UtcNow;
             return await context.Reservations
