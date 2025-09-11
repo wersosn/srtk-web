@@ -14,14 +14,14 @@ namespace srtk.Mappings
                 End = reservation.End,
                 Cost = reservation.Cost,
                 TrackId = reservation.TrackId,
-                TrackName = reservation.Track.Name,
+                TrackName = reservation.Track?.Name ?? "",
                 StatusId = reservation.StatusId,
-                StatusName = reservation.Status.Name,
+                StatusName = reservation.Status?.Name ?? "",
                 EquipmentReservations = reservation.EquipmentReservations
                         .Select(er => new EquipmentReservationDto
                         {
                             EquipmentId = er.EquipmentId,
-                            Name = er.Equipment.Name,
+                            Name = er.Equipment?.Name ?? "",
                             Quantity = er.Quantity
                         })
                         .ToList()

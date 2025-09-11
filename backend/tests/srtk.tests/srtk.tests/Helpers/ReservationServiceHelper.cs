@@ -2,6 +2,7 @@
 using srtk.DTO;
 using srtk.Models;
 using srtk.Services;
+using srtk.Mappings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,13 @@ namespace srtk.tests.Helpers
             context.Reservations.Add(reservation);
             await context.SaveChangesAsync();
             return reservation;
+        }
+
+        public override async Task<List<ReservationDto>> GetAll()
+        {
+            return await context.Reservations
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public override async Task<List<ReservationDto>> GetUserReservations(int userId)

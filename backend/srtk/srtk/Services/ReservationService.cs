@@ -22,7 +22,7 @@ namespace srtk.Services
             this.emailService = emailService;
         }
 
-        public async Task<List<ReservationDto>> GetAll()
+        public async virtual Task<List<ReservationDto>> GetAll()
         {
             return await context.Reservations
                 .Include(r => r.User)

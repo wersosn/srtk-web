@@ -33,20 +33,32 @@ namespace srtk.tests.Tests
             var context = DbContextHelper.GetDbContext();
             var service = new ReservationServiceHelper(context, emailService);
             var userService = new UserService(context);
+            var trackService = new TrackService(context);
             var user = new User
             {
                 Email = "test@test.pl",
                 Password = "test123",
                 RoleId = 1
             };
-            await userService.Add(user);
+            var u = await userService.Add(user);
+
+            var track = new TrackDto
+            {
+                Name = "Tor 1",
+                Length = 100,
+                TypeOfSurface = "Beton",
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
+            };
+            var t = await trackService.Add(track);
 
             var reservation = new Reservation
             {
                 Start = DateTime.Now,
                 End = DateTime.MaxValue,
-                UserId = user.Id,
-                TrackId = 1
+                UserId = u.Id,
+                TrackId = t.Id
             };
             await service.Add(reservation);
 
@@ -54,8 +66,8 @@ namespace srtk.tests.Tests
             {
                 Start = DateTime.MinValue,
                 End = DateTime.MaxValue,
-                UserId = user.Id,
-                TrackId = 1
+                UserId = u.Id,
+                TrackId = t.Id
             };
             await service.Add(reservation2);
 
@@ -135,6 +147,7 @@ namespace srtk.tests.Tests
 
             var track = new TrackDto
             { 
+                Id = 1,
                 Name = "Tor 1", 
                 Length = 100, 
                 TypeOfSurface = "Beton",
@@ -142,25 +155,14 @@ namespace srtk.tests.Tests
                 ClosingHour = new TimeSpan(20, 0, 0),
                 AvailableDays = "Poniedziałek,Wtorek,Czwartek"
             };
-            await trackService.Add(track);
-
-            var track2 = new TrackDto
-            { 
-                Name = "Tor 2", 
-                Length = 200, 
-                TypeOfSurface = "Asfalt",
-                OpeningHour = new TimeSpan(10, 0, 0),
-                ClosingHour = new TimeSpan(20, 0, 0),
-                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
-            };
-            await trackService.Add(track2);
+            var t = await trackService.Add(track);
 
             var reservation = new Reservation
             {
                 Start = DateTime.Now,
                 End = DateTime.Now.AddHours(2),
                 UserId = user.Id,
-                TrackId = track.Id
+                TrackId = t.Id
             };
             await service.Add(reservation);
 
@@ -169,14 +171,14 @@ namespace srtk.tests.Tests
                 Start = DateTime.MinValue,
                 End = DateTime.Now.AddHours(5),
                 UserId = user.Id,
-                TrackId = track2.Id
+                TrackId = t.Id
             };
             await service.Add(reservation2);
 
-            var result = await service.GetAllInTrack(track.Id);
+            var result = await service.GetAllInTrack(t.Id);
             Assert.Single(result);
-            Assert.Equal(track.Id, result[0].TrackId);
-            output.WriteLine($"Wynik dla {track.Name}: " + result.Count);
+            Assert.Equal(t.Id, result[0].TrackId);
+            output.WriteLine($"Wynik dla {t.Name}: " + result.Count);
         }
 
         // Test - pobranie rezerwacji z danym statusem:
