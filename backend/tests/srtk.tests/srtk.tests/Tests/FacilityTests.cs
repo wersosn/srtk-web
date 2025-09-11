@@ -54,6 +54,7 @@ namespace srtk.tests.Tests
             var service = new FacilityService(context);
             var facility = new FacilityDto
             {
+                Id = 1,
                 Name = "Duży obiekt",
                 City = "Białystok",
                 Address = "ul. Sportowa 1"
@@ -105,6 +106,7 @@ namespace srtk.tests.Tests
             var service = new FacilityService(context);
             var facility = new FacilityDto
             {
+                Id = 1,
                 Name = "Duży obiekt",
                 City = "Białystok",
                 Address = "ul. Sportowa 1"
@@ -136,6 +138,7 @@ namespace srtk.tests.Tests
             var service = new FacilityService(context);
             var facility = new FacilityDto
             {
+                Id = 1,
                 Name = "Duży obiekt",
                 City = "Białystok",
                 Address = "ul. Sportowa 1"

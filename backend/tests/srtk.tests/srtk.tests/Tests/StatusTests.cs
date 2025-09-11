@@ -53,6 +53,7 @@ namespace srtk.tests.Tests
             var service = new StatusService(context);
             var status = new StatusDto
             {
+                Id = 1,
                 Name = "Zarezerwowano"
             };
             await service.Add(status);
@@ -96,6 +97,7 @@ namespace srtk.tests.Tests
             var service = new StatusService(context);
             var status = new StatusDto
             {
+                Id = 1,
                 Name = "Zarezerwowano"
             };
             await service.Add(status);
@@ -121,6 +123,7 @@ namespace srtk.tests.Tests
             var service = new StatusService(context);
             var status = new StatusDto
             {
+                Id = 1,
                 Name = "Zarezerwowano"
             };
             await service.Add(status);

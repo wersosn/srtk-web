@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace srtk.tests.Tests
 {
@@ -62,14 +63,13 @@ namespace srtk.tests.Tests
                 City = "Białystok",
                 Address = "ul. Sportowa 1"
             };
-            await facilityService.Add(facility);
+            var f = await facilityService.Add(facility);
 
             var eq = new EquipmentDto
             {
                 Name = "Rower",
                 Type = "Górski",
-                Cost = 50,
-                FacilityId = 1234
+                Cost = 50
             };
             await service.Add(eq);
 
@@ -78,11 +78,11 @@ namespace srtk.tests.Tests
                 Name = "Rower",
                 Type = "BMX",
                 Cost = 80,
-                FacilityId = facility.Id
+                FacilityId = f.Id
             };
             await service.Add(eq2);
 
-            var result = await service.GetAllInFacility(facility.Id);
+            var result = await service.GetAllInFacility(f.Id);
 
             Assert.NotNull(result);
             Assert.Single(result);
@@ -97,7 +97,7 @@ namespace srtk.tests.Tests
             var service = new EquipmentService(context);
             var eq = new EquipmentDto
             {
-                Id = 33,
+                Id = 1,
                 Name = "Rower",
                 Type = "Górski",
                 Cost = 50
@@ -150,6 +150,7 @@ namespace srtk.tests.Tests
             var service = new EquipmentService(context);
             var eq = new EquipmentDto
             {
+                Id = 1,
                 Name = "Rower",
                 Type = "Miejski",
                 Cost = 60
@@ -181,6 +182,7 @@ namespace srtk.tests.Tests
             var service = new EquipmentService(context);
             var eq = new EquipmentDto
             {
+                Id = 1,
                 Name = "Rower",
                 Type = "Miejski",
                 Cost = 60

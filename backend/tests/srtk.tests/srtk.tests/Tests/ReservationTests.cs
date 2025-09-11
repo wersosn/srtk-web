@@ -444,6 +444,7 @@ namespace srtk.tests.Tests
 
             var reservation = new Reservation
             {
+                Id = 1,
                 Start = DateTime.Now,
                 End = DateTime.MaxValue,
                 UserId = user.Id,

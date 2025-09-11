@@ -109,6 +109,7 @@ namespace srtk.tests.Tests
             var service = new TrackService(context);
             var track = new TrackDto
             {
+                Id = 1,
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
                 Length = 1000,
@@ -120,6 +121,7 @@ namespace srtk.tests.Tests
 
             var track2 = new TrackDto
             {
+                Id = 2,
                 Name = "Tor 2",
                 TypeOfSurface = "Asfalt",
                 Length = 200,
@@ -172,6 +174,7 @@ namespace srtk.tests.Tests
             var service = new TrackService(context);
             var track = new TrackDto
             {
+                Id = 1,
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
                 Length = 1000,
@@ -210,6 +213,7 @@ namespace srtk.tests.Tests
             var service = new TrackService(context);
             var track = new TrackDto
             {
+                Id = 1,
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
                 Length = 1000,

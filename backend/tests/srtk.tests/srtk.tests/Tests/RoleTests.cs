@@ -54,6 +54,7 @@ namespace srtk.tests.Tests
             var service = new RoleService(context);
             var role = new RoleDto
             {
+                Id = 1,
                 Name = "Klient"
             };
             await service.Add(role);
@@ -97,6 +98,7 @@ namespace srtk.tests.Tests
             var service = new RoleService(context);
             var role = new RoleDto
             {
+                Id = 1,
                 Name = "Klient"
             };
             await service.Add(role);
@@ -122,6 +124,7 @@ namespace srtk.tests.Tests
             var service = new RoleService(context);
             var role = new RoleDto
             {
+                Id = 1,
                 Name = "Klient"
             };
             await service.Add(role);

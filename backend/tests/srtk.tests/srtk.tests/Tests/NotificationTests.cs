@@ -40,6 +40,7 @@ namespace srtk.tests.Tests
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
                 UserId = user.Id,
+                Language = "pl"
             };
             await service.Add(notif);
 
@@ -69,7 +70,8 @@ namespace srtk.tests.Tests
             {
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
-                UserId = user.Id
+                UserId = user.Id,
+                Language = "pl"
             };
             await service.Add(notif);
 
@@ -100,7 +102,8 @@ namespace srtk.tests.Tests
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
                 UserId = user.Id,
-                IsRead = true
+                IsRead = true,
+                Language = "pl"
             };
             await service.Add(notif);
 
@@ -108,7 +111,8 @@ namespace srtk.tests.Tests
             {
                 Title = "Anulowano rezerwację",
                 Description = "Anulowano rezerwację na tor kolarski",
-                UserId = user.Id
+                UserId = user.Id,
+                Language = "pl"
             };
             await service.Add(notif2);
 
@@ -139,7 +143,8 @@ namespace srtk.tests.Tests
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
                 UserId = user.Id,
-                IsRead = true
+                IsRead = true,
+                Language = "pl"
             };
             await service.Add(notif);
 
@@ -148,7 +153,8 @@ namespace srtk.tests.Tests
                 Title = "Anulowano rezerwację",
                 Description = "Anulowano rezerwację na tor kolarski",
                 UserId = user.Id,
-                IsRead = true
+                IsRead = true,
+                Language = "pl"
             };
             await service.Add(notif2);
 
@@ -176,10 +182,12 @@ namespace srtk.tests.Tests
 
             var notif = new NotificationDto
             {
+                Id = 1,
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
                 UserId = user.Id,
-                IsRead = true
+                IsRead = true,
+                Language = "pl"
             };
             await service.Add(notif);
 
@@ -188,7 +196,8 @@ namespace srtk.tests.Tests
                 Title = "Anulowano rezerwację",
                 Description = "Anulowano rezerwację na tor kolarski",
                 UserId = user.Id,
-                IsRead = true
+                IsRead = true,
+                Language = "pl"
             };
             await service.Add(notif2);
 
@@ -218,7 +227,8 @@ namespace srtk.tests.Tests
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
                 UserId = user.Id,
-                IsRead = true
+                IsRead = true,
+                Language = "pl"
             };
 
             var result = await service.Add(notif);
@@ -249,10 +259,12 @@ namespace srtk.tests.Tests
 
             var notif = new NotificationDto
             {
+                Id = 1,
                 Title = "Dodano rezerwację",
                 Description = "Dodano nową rezerwację na tor kolarski",
                 UserId = user.Id,
-                IsRead = true
+                IsRead = true,
+                Language = "pl"
             };
             await service.Add(notif);
 
