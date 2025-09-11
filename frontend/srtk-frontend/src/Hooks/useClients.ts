@@ -7,7 +7,7 @@ export const useClients = (token: string | null) => {
     const [loadingClients, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
+    const fetchClients = () => {
         if (!token) {
             return;
         }
@@ -19,7 +19,11 @@ export const useClients = (token: string | null) => {
             .then(data => setClients(data))
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchClients();
     }, [token]);
 
-    return { clients, setClients, loadingClients, error };
+    return { clients, setClients, loadingClients, error, refreshClients: fetchClients };
 };

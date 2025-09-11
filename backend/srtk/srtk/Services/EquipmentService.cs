@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Mappings;
 
 namespace srtk.Services
 {
@@ -18,29 +19,13 @@ namespace srtk.Services
         public async Task<List<EquipmentDto>> GetAll()
         {
             var equipments = await context.Equipments.ToListAsync();
-            var list = equipments.Select(e => new EquipmentDto
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Type = e.Type,
-                Cost = e.Cost,
-                FacilityId = e.FacilityId
-            }).ToList();
-            return list;
+            return equipments.Select(e => e.ToDto()).ToList();
         }
 
         public async Task<List<EquipmentDto>> GetAllInFacility(int facilityId)
         {
             var equipments = await context.Equipments.Where(e => e.FacilityId == facilityId).ToListAsync();
-            var list = equipments.Select(e => new EquipmentDto
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Type = e.Type,
-                Cost = e.Cost,
-                FacilityId = e.FacilityId
-            }).ToList();
-            return list;
+            return equipments.Select(e => e.ToDto()).ToList();
         }
 
         public async Task<EquipmentDto?> GetById(int id)
@@ -50,41 +35,15 @@ namespace srtk.Services
             {
                 return null;
             }
-
-            var eDto = new EquipmentDto
-            {
-                Id = equipment.Id,
-                Name = equipment.Name,
-                Type = equipment.Type,
-                Cost = equipment.Cost,
-                FacilityId = equipment.FacilityId
-            };
-
-            return eDto;
+            return equipment.ToDto();
         }
 
         public async Task<EquipmentDto> Add(EquipmentDto dto)
         {
-            var equipment = new Equipment
-            {
-                Name = dto.Name,
-                Type = dto.Type,
-                Cost = dto.Cost,
-                FacilityId = dto.FacilityId
-            };
-
+            var equipment = dto.ToEquipment();
             context.Equipments.Add(equipment);
             await context.SaveChangesAsync();
-
-            var eDto = new EquipmentDto
-            {
-                Id = equipment.Id,
-                Name = equipment.Name,
-                Type = equipment.Type,
-                Cost = equipment.Cost,
-                FacilityId = equipment.FacilityId
-            };
-            return eDto;
+            return equipment.ToDto();
         }
 
         public async Task<EquipmentDto?> Update(int id, [FromBody] EquipmentDto dto)
@@ -99,16 +58,7 @@ namespace srtk.Services
             equipment.Type = dto.Type;
             equipment.FacilityId = dto.FacilityId;
             await context.SaveChangesAsync();
-
-            var eDto = new EquipmentDto
-            {
-                Id = equipment.Id,
-                Name = equipment.Name,
-                Type = equipment.Type,
-                Cost = equipment.Cost,
-                FacilityId = equipment.FacilityId
-            };
-            return eDto;
+            return equipment.ToDto();
         }
 
         public async Task<bool> Delete(int id)

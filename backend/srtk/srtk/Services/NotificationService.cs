@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using srtk.Models;
 using srtk.DTO;
+using srtk.Mappings;
 using System.Data;
-using Microsoft.AspNetCore.SignalR;
 
 namespace srtk.Services
 {
@@ -19,30 +18,14 @@ namespace srtk.Services
         public async Task<List<NotificationDto>> GetAll()
         {
             var notifications = await context.Notifications.ToListAsync();
-            var list = notifications.Select(n => new NotificationDto
-            {
-                Id = n.Id,
-                Title = n.Title,
-                Description = n.Description,
-                TimeStamp = n.TimeStamp,
-                IsRead = n.IsRead,
-                UserId = n.UserId
-            }).ToList();
-            return list;
+            return notifications.Select(n => n.ToDto()).ToList();
         }
 
         public async Task<List<NotificationDto>> GetPolishForUser(int userId)
         {
             var notifications = await context.Notifications
                 .Where(n => n.UserId == userId && n.Language == "pl")
-                .Select(n => new NotificationDto
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    TimeStamp = n.TimeStamp,
-                    IsRead = n.IsRead
-                })
+                .Select(n => n.ToDto())
                 .ToListAsync();
             return notifications;
         }
@@ -51,14 +34,7 @@ namespace srtk.Services
         {
             var notifications = await context.Notifications
                 .Where(n => n.UserId == userId && n.Language == "en")
-                .Select(n => new NotificationDto
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    TimeStamp = n.TimeStamp,
-                    IsRead = n.IsRead
-                })
+                .Select(n => n.ToDto())
                 .ToListAsync();
             return notifications;
         }
@@ -67,14 +43,7 @@ namespace srtk.Services
         {
             var notifications = await context.Notifications
                 .Where(n => n.UserId == userId)
-                .Select(n => new NotificationDto
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    TimeStamp = n.TimeStamp,
-                    IsRead = n.IsRead
-                })
+                .Select(n => n.ToDto())
                 .ToListAsync();
             return notifications;
         }
@@ -83,14 +52,7 @@ namespace srtk.Services
         {
             var notifications = await context.Notifications
                 .Where(u => u.UserId == userId && u.IsRead == false)
-                .Select(n => new NotificationDto
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    TimeStamp = n.TimeStamp,
-                    IsRead = n.IsRead
-                })
+                .Select(n => n.ToDto())
                 .ToListAsync();
             return notifications;
         }
@@ -99,14 +61,7 @@ namespace srtk.Services
         {
             var notifications = await context.Notifications
                 .Where(u => u.UserId == userId && u.IsRead == true)
-                .Select(n => new NotificationDto
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    TimeStamp = n.TimeStamp,
-                    IsRead = n.IsRead
-                })
+                .Select(n => n.ToDto())
                 .ToListAsync();
             return notifications;
         }
@@ -118,17 +73,7 @@ namespace srtk.Services
             {
                 return null;
             }
-
-            var dto = new NotificationDto
-            {
-                Id = notification.Id,
-                Title = notification.Title,
-                Description = notification.Description,
-                TimeStamp = notification.TimeStamp,
-                IsRead = notification.IsRead,
-                UserId = notification.UserId
-            };
-            return dto;
+            return notification.ToDto();
         }
 
         public async Task MarkAllAsRead(int userId)
@@ -143,27 +88,10 @@ namespace srtk.Services
 
         public async Task<NotificationDto> Add(NotificationDto dto)
         {
-            var notification = new Notification
-            {
-                Title = dto.Title,
-                Description = dto.Description,
-                TimeStamp = dto.TimeStamp,
-                IsRead = dto.IsRead,
-                Language = dto.Language,
-                UserId = dto.UserId
-            };
+            var notification = dto.ToNotification();
             context.Notifications.Add(notification);
             await context.SaveChangesAsync();
-            return new NotificationDto
-            {
-                Id = notification.Id,
-                Title = notification.Title,
-                Description = notification.Description,
-                TimeStamp = notification.TimeStamp,
-                IsRead = notification.IsRead,
-                Language = notification.Language,
-                UserId = notification.UserId
-            };
+            return notification.ToDto();
         }
 
         public async Task<bool> Delete(int id)

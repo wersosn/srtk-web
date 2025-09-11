@@ -22,8 +22,8 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
     const [surname, setSurname] = useState(currentSurname);
     const [phoneNumber, setPhoneNumber] = useState(currentPhoneNumber);
     const [roleId, setRoleId] = useState(currentRoleId);
-    const { facilityId } = useAuth();
-    const [facilityID, setFacilityId] = useState(currentFacilityId);
+    const { facilityId: authFacilityId } = useAuth();
+    const [facilityId, setFacilityId] = useState(currentFacilityId);
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
@@ -33,10 +33,10 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
 
     useEffect(() => {
         if (token) {
-            if (!isNaN(facilityId!)) {
-                setAdminInFacility(facilityId);
-                if (facilityId !== 0) {
-                    setFacilityId(facilityId!);
+            if (!isNaN(authFacilityId!)) {
+                setAdminInFacility(authFacilityId);
+                if (authFacilityId !== 0) {
+                    setFacilityId(authFacilityId!);
                 }
             }
         }
@@ -49,6 +49,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 console.error(t("api.facilityError"));
             }
         };
+        
         const fetchRoles = async () => {
             try {
                 const data = await getAllRoles(token!);
@@ -95,10 +96,10 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 setMessage('');
             } else {
                 const error = await response.text();
-                setMessage( t("universal.error") + error);
+                setMessage(t("universal.error") + error);
             }
         } catch (err: any) {
-            setMessage( t("universal.error") + err.message);
+            setMessage(t("universal.error") + err.message);
         }
     };
 
@@ -137,10 +138,10 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                     )}
 
                     {roleId === 2 && (
-                        adminInFacility === 0 ? (
+                        authFacilityId === 0 ? (
                             <div>
                                 <label>{t("user.facility")}</label>
-                                <select id="facilitySelect" value={facilityID} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
+                                <select id="facilitySelect" value={facilityId} onChange={(e) => setFacilityId(Number(e.target.value))} className="info-input">
                                     <option value="">{t("user.selectFacility")}</option>
                                     {facilities.map((f) => (
                                         <option key={f.id} value={f.id}>

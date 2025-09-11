@@ -2,14 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Mappings;
 using ClosedXML.Excel;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using System.Globalization;
 using Track = srtk.Models.Track;
-using DocumentFormat.OpenXml.Office2019.Presentation;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace srtk.Services
 {
@@ -32,52 +30,21 @@ namespace srtk.Services
                 .Include(r => r.Status)
                 .Include(r => r.EquipmentReservations)
                 .ThenInclude(er => er.Equipment)
-                .Select(r => new ReservationDto
-                {
-                    Id = r.Id,
-                    Start = r.Start,
-                    End = r.End,
-                    Cost = r.Cost,
-                    TrackId = r.TrackId,
-                    TrackName = r.Track.Name,
-                    StatusId = r.StatusId,
-                    StatusName = r.Status.Name,
-                    EquipmentReservations = r.EquipmentReservations
-                        .Select(er => new EquipmentReservationDto
-                        {
-                            EquipmentId = er.EquipmentId,
-                            Name = er.Equipment.Name,
-                            Quantity = er.Quantity
-                        })
-                        .ToList()
-                }).ToListAsync();
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public async Task<List<ReservationDto>> GetAllInTrack(int trackId)
         {
             return await context.Reservations
                 .Where(r => r.TrackId == trackId)
+                .Include(r => r.Track)
                 .Include(r => r.User)
                 .Include(r => r.Status)
                 .Include(r => r.EquipmentReservations)
                 .ThenInclude(er => er.Equipment)
-                .Select(r => new ReservationDto
-                {
-                    Id = r.Id,
-                    Start = r.Start,
-                    End = r.End,
-                    Cost = r.Cost,
-                    TrackId = r.TrackId,
-                    TrackName = r.Track.Name,
-                    StatusId = r.StatusId,
-                    StatusName = r.Status.Name,
-                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
-                    {
-                        EquipmentId = er.EquipmentId,
-                        Name = er.Equipment.Name,
-                        Quantity = er.Quantity
-                    }).ToList()
-                }).ToListAsync();
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public async Task<List<ReservationDto>> GetAllWithStatus(int statusId)
@@ -88,23 +55,8 @@ namespace srtk.Services
                 .Include(r => r.Status)
                 .Include(r => r.EquipmentReservations)
                 .ThenInclude(er => er.Equipment)
-                .Select(r => new ReservationDto
-                {
-                    Id = r.Id,
-                    Start = r.Start,
-                    End = r.End,
-                    Cost = r.Cost,
-                    TrackId = r.TrackId,
-                    TrackName = r.Track.Name,
-                    StatusId = r.StatusId,
-                    StatusName = r.Status.Name,
-                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
-                    {
-                        EquipmentId = er.EquipmentId,
-                        Name = er.Equipment.Name,
-                        Quantity = er.Quantity
-                    }).ToList()
-                }).ToListAsync();
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public async virtual Task<List<ReservationDto>> GetUserReservations(int userId)
@@ -115,37 +67,15 @@ namespace srtk.Services
                 .Include(r => r.Status)
                 .Include(r => r.EquipmentReservations)
                 .ThenInclude(er => er.Equipment)
-                .Select(r => new ReservationDto
-                {
-                    Id = r.Id,
-                    Start = r.Start,
-                    End = r.End,
-                    Cost = r.Cost,
-                    TrackId = r.TrackId,
-                    TrackName = r.Track.Name,
-                    StatusId = r.StatusId,
-                    StatusName = r.Status.Name,
-                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
-                    {
-                        EquipmentId = er.EquipmentId,
-                        Name = er.Equipment.Name,
-                        Quantity = er.Quantity
-                    }).ToList()
-                }).ToListAsync();
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public async Task<List<EquipmentReservationDto>> GetEquipments(int reservationId)
         {
             return await context.EquipmentReservations
                 .Where(er => er.ReservationId == reservationId)
-                .Select(er => new EquipmentReservationDto
-                {
-                    EquipmentId = er.EquipmentId,
-                    Name = er.Equipment!.Name,
-                    Type = er.Equipment!.Type,
-                    Cost = er.Equipment.Cost,
-                    Quantity = er.Quantity
-                })
+                .Select(er => er.ToDto())
                 .ToListAsync();
         }
 
@@ -157,23 +87,8 @@ namespace srtk.Services
                 .Include(r => r.Status)
                 .Include(r => r.EquipmentReservations)
                 .ThenInclude(er => er.Equipment)
-                .Select(r => new ReservationDto
-                {
-                    Id = r.Id,
-                    Start = r.Start,
-                    End = r.End,
-                    Cost = r.Cost,
-                    TrackId = r.TrackId,
-                    TrackName = r.Track.Name,
-                    StatusId = r.StatusId,
-                    StatusName = r.Status.Name,
-                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
-                    {
-                        EquipmentId = er.EquipmentId,
-                        Name = er.Equipment.Name,
-                        Quantity = er.Quantity
-                    }).ToList()
-                }).ToListAsync();
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public async Task<List<ReservationDto>> GetByEndDateAndHour(DateTime date, TimeSpan hour)
@@ -184,23 +99,8 @@ namespace srtk.Services
                 .Include(r => r.Status)
                 .Include(r => r.EquipmentReservations)
                 .ThenInclude(er => er.Equipment)
-                .Select(r => new ReservationDto
-                {
-                    Id = r.Id,
-                    Start = r.Start,
-                    End = r.End,
-                    Cost = r.Cost,
-                    TrackId = r.TrackId,
-                    TrackName = r.Track.Name,
-                    StatusId = r.StatusId,
-                    StatusName = r.Status.Name,
-                    EquipmentReservations = r.EquipmentReservations.Select(er => new EquipmentReservationDto
-                    {
-                        EquipmentId = er.EquipmentId,
-                        Name = er.Equipment.Name,
-                        Quantity = er.Quantity
-                    }).ToList()
-                }).ToListAsync();
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public async virtual Task<bool> IsTrackAvailable(int trackId, DateTime start, DateTime end, int? reservationId = null)
@@ -223,16 +123,8 @@ namespace srtk.Services
             return await context.Reservations
                 .Where(r => r.UserId == userId && r.Start > now && r.Start <= now.AddHours(1))
                 .Include(r => r.Track)
-                .Select(r => new ReservationDto
-                {
-                    Id = r.Id,
-                    Start = r.Start,
-                    End = r.End,
-                    Cost = r.Cost,
-                    TrackId = r.TrackId,
-                    TrackName = r.Track.Name,
-                    StatusName = r.Status.Name
-                }).ToListAsync();
+                .Select(r => r.ToDto())
+                .ToListAsync();
         }
 
         public async virtual Task<Reservation?> GetById(int id)

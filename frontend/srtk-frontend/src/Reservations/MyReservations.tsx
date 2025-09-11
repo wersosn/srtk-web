@@ -109,7 +109,7 @@ function MyReservations() {
     };
 
     // Obsługa eksportu:
-    const handleExport = (reservationId: Number) => {
+    const handleExport = (reservationId: number) => {
         window.location.href = `/api/reservations/exportPdf?reservationId=${reservationId}`;
     };
 

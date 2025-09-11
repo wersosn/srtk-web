@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Mappings;
 
 namespace srtk.Services
 {
@@ -16,12 +17,7 @@ namespace srtk.Services
         public async Task<List<StatusDto>> GetAll()
         {
             var statuses = await context.Statuses.ToListAsync();
-            var list = statuses.Select(s => new StatusDto
-            {
-                Id = s.Id,
-                Name = s.Name
-            }).ToList();
-            return list;
+            return statuses.Select(s => s.ToDto()).ToList();
         }
 
         public async Task<StatusDto?> GetById(int id)
@@ -31,22 +27,15 @@ namespace srtk.Services
             {
                 return null;
             }
-
-            var sDto = new StatusDto
-            {
-                Id = status.Id,
-                Name = status.Name
-            };
-
-            return sDto;
+            return status.ToDto();
         }
 
         public async Task<StatusDto> Add(StatusDto dto)
         {
-            var status = new Status { Name = dto.Name };
+            var status = dto.ToStatus();
             context.Statuses.Add(status);
             await context.SaveChangesAsync();
-            return new StatusDto { Id = status.Id, Name = status.Name };
+            return status.ToDto();
         }
 
         public async Task<StatusDto?> Update(int id, StatusDto dto)
@@ -58,7 +47,7 @@ namespace srtk.Services
             }
             status.Name = dto.Name;
             await context.SaveChangesAsync();
-            return new StatusDto { Id = status.Id, Name = status.Name };
+            return status.ToDto();
         }
 
         public async Task<bool> Delete(int id)

@@ -20,8 +20,8 @@ function UserManagement() {
     const { userId } = useAuth();
     const [editingUser, setEditingUser] = useState<Client | Admin | null>(null);
     const [showDetails, setShowDetails] = useState<Client | Admin | null>(null);
-    const { clients, setClients, loadingClients, error } = useClients(token);
-    const { admins, setAdmins, loadingAdmins, errorAdmin } = useAdmins(token);
+    const { clients, setClients, loadingClients, error, refreshClients } = useClients(token);
+    const { admins, setAdmins, loadingAdmins, errorAdmin, refreshAdmins } = useAdmins(token);
     const { t } = useTranslation();
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
 
@@ -55,6 +55,7 @@ function UserManagement() {
                     return [...prev, updated as Client];
                 }
             });
+            refreshClients();
         } else {
             setClients(prev => prev.filter(c => c.id !== updated.id));
             setAdmins(prev => {
@@ -65,6 +66,7 @@ function UserManagement() {
                     return [...prev, updated as Admin];
                 }
             });
+            refreshAdmins();
         }
 
         if (showDetails?.id === updated.id) {
@@ -167,7 +169,7 @@ function UserManagement() {
                                     {showDetails?.id === admin.id && (
                                         <div className="mt-2 ps-2 details">
                                             <em>Admin</em> <br />
-                                            <strong>{t("user.faclityId")}:</strong> {admin.facilityId}
+                                            <strong>{t("user.facilityId")}:</strong> {admin.facilityId}
                                         </div>
                                     )}
                                 </li>

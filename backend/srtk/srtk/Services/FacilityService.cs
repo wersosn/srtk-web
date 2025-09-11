@@ -1,5 +1,6 @@
 ﻿using srtk.DTO;
 using srtk.Models;
+using srtk.Mappings;
 using Microsoft.EntityFrameworkCore;
 
 namespace srtk.Services
@@ -16,14 +17,7 @@ namespace srtk.Services
         public async Task<List<FacilityDto>> GetAll()
         {
             var facilities = await context.Facilities.ToListAsync();
-            var list = facilities.Select(f => new FacilityDto
-            {
-                Id = f.Id,
-                Name = f.Name,
-                City = f.City,
-                Address = f.Address
-            }).ToList();
-            return list;
+            return facilities.Select(f => f.ToDto()).ToList();
         }
 
         public async Task<FacilityDto?> GetById(int id)
@@ -33,24 +27,15 @@ namespace srtk.Services
             {
                 return null;
             }
-
-            var fDto = new FacilityDto
-            {
-                Id = facility.Id,
-                Name = facility.Name,
-                City = facility.City,
-                Address = facility.Address
-            };
-
-            return fDto;
+            return facility.ToDto();
         }
 
         public async Task<FacilityDto> Add(FacilityDto dto)
         {
-            var facility = new Facility { Name = dto.Name, City = dto.City, Address = dto.Address };
+            var facility = dto.ToFacility();
             context.Facilities.Add(facility);
             await context.SaveChangesAsync();
-            return new FacilityDto { Id = facility.Id, Name = facility.Name, City = facility.City, Address = facility.Address };
+            return facility.ToDto();
         }
 
         public async Task<FacilityDto?> Update(int id, FacilityDto dto)
@@ -64,7 +49,7 @@ namespace srtk.Services
             facility.City = dto.City;
             facility.Address = dto.Address;
             await context.SaveChangesAsync();
-            return new FacilityDto { Id = facility.Id, Name = facility.Name, City = facility.City, Address = facility.Address };
+            return facility.ToDto();
         }
 
         public async Task<bool> Delete(int id)

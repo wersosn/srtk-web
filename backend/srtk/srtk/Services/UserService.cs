@@ -1,10 +1,8 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
-using srtk.Migrations;
 using srtk.Models;
+using srtk.Mappings;
 
 namespace srtk.Services
 {
@@ -20,32 +18,7 @@ namespace srtk.Services
         public async Task<List<UserDto>> GetAll()
         {
             var users = await context.Users.ToListAsync();
-            var list = new List<UserDto>();
-
-            foreach (var u in users)
-            {
-                var dto = new UserDto
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    RoleId = u.RoleId
-                };
-
-                if (u is Client client)
-                {
-                    dto.Name = client.Name;
-                    dto.Surname = client.Surname;
-                    dto.PhoneNumber = client.PhoneNumber;
-                }
-
-                if (u is Admin admin)
-                {
-                    dto.FacilityId = admin.FacilityId;
-                }
-
-                list.Add(dto);
-            }
-            return list;
+            return users.Select(u => u.ToDto()).ToList();
         }
 
         public async Task<List<Client>> GetAllClients()
@@ -65,27 +38,7 @@ namespace srtk.Services
             {
                 return null;
             }
-
-            var dto = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                RoleId = user.RoleId
-            };
-
-            if (user is Client client)
-            {
-                dto.Name = client.Name;
-                dto.Surname = client.Surname;
-                dto.PhoneNumber = client.PhoneNumber;
-            }
-
-            if (user is Admin admin)
-            {
-                dto.FacilityId = admin.FacilityId;
-            }
-
-            return dto;
+            return user.ToDto();
         }
         public async Task<UserDto?> GetByEmail(string email)
         {
@@ -94,27 +47,7 @@ namespace srtk.Services
             {
                 return null;
             }
-
-            var dto = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                RoleId = user.RoleId
-            };
-
-            if (user is Client client)
-            {
-                dto.Name = client.Name;
-                dto.Surname = client.Surname;
-                dto.PhoneNumber = client.PhoneNumber;
-            }
-
-            if (user is Admin admin)
-            {
-                dto.FacilityId = admin.FacilityId;
-            }
-
-            return dto;
+            return user.ToDto();
         }
 
         public async Task<Client?> GetClientById(int id)
@@ -125,32 +58,7 @@ namespace srtk.Services
         public async Task<List<UserDto>> GetByRole(int roleId)
         {
             var users = await context.Users.Where(u => u.RoleId == roleId).ToListAsync();
-            var list = new List<UserDto>();
-
-            foreach (var u in users)
-            {
-                var dto = new UserDto
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    RoleId = u.RoleId
-                };
-
-                if (u is Client client)
-                {
-                    dto.Name = client.Name;
-                    dto.Surname = client.Surname;
-                    dto.PhoneNumber = client.PhoneNumber;
-                }
-
-                if (u is Admin admin)
-                {
-                    dto.FacilityId = admin.FacilityId;
-                }
-
-                list.Add(dto);
-            }
-            return list;
+            return users.Select(u => u.ToDto()).ToList();
         }
 
         public async Task<User> Add(User user)

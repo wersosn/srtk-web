@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
+using srtk.Mappings;
 
 namespace srtk.Services
 {
@@ -16,12 +17,7 @@ namespace srtk.Services
         public async Task<List<RoleDto>> GetAll()
         {
             var roles = await context.Roles.ToListAsync();
-            var list = roles.Select(r => new RoleDto
-            {
-                Id = r.Id,
-                Name = r.Name
-            }).ToList();
-            return list;
+            return roles.Select(r => r.ToDto()).ToList();
         }
 
         public async Task<RoleDto?> GetById(int id)
@@ -31,22 +27,15 @@ namespace srtk.Services
             {
                 return null;
             }
-
-            var rDto = new RoleDto
-            {
-                Id = role.Id,
-                Name = role.Name
-            };
-
-            return rDto;
+            return role.ToDto();
         }
 
         public async Task<RoleDto> Add(RoleDto dto)
         {
-            var role = new Role { Name = dto.Name };
+            var role = dto.ToRole();
             context.Roles.Add(role);
             await context.SaveChangesAsync();
-            return new RoleDto { Id = role.Id, Name = role.Name };
+            return role.ToDto();
         }
 
         public async Task<RoleDto?> Update(int id, RoleDto dto)
@@ -58,7 +47,7 @@ namespace srtk.Services
             }
             role.Name = dto.Name;
             await context.SaveChangesAsync();
-            return new RoleDto { Id = role.Id, Name = role.Name };
+            return role.ToDto();
         }
 
         public async Task<bool> Delete(int id)
