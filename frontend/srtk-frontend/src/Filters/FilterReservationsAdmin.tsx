@@ -9,12 +9,10 @@ interface FilterReservationsAdminProps {
     onFilterChange: (trackId?: number, statusId?: number, startDate?: string) => void;
 }
 
-
 const FilterReservationsAdmin: React.FC<FilterReservationsAdminProps> = ({ tracks, statuses, onFilterChange }) => {
     const [selectedTrackId, setSelectedTrackId] = useState<number | undefined>(undefined);
     const [selectedStatusId, setSelectedStatusId] = useState<number | undefined>(undefined);
     const [selectedStartDate, setSelectedStartDate] = useState<string | undefined>();
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     // Filtr torów:

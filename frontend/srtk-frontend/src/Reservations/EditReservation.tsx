@@ -1,69 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
-import type { Equipment, Track } from '../Types/Types';
-import { getTrackById, getAllEquipmentsInFacility, getAllEquipmentsInReservation, getTrackAvailabilityEdit } from '../Services/Api';
+import { getAllEquipmentsInReservation } from '../Services/Api';
 import { useTranslation } from "react-i18next";
+import { useTrackAvailabilityEdit } from '../Hooks/useTrackAvailabilityEdit';
+import { useCost } from '../Hooks/useCost';
+import { useTrack } from '../Hooks/useTrack';
+import { useEquipmentsInFacility } from '../Hooks/useEquipmentsInFacility';
 
 interface EditReservationProps {
     reservationId: number;
     currentStart: string;
     currentEnd: string;
-    currentCost: number;
     trackId: number;
     onUpdated: (updatedReservation: any) => void;
     onCancel: () => void;
 }
 
-const EditReservation: React.FC<EditReservationProps> = ({ reservationId, currentStart, currentEnd, currentCost, trackId, onUpdated, onCancel }) => {
+const EditReservation: React.FC<EditReservationProps> = ({ reservationId, currentStart, currentEnd, trackId, onUpdated, onCancel }) => {
+    const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const [startDate, setStartDate] = useState(formatToDatetimeLocal(currentStart));
     const [endDate, setEndDate] = useState(formatToDatetimeLocal(currentEnd));
-    const [cost, setCost] = useState(currentCost);
+    const track = useTrack(trackId, token);
     const [rentEquipment, setRentEquipment] = useState(false);
-    const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
+    const equipmentList = useEquipmentsInFacility(rentEquipment, track, token);
     const [equipmentQuantities, setEquipmentQuantities] = useState<Record<string, number>>({});
-    const [tr, setTrack] = useState<Track | null>(null);
-    const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
     const [datesChanged, setDatesChanged] = useState(false);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
-    const token = localStorage.getItem('token');
-    const { t } = useTranslation();
+    const cost = useCost(equipmentQuantities, equipmentList);
+    const { isAvailable } = useTrackAvailabilityEdit(trackId, startDate, endDate, reservationId, token!);
 
     useEffect(() => {
-        const fetchTrack = async () => {
-            try {
-                if (token) {
-                    const data = await getTrackById(trackId, token);
-                    setTrack(data);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        fetchTrack();
-    }, [trackId, token]);
-
-    useEffect(() => {
-        const fetchEquipment = async () => {
-            if (!rentEquipment) {
-                setEquipmentList([]);
-                return;
-            }
-            if (!tr) return;
-            try {
-                if (token) {
-                    const data = await getAllEquipmentsInFacility(tr.facilityId, token);
-                    setEquipmentList(data);
-                }
-            } catch (err: any) {
-                console.error(err);
-            }
-        };
-        fetchEquipment();
-    }, [rentEquipment, tr, trackId]);
-
-    useEffect(() => {
-        if (!reservationId) return;
+        if (!reservationId) {
+            return;
+        }
 
         const fetchReservationEquipments = async () => {
             try {
@@ -88,58 +59,9 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         fetchReservationEquipments();
     }, [reservationId, token]);
 
-    // Obliczanie kosztów:
-    useEffect(() => {
-        const calculateCostAndCheckAvailability = async () => {
-            if (!equipmentList.length) return;
-            const equipmentCost = Object.entries(equipmentQuantities)
-                .map(([id, qty]) => {
-                    const equipment = equipmentList.find(e => e.id === Number(id));
-                    const parsedQty = Number(qty);
-                    return (equipment?.cost || 0) * (isNaN(parsedQty) ? 0 : parsedQty);
-                })
-                .reduce((sum, val) => sum + val, 0);
-
-            setCost(equipmentCost);
-        };
-
-        calculateCostAndCheckAvailability();
-    }, [startDate, endDate, equipmentQuantities, equipmentList, tr]);
-
-    // Sprawdzenie, czy tor jest dostępny do zarezerwowania (tzn. nie ma innej rezerwacji w wybranym czasie):
-    useEffect(() => {
-        const checkTrackAvailability = async () => {
-            if (!trackId || !startDate || !endDate) {
-                setIsAvailable(null);
-                return null;
-            }
-
-            const params = new URLSearchParams({
-                trackId: trackId.toString(),
-                start: new Date(startDate).toISOString(),
-                end: new Date(endDate).toISOString(),
-            });
-
-            if (reservationId) {
-                params.append('reservationId', reservationId.toString());
-            }
-
-            try {
-                const data = await getTrackAvailabilityEdit(params, token!);
-                setIsAvailable(data.isAvailable);
-                return data.isAvailable;
-            } catch (err) {
-                console.error(err);
-                setIsAvailable(null);
-                return null;
-            }
-        };
-        checkTrackAvailability();
-    }, [trackId, startDate, endDate]);
-
-    const allowedDays = tr ? parseAvailableDays(tr.availableDays) : [];
-    const openingHour = tr?.openingHour || '00:00';
-    const closingHour = tr?.closingHour || '23:59';
+    const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
+    const openingHour = track?.openingHour || '00:00';
+    const closingHour = track?.closingHour || '23:59';
 
     // Handler sprawdzający, czy data rozpoczęcia jest zgodna z godzinami funkcjonowania toru:
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,19 +94,20 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (isAvailable === false) {
-            alert(t("makeReservations.availabilityFalse"));
-            return;
-        }
-
+    const validateInputs = () => {
         if (new Date(startDate) >= new Date(endDate)) {
             alert(t("makeReservations.datesError"));
-            return;
+            return false;
         }
+        if (isAvailable === false) {
+            alert(t("makeReservations.availabilityFalse"));
+            return false;
+        }
+        return true;
+    };
 
+    // Budowa body do wysłania do serwera:
+    const buildReservationBody = () => {
         const equipmentReservations = Object.entries(equipmentQuantities)
             .filter(([, qty]) => qty > 0)
             .map(([equipmentId, quantity]) => ({
@@ -192,13 +115,19 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 Quantity: quantity,
             }));
 
-        const reservationBody = {
+        return {
             Start: new Date(startDate).toISOString(),
             End: new Date(endDate).toISOString(),
             Cost: cost,
             TrackId: trackId,
             EquipmentReservations: equipmentReservations
         };
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        validateInputs();
+        const reservationBody = buildReservationBody();
 
         try {
             const response = await fetch(`/api/reservations/${reservationId}`, {

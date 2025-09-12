@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
-import { parseAvailableDays, isValidDateTime } from './DateHelper';
+import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
 import './Reservations.css';
 import cycleImage from '../assets/cycle.svg';
 import { useTracks } from '../Hooks/useTracks';
 import { useAuth } from '../User/AuthContext';
-import { useEquipment } from '../Hooks/useEquipment';
+import { useEquipments } from '../Hooks/useEquipments';
 import { useTrackAvailability } from '../Hooks/useTrackAvailability';
 import { useCost } from '../Hooks/useCost';
 import { useTrackDetails } from '../Hooks/useTrackDetails';
@@ -15,14 +15,14 @@ import { useNotifications } from '../Hooks/useNotifications';
 function MakeReservation() {
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
     const { userId } = useAuth();
     const { tracks, loading, error } = useTracks(token!);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [rentEquipment, setRentEquipment] = useState(false);
-    const { equipmentList } = useEquipment(selectedTrackId, rentEquipment, tracks, token);
+    const { equipmentList } = useEquipments(selectedTrackId, rentEquipment, tracks, token);
     const [equipmentQuantities, setEquipmentQuantities] = useState<Record<number, number>>({});
     const isAvailable = useTrackAvailability(selectedTrackId, startDate, endDate, token);
     const cost = useCost(equipmentQuantities, equipmentList);
@@ -54,33 +54,34 @@ function MakeReservation() {
         }
     };
 
-    // Obsługa dodawania rezerwacji:
-    const handleReservation = async () => {
+    const validateInputs = () => {
         if (!selectedTrackId || !startDate || !endDate || !userId) {
             alert(t("makeReservations.allInfo"));
-            return;
+            return false;
         }
-
         if (new Date(startDate) >= new Date(endDate)) {
             alert(t("makeReservations.datesError"));
-            return;
+            return false;
         }
-
         if (isAvailable === false) {
             alert(t("makeReservations.availabilityFalse"));
-            return;
+            return false;
         }
+        return true;
+    };
 
+    // Budowa body do wysłania do serwera:
+    const buildReservationBody = () => {
         const equipmentReservations = rentEquipment
             ? Object.entries(equipmentQuantities)
-                .filter(([_, quantity]) => quantity > 0)
-                .map(([equipmentId, quantity]) => ({
-                    EquipmentId: parseInt(equipmentId),
-                    Quantity: quantity
+                .filter(([_, qty]) => qty > 0)
+                .map(([id, qty]) => ({
+                    EquipmentId: parseInt(id, 10),
+                    Quantity: qty
                 }))
             : [];
 
-        const reservationBody = {
+        return {
             Start: new Date(startDate).toISOString(),
             End: new Date(endDate).toISOString(),
             Cost: cost,
@@ -89,6 +90,25 @@ function MakeReservation() {
             StatusId: 1,
             EquipmentReservations: equipmentReservations
         };
+    };
+
+    const sendNotifications = async () => {
+        await addNotification(
+            `Zarezerwowano tor ${track?.name}`,
+            `Twoja rezerwacja zaczyna się w dniu  ${formatToDatetimeLocal(startDate)}`,
+            "pl"
+        );
+
+        await addNotification(
+            `Track reserved ${track?.name}`,
+            `Your reservation starts on ${formatToDatetimeLocal(startDate)}`,
+            "en"
+        );
+    }
+
+    const handleReservation = async () => {
+        validateInputs();
+        const reservationBody = buildReservationBody();
 
         try {
             const res = await fetch('/api/reservations', {
@@ -101,19 +121,7 @@ function MakeReservation() {
             });
             if (!res.ok) throw new Error(t("makeReservations.reservationError"));
             alert(t("makeReservations.reservationPositive"));
-
-            await addNotification(
-                `Zarezerwowano tor ${track?.name}`,
-                `Twoja rezerwacja zaczyna się w dniu  ${new Date(startDate).toLocaleString()}`,
-                "pl"
-            );
-
-            await addNotification(
-                `Track reserved ${track?.name}`,
-                `Your reservation starts on ${new Date(startDate).toLocaleString()}`,
-                "en"
-            );
-
+            sendNotifications();
             navigate('/');
         } catch (err: any) {
             alert(err.message);

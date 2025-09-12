@@ -2,29 +2,26 @@ import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
 import cancelIcon from "../assets/cancel.png";
-import arrowLeftIcon from "../assets/arrow-left.png";
-import arrowLeftLightIcon from "../assets/arrow-left-light.png";
-import arrowRightIcon from "../assets/arrow-right.png";
-import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservations from '../Filters/FilterReservations';
 import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
+import { getTrackName, getStatusName } from '../Services/GetNames';
 import { useTranslation } from "react-i18next";
 import { useStatuses } from '../Hooks/useStatuses';
 import { useTracks } from '../Hooks/useTracks';
 import { useAuth } from '../User/AuthContext';
 import { useReservations } from '../Hooks/useUserReservations';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
-import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { useFilteredReservations } from '../Hooks/useFilteredReservations';
 import { usePagination } from '../Hooks/usePagination';
+import Pagination from '../Pagination/Pagination';
 
 function MyReservations() {
     const token = localStorage.getItem('token');
-    const { t } = useTranslation();  
+    const { t } = useTranslation();
     const { userId } = useAuth();
     const { statuses } = useStatuses(token);
     const { tracks } = useTracks(token);
@@ -36,11 +33,6 @@ function MyReservations() {
     const { filteredReservations, setFilteredReservations } = useFilteredReservations(reservations);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredReservations, elementsPerPage);
 
-    const isDark = usePrefersDark();
-    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
-    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
-
-    // Obsługa edycji rezerwacji:
     const handleEdit = (updated: Reservation) => {
         const updatedReservation = reservations.map(r => r.id === updated.id ? updated : r);
         setReservations(updatedReservation);
@@ -48,7 +40,6 @@ function MyReservations() {
         setRefreshCalendarCounter(prev => prev + 1);
     };
 
-    // Obsługa filtrowania:
     const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
         let result = reservations;
         if (trackId) {
@@ -71,7 +62,6 @@ function MyReservations() {
         setFilteredReservations(reservations);
     }, [reservations]);
 
-    // Obsługa anulowania rezerwacji:
     const handleCancel = async (reservationId: number) => {
         if (!window.confirm(t("reservation.cancelAlert"))) {
             return;
@@ -96,19 +86,6 @@ function MyReservations() {
         }
     }
 
-    // Ustawienie nazwy toru:
-    const getTrackName = (trackId: number) => {
-        const track = tracks.find(t => t.id === trackId);
-        return track ? track.name : t("api.unknownTrack");
-    };
-
-    // Ustawienie nazwy statusu:
-    const getStatusName = (statusId: number) => {
-        const status = statuses.find(t => t.id === statusId);
-        return status ? status.name : t("api.unknownStatus");
-    };
-
-    // Obsługa eksportu:
     const handleExport = (reservationId: number) => {
         window.location.href = `/api/reservations/exportPdf?reservationId=${reservationId}`;
     };
@@ -138,7 +115,7 @@ function MyReservations() {
                                     <li key={Reservation.id} className="list-group-item p-0">
                                         <div onClick={() => setShowDetails(prev => (prev?.id === Reservation.id ? null : Reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                             <div className="d-flex align-items-center gap-1">
-                                                <em>{getTrackName(Reservation.trackId)}:</em>
+                                                <em>{getTrackName(tracks, Reservation.trackId, t)}:</em>
                                                 <span>
                                                     {formatToDatetimeLocal(Reservation.start)} - {formatToDatetimeLocal(Reservation.end)}
                                                 </span>
@@ -164,11 +141,11 @@ function MyReservations() {
                                         {showDetails?.id === Reservation.id && (
                                             <div className="mt-2 ps-2 details">
                                                 <div>
-                                                    <strong>{t("reservation.track")}</strong> {getTrackName(Reservation.trackId)}<br />
+                                                    <strong>{t("reservation.track")}</strong> {getTrackName(tracks, Reservation.trackId, t)}<br />
                                                     <strong>{t("reservation.start")}</strong> {formatToDatetimeLocal(Reservation.start)}<br />
                                                     <strong>{t("reservation.end")}</strong> {formatToDatetimeLocal(Reservation.end)}<br />
                                                     <strong>{t("reservation.cost")}</strong> {Reservation.cost}<br />
-                                                    <strong>Status:</strong> {getStatusName(Reservation.statusId)}<br />
+                                                    <strong>Status:</strong> {getStatusName(statuses, Reservation.statusId, t)}<br />
                                                 </div>
                                             </div>
                                         )}
@@ -176,23 +153,11 @@ function MyReservations() {
                                 ))}
                             </ul>
 
-                            <div className="pagination-container">
-                                <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="icon-button" title={t("universal.prev")}>
-                                    <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
-                                </button>
-                                <span className="page-info">
-                                    {currentPage}
-                                </span>
-                                <span className="page-info">
-                                    /
-                                </span>
-                                <span className="page-info">
-                                    {totalPages}
-                                </span>
-                                <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="icon-button" title={t("universal.next")}>
-                                    <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
-                                </button>
-                            </div>
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={(newPage) => setCurrentPage(newPage)}
+                                t={t}/>
 
                             <hr />
                             {editingReservation && (
@@ -203,7 +168,6 @@ function MyReservations() {
                                         reservationId={editingReservation.id}
                                         currentStart={editingReservation.start}
                                         currentEnd={editingReservation.end}
-                                        currentCost={editingReservation.cost}
                                         trackId={editingReservation.trackId}
                                         onUpdated={handleEdit}
                                         onCancel={() => setEditingReservation(null)} />

@@ -3,12 +3,15 @@ import type { Track, Facility } from '../Types/Types';
 import { getAllFacilities } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../User/AuthContext";
+import { useFacilities } from "../Hooks/useFacilities";
 
 interface AddTrackProps {
     onAddTrack: (newTrack: Track) => void;
 }
 
 const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
+    const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const [name, setName] = useState<string>("");
     const [typeofsurface, setTypeofsurface] = useState<string>("");
     const [length, setLength] = useState<number | "">("");
@@ -18,33 +21,16 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const allDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];
     const { facilityId } = useAuth();
     const [facilityID, setFacilityId] = useState<number | "">("");
-    const [facilities, setFacilities] = useState<Facility[]>([]);
+    const { facilities } = useFacilities(token);
     const [message, setMessage] = useState<string>("");
-    const token = localStorage.getItem('token');
-    const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
-    const { t } = useTranslation();
 
     useEffect(() => {
         if (token) {
-            if (!isNaN(facilityId!)) {
-                setAdminInFacility(facilityId);
-                if (facilityId !== 0) {
-                    setFacilityId(facilityId!);
-                }
+            if (facilityId !== 0) {
+                setFacilityId(facilityId!);
             }
         }
-
-        const fetchFacilities = async () => {
-            try {
-                const data = await getAllFacilities(token!);
-                setFacilities(data);
-            } catch (err: any) {
-                setMessage(err.message || t("api.facilityError"));
-            }
-        };
-        fetchFacilities();
     }, [token]);
-
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -90,7 +76,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    {adminInFacility === 0 && (
+                    {facilityId === 0 && (
                         <>
                             <label>{t("track.facility")}</label><br />
                             <select id="facilitySelect" value={facilityID} onChange={e => setFacilityId(Number(e.target.value))} required className="info-input">

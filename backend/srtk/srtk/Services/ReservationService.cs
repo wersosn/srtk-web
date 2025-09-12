@@ -75,6 +75,7 @@ namespace srtk.Services
         {
             return await context.EquipmentReservations
                 .Where(er => er.ReservationId == reservationId)
+                .Include(er => er.Equipment)
                 .Select(er => er.ToDto())
                 .ToListAsync();
         }

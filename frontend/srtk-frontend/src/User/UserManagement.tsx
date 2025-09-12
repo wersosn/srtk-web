@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import editIcon from '../assets/edit.png';
-import arrowLeftIcon from "../assets/arrow-left.png";
-import arrowLeftLightIcon from "../assets/arrow-left-light.png";
-import arrowRightIcon from "../assets/arrow-right.png";
-import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import EditUser from './EditUser';
 import DeleteUser from './DeleteUser';
 import type { Client, Admin } from '../Types/Types';
@@ -12,17 +8,17 @@ import { useClients } from '../Hooks/useClients';
 import { useAdmins } from '../Hooks/useAdmins';
 import { useAuth } from './AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
-import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { usePagination } from '../Hooks/usePagination';
+import Pagination from '../Pagination/Pagination';
 
 function UserManagement() {
     const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const { userId } = useAuth();
     const [editingUser, setEditingUser] = useState<Client | Admin | null>(null);
     const [showDetails, setShowDetails] = useState<Client | Admin | null>(null);
     const { clients, setClients, loadingClients, error, refreshClients } = useClients(token);
     const { admins, setAdmins, loadingAdmins, errorAdmin, refreshAdmins } = useAdmins(token);
-    const { t } = useTranslation();
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
 
     const {
@@ -39,11 +35,6 @@ function UserManagement() {
         setCurrentPage: setCurrentAdminPage
     } = usePagination(admins, elementsPerPage);
 
-    const isDark = usePrefersDark();
-    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
-    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
-
-    // Edycja użytkownika:
     const handleEdit = (updated: Client | Admin) => {
         if (updated.roleId === 1) {
             setAdmins(prev => prev.filter(a => a.id !== updated.id));
@@ -75,7 +66,6 @@ function UserManagement() {
         setEditingUser(null);
     };
 
-    // Usuwanie użytkownika:
     const handleDelete = (id: number, roleId: number) => {
         if (roleId === 1) {
             setClients(prev => prev.filter(c => c.id !== id));
@@ -125,23 +115,11 @@ function UserManagement() {
                                 </li>
                             ))}
                         </ul>
-                        <div className="pagination-container">
-                            <button onClick={() => setCurrentClientPage(prev => Math.max(prev - 1, 1))} disabled={currentClientPage === 1} className="icon-button" title={t("universal.prev")}>
-                                <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
-                            </button>
-                            <span className="page-info">
-                                {currentClientPage}
-                            </span>
-                            <span className="page-info">
-                                /
-                            </span>
-                            <span className="page-info">
-                                {totalClientPages}
-                            </span>
-                            <button onClick={() => setCurrentClientPage(prev => Math.min(prev + 1, totalClientPages))} disabled={currentClientPage === totalClientPages} className="icon-button" title={t("universal.next")}>
-                                <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
-                            </button>
-                        </div>
+                        <Pagination
+                            currentPage={currentClientPage}
+                            totalPages={totalClientPages}
+                            onPageChange={(newPage) => setCurrentClientPage(newPage)}
+                            t={t} />
                     </>
                 )}
                 <br />
@@ -175,23 +153,11 @@ function UserManagement() {
                                 </li>
                             ))}
                         </ul>
-                        <div className="pagination-container">
-                            <button onClick={() => setCurrentAdminPage(prev => Math.max(prev - 1, 1))} disabled={currentAdminPage === 1} className="icon-button" title={t("universal.prev")}>
-                                <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
-                            </button>
-                            <span className="page-info">
-                                {currentAdminPage}
-                            </span>
-                            <span className="page-info">
-                                /
-                            </span>
-                            <span className="page-info">
-                                {totalAdminPages}
-                            </span>
-                            <button onClick={() => setCurrentAdminPage(prev => Math.min(prev + 1, totalAdminPages))} disabled={currentAdminPage === totalAdminPages} className="icon-button" title={t("universal.next")}>
-                                <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
-                            </button>
-                        </div>
+                        <Pagination
+                            currentPage={currentAdminPage}
+                            totalPages={totalAdminPages}
+                            onPageChange={(newPage) => setCurrentAdminPage(newPage)}
+                            t={t} />
                     </>
                 )}
 

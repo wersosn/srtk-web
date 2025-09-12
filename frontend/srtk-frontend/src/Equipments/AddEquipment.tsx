@@ -1,49 +1,31 @@
 import React, { useState, useEffect, type FormEvent } from "react";
-import { jwtDecode } from 'jwt-decode';
-import type { Equipment, Facility } from '../Types/Types';
-import { getAllFacilities } from '../Services/Api';
+import type { Equipment } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../User/AuthContext";
+import { useFacilities } from "../Hooks/useFacilities";
 
 interface AddEquipmentProps {
     onAddEquipment: (newEquipment: Equipment) => void;
 }
 
 const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
+    const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const [name, setName] = useState<string>("");
     const [type, setType] = useState<string>("");
     const [cost, setCost] = useState<number | "">("");
     const { facilityId } = useAuth();
     const [facilityID, setFacilityId] = useState<number | "">("");
-    const [facilities, setFacilities] = useState<Facility[]>([]);
+    const { facilities } = useFacilities(token);
     const [message, setMessage] = useState<string>("");
-    const token = localStorage.getItem('token');
-    const [adminInFacility, setAdminInFacility] = useState<number | null>(null);
-    const { t } = useTranslation();
 
     useEffect(() => {
         if (token) {
-            if (!isNaN(facilityId!)) {
-                setAdminInFacility(facilityId);
-                if (facilityId !== 0) {
-                    setFacilityId(facilityId!);
-                }
+            if (facilityId !== 0) {
+                setFacilityId(facilityId!);
             }
         }
-
-        const fetchFacilities = async () => {
-            try {
-                if (token) {
-                    const data = await getAllFacilities(token);
-                    setFacilities(data);
-                }
-            } catch (err: any) {
-                setMessage(err.message || t("api.facilityError"));
-            }
-        };
-        fetchFacilities();
     }, [token]);
-
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -86,7 +68,7 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
         <>
             <form onSubmit={handleSubmit}>
                 <div>
-                    {adminInFacility === 0 && (
+                    {facilityId === 0 && (
                         <>
                             <label>{t("eq.facility")}</label><br />
                             <select id="facilitySelect" value={facilityID} onChange={e => setFacilityId(Number(e.target.value))} required className="info-input">

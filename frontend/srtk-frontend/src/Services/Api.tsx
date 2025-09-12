@@ -32,6 +32,10 @@ export const getUserPreferences = async (userId: number, token: string): Promise
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 // REZERWACJE:
+export const getReservationDetails = async (reservationId: number, token: string) : Promise<Reservation> => {
+    return fetchWithAuth(`/api/reservations/${reservationId}`, token);
+};
+
 export const getUserReservations = async (userId: number, token: string): Promise<Reservation[]> => {
     return fetchWithAuth(`/api/reservations/user?userId=${userId}`, token);
 };

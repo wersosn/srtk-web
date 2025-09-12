@@ -3,15 +3,12 @@ import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
 import downloadIconLight from '../assets/download-light.png';
 import cancelIcon from "../assets/cancel.png";
-import arrowLeftIcon from "../assets/arrow-left.png";
-import arrowLeftLightIcon from "../assets/arrow-left-light.png";
-import arrowRightIcon from "../assets/arrow-right.png";
-import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
 import FilterReservationsAdmin from '../Filters/FilterReservationsAdmin';
 import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from './DateHelper';
+import { getStatusName } from '../Services/GetNames';
 import { useTranslation } from "react-i18next";
 import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { useStatuses } from '../Hooks/useStatuses';
@@ -19,6 +16,8 @@ import { useTracksAdmin } from '../Hooks/useTracksAdmin';
 import { useAuth } from '../User/AuthContext';
 import { useAdminReservations } from '../Hooks/useAdminReservations';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
+import { filterReservationsGrouped } from './FilterReservationsGrouped';
+import Pagination from '../Pagination/Pagination';
 
 function ReservationManagement() {
     const token = localStorage.getItem('token');
@@ -36,39 +35,15 @@ function ReservationManagement() {
 
     const isDark = usePrefersDark();
     const icon = isDark ? downloadIconLight : downloadIcon;
-    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
-    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
 
-    // Obsługa filtrowania:
     const handleFilterChange = (trackId?: number, statusId?: number, startDate?: string) => {
-        let result: Record<number, Reservation[]> = {};
-
-        if (trackId) {
-            const reservations = reservationsByTrack[trackId] || [];
-            result[trackId] = reservations.filter(r => {
-                let statusMatch = statusId ? r.statusId === statusId : true;
-                let dateMatch = startDate ? new Date(r.start).toISOString().split('T')[0] === startDate : true;
-                return statusMatch && dateMatch;
-            });
-        } else {
-            Object.entries(reservationsByTrack).forEach(([id, reservations]) => {
-                const filtered = reservations.filter(r => {
-                    let statusMatch = statusId ? r.statusId === statusId : true;
-                    let dateMatch = startDate ? new Date(r.start).toISOString().split('T')[0] === startDate : true;
-                    return statusMatch && dateMatch;
-                });
-                result[Number(id)] = filtered;
-            });
-        }
-
-        setFilteredReservations(result);
+        setFilteredReservations(filterReservationsGrouped(reservationsByTrack, trackId, statusId, startDate));
     };
 
     useEffect(() => {
         setFilteredReservations(reservationsByTrack);
     }, [reservationsByTrack]);
 
-    // Obsługa edycji:
     const handleEdit = (updated: Reservation) => {
         setReservationsByTrack(prev => {
             const trackReservations = prev[updated.trackId];
@@ -81,7 +56,6 @@ function ReservationManagement() {
         setEditingReservation(null);
     };
 
-    // Obsługa anulowania rezerwacji:
     const handleCancel = async (reservationId: number) => {
         if (!window.confirm(t("reservation.cancelAlert"))) {
             return;
@@ -105,14 +79,7 @@ function ReservationManagement() {
         }
     }
 
-    // Ustawienie nazwy statusu:
-    const getStatusName = (statusId: number) => {
-        const status = statuses.find(t => t.id === statusId);
-        return status ? status.name : t("api.unknownStatus");
-    };
-
-    // Obsługa eksportu:
-    const handleExport = (trackId: Number) => {
+    const handleExport = (trackId: number) => {
         window.location.href = `/api/reservations/export?trackId=${trackId}`;
     };
 
@@ -191,7 +158,7 @@ function ReservationManagement() {
                                                                 <strong>{t("reservation.start")}</strong> {formatToDatetimeLocal(reservation.start)}<br />
                                                                 <strong>{t("reservation.end")}</strong> {formatToDatetimeLocal(reservation.end)}<br />
                                                                 <strong>{t("reservation.cost")}</strong> {reservation.cost}<br />
-                                                                <strong>Status:</strong> {getStatusName(reservation.statusId)}<br />
+                                                                <strong>Status:</strong> {getStatusName(statuses, reservation.statusId, t)}<br />
                                                             </div>
                                                         </div>
                                                     )}
@@ -199,23 +166,11 @@ function ReservationManagement() {
                                             ))
                                         )}
                                     </ul>
-                                    <div className="pagination-container">
-                                        <button onClick={() => handlePageChange(Number(trackId), currentPage - 1, totalPages)} disabled={currentPage === 1} className="icon-button" title={t("universal.prev")}>
-                                            <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
-                                        </button>
-                                        <span className="page-info">
-                                            {currentPage}
-                                        </span>
-                                        <span className="page-info">
-                                            /
-                                        </span>
-                                        <span className="page-info">
-                                            {totalPages}
-                                        </span>
-                                        <button onClick={() => handlePageChange(Number(trackId), currentPage + 1, totalPages)} disabled={currentPage === totalPages} className="icon-button" title={t("universal.next")}>
-                                            <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
-                                        </button>
-                                    </div>
+                                    <Pagination
+                                        currentPage={currentPages[track!.id] || 1}
+                                        totalPages={totalPages}
+                                        onPageChange={(newPage) => handlePageChange(track!.id, newPage, totalPages)}
+                                        t={t}/>
                                 </div>
                             );
                         })}
@@ -228,7 +183,6 @@ function ReservationManagement() {
                                     reservationId={editingReservation.id}
                                     currentStart={editingReservation.start}
                                     currentEnd={editingReservation.end}
-                                    currentCost={editingReservation.cost}
                                     trackId={editingReservation.trackId}
                                     onUpdated={handleEdit}
                                     onCancel={() => setEditingReservation(null)} />

@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
-import arrowLeftIcon from "../assets/arrow-left.png";
-import arrowLeftLightIcon from "../assets/arrow-left-light.png";
-import arrowRightIcon from "../assets/arrow-right.png";
-import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import AddEquipment from './AddEquipment';
 import EditEquipment from './EditEquipment';
 import DeleteEquipment from './DeleteEquipment';
@@ -12,10 +8,10 @@ import type { Equipment } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 import { useAuth } from '../User/AuthContext';
 import { useEquipmentsAdmin } from '../Hooks/useEquipmentsAdmin';
-import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { useFilteredEquipments } from '../Hooks/useFilteredEquipments';
 import { usePagination } from '../Hooks/usePagination';
+import Pagination from '../Pagination/Pagination';
 
 function EquipmentsManagement() {
     const token = localStorage.getItem('token');
@@ -28,23 +24,16 @@ function EquipmentsManagement() {
     const { filteredEquipments, setFilteredEquipments } = useFilteredEquipments(equipmentList);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredEquipments, elementsPerPage);
 
-    const isDark = usePrefersDark();
-    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
-    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
-
-    // Obsługa dodawania sprzętu:
     const handleAdd = (newEquipment: Equipment) => {
         setEquipmentList(prev => [...prev, newEquipment]);
     };
 
-    // Obsługa edycji sprzętu:
     const handleEdit = (updated: Equipment) => {
         const updatedEquipment = equipmentList.map(r => r.id === updated.id ? updated : r);
         setEquipmentList(updatedEquipment);
         setEditingEquipment(null);
     };
 
-    // Obsługa filtrowania:
     const handleFilterChange = (facilityId?: number) => {
         let result = equipmentList;
         if (facilityId) {
@@ -102,23 +91,11 @@ function EquipmentsManagement() {
                         ))}
                     </ul>
 
-                    <div className="pagination-container">
-                        <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="icon-button" title={t("universal.prev")}>
-                            <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
-                        </button>
-                        <span className="page-info">
-                            {currentPage}
-                        </span>
-                        <span className="page-info">
-                            /
-                        </span>
-                        <span className="page-info">
-                            {totalPages}
-                        </span>
-                        <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="icon-button" title={t("universal.next")}>
-                            <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
-                        </button>
-                    </div>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(newPage) => setCurrentPage(newPage)}
+                        t={t} />
 
                     <hr />
                     {editingEquipment ? (

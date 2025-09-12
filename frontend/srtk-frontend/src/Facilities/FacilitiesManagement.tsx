@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import editIcon from '../assets/edit.png';
-import arrowLeftIcon from "../assets/arrow-left.png";
-import arrowLeftLightIcon from "../assets/arrow-left-light.png";
-import arrowRightIcon from "../assets/arrow-right.png";
-import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import AddFacility from './AddFacility';
 import EditFacility from './EditFacility';
 import DeleteFacility from './DeleteFacility';
@@ -12,8 +8,8 @@ import { useTranslation } from "react-i18next";
 import { useFacilities } from '../Hooks/useFacilities';
 import { useAuth } from '../User/AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
-import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { usePagination } from '../Hooks/usePagination';
+import Pagination from '../Pagination/Pagination';
 
 function FacilitiesManagement() {
     const token = localStorage.getItem('token');
@@ -22,22 +18,13 @@ function FacilitiesManagement() {
     const { facilities, setFacilities, loading, error } = useFacilities(token);
     const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
     const [showDetails, setShowDetails] = useState<Facility | null>(null);
-
-    // Obsługa ilości elementów na stronie:
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(facilities, elementsPerPage);
 
-    const isDark = usePrefersDark();
-    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
-    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
-
-
-    // Obsługa dodawania obiektu:
     const handleAdd = (newFacility: Facility) => {
         setFacilities(prev => [...prev, newFacility]);
     };
 
-    // Obsługa edycji obiektu:
     const handleEdit = (updated: Facility) => {
         const updatedFacility = facilities.map(r => r.id === updated.id ? updated : r);
         setFacilities(updatedFacility);
@@ -81,23 +68,11 @@ function FacilitiesManagement() {
                         ))}
                     </ul>
 
-                    <div className="pagination-container">
-                        <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="icon-button" title={t("universal.prev")}>
-                            <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
-                        </button>
-                        <span className="page-info">
-                            {currentPage}
-                        </span>
-                        <span className="page-info">
-                            /
-                        </span>
-                        <span className="page-info">
-                            {totalPages}
-                        </span>
-                        <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="icon-button" title={t("universal.next")}>
-                            <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
-                        </button>
-                    </div>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(newPage) => setCurrentPage(newPage)}
+                        t={t} />
 
                     <hr />
                     {editingFacility ? (

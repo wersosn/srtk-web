@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
-import arrowLeftIcon from "../assets/arrow-left.png";
-import arrowLeftLightIcon from "../assets/arrow-left-light.png";
-import arrowRightIcon from "../assets/arrow-right.png";
-import arrowRightLightIcon from "../assets/arrow-right-light.png";
 import AddTrack from './AddTrack';
 import EditTrack from './EditTrack';
 import DeleteTrack from './DeleteTrack';
@@ -13,9 +9,9 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from '../User/AuthContext';
 import { useTracksAdmin } from '../Hooks/useTracksAdmin';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
-import { usePrefersDark } from '../Hooks/usePrefersDark';
 import { useFilteredTracks } from '../Hooks/useFilteredTracks';
 import { usePagination } from '../Hooks/usePagination';
+import Pagination from '../Pagination/Pagination';
 
 function TrackManagement() {
     const token = localStorage.getItem('token');
@@ -28,23 +24,16 @@ function TrackManagement() {
     const { filteredTracks, setFilteredTracks } = useFilteredTracks(tracks);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredTracks, elementsPerPage);
 
-    const isDark = usePrefersDark();
-    const arrowL = isDark ? arrowLeftLightIcon : arrowLeftIcon;
-    const arrowR = isDark ? arrowRightLightIcon : arrowRightIcon;
-
-    // Obsługa dodawania toru:
     const handleAdd = (newTrack: Track) => {
         setTracks(prev => [...prev, newTrack]);
     };
 
-    // Obsługa edycji toru:
     const handleEdit = (updated: Track) => {
         const updatedTrack = tracks.map(r => r.id === updated.id ? updated : r);
         setTracks(updatedTrack);
         setEditingTrack(null);
     };
 
-    // Obsługa filtrowania:
     const handleFilterChange = (facilityId?: number) => {
         let result = tracks;
         if (facilityId) {
@@ -105,23 +94,11 @@ function TrackManagement() {
                         ))}
                     </ul>
 
-                    <div className="pagination-container">
-                        <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="icon-button" title={t("universal.prev")}>
-                            <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
-                        </button>
-                        <span className="page-info">
-                            {currentPage}
-                        </span>
-                        <span className="page-info">
-                            /
-                        </span>
-                        <span className="page-info">
-                            {totalPages}
-                        </span>
-                        <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="icon-button" title={t("universal.next")}>
-                            <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
-                        </button>
-                    </div>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(newPage) => setCurrentPage(newPage)}
+                        t={t} />
 
                     <hr />
                     {editingTrack ? (
