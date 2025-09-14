@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from "react-i18next";
 import i18n from "../Locales/i18next";
-import type { Client } from '../Types/Types';
+import type { Client, UserPreference } from '../Types/Types';
 import { getUserInfo } from '../Services/Api';
 import EditMyInfo from './EditMyInfo';
 import profileImage from '../assets/profile.svg';
 import './Profile.css';
 import { useAuth } from '../User/AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
+import api from "../Api/axios";
 
 function Profile() {
     const token = localStorage.getItem('token');
@@ -93,21 +94,7 @@ function Profile() {
         }
 
         try {
-            const response = await fetch(`/api/users/${userId}/preferences`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ elementsPerPage })
-            });
-
-            if (!response.ok) {
-                const errorMsg = await response.text();
-                console.log(errorMsg);
-                throw new Error(errorMsg);
-            }
-
+            await api.put<UserPreference>(`/users/${userId}/preferences`, { elementsPerPage });
             alert(t("profile.preferencesUpdated"));
         } catch (err: any) {
             setError(err.message);

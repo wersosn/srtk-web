@@ -8,7 +8,6 @@ function ConfirmedEmail() {
     const [error, setError] = useState('');
     const { t } = useTranslation();
     const navigate = useNavigate();
-
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get('token');

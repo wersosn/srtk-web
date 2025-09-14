@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import i18n from "../Locales/i18next";
 import { useAuth } from '../User/AuthContext';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
+import api from "../Api/axios";
+import type { UserPreference } from '../Types/Types';
 
 function Settings() {
     const [language, setLanguage] = useState(i18n.language);
@@ -11,7 +13,6 @@ function Settings() {
     const token = localStorage.getItem('token');
     const { elementsPerPage, setElementsPerPage } = useUserPreferences(userId!, token, t);
 
-    // Obsługa zmiany języka:
     const handleLanguageChange = (lang: string) => {
         setLanguage(lang);
         i18n.changeLanguage(lang);
@@ -24,7 +25,6 @@ function Settings() {
         }
     };
 
-    // Obsługa zmiany ilości elementów na listach (np. rezerwacji itp.):
     const handleUpdatingElementsPerPage = async () => {
         if (elementsPerPage <= 0) {
             alert(t("profile.invalidElements"));
@@ -32,20 +32,7 @@ function Settings() {
         }
 
         try {
-            const response = await fetch(`/api/users/${userId}/preferences`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ elementsPerPage })
-            });
-
-            if (!response.ok) {
-                const errorMsg = await response.text();
-                throw new Error(errorMsg);
-            }
-
+            await api.put<UserPreference>(`/users/${userId}/preferences`, { elementsPerPage });
             alert(t("profile.preferencesUpdated"));
         } catch (err: any) {
             console.log(err.message);

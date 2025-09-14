@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
+import type { User } from '../Types/Types';
 
 interface EditMyInfoProps {
     userId: number;
@@ -29,22 +31,9 @@ const EditMyInfo: React.FC<EditMyInfoProps> = ({ userId, currentEmail, currentNa
         const bodyData: any = { email, name, surname, phoneNumber };
 
         try {
-            const response = await fetch(`/api/users/clients/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(bodyData)
-            });
-            if (response.ok) {
-                const updatedUser = await response.json();
-                onUpdated(updatedUser);
-                setMessage('');
-            } else {
-                const error = await response.text();
-                setMessage(t("universal.error") + error);
-            }
+            const { data: updatedUser } = await api.put<User>(`/users/clients/${userId}`, bodyData);
+            onUpdated(updatedUser);
+            setMessage('');
         } catch (err: any) {
             setMessage(t("universal.error") + err.message);
         }

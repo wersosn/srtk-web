@@ -17,7 +17,9 @@ function ForgotPassword() {
 
         try {
             const res = await fetch(`/api/users/email?email=${encodeURIComponent(email)}`);
-            if (!res.ok) throw new Error(t("profile.userFetchError"));
+            if (!res.ok) {
+                throw new Error(t("profile.userFetchError"));
+            }
 
             const data = await res.json();
 
