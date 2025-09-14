@@ -159,7 +159,7 @@ namespace srtk.Services
 
             if(user.EmailConfirmed == false)
             {
-                throw new UnauthorizedAccessException("Musisz potwierdzić adres e-mail, aby zresetować hasło");
+                throw new ApplicationException("Musisz potwierdzić adres e-mail, aby zresetować hasło");
             }
 
             var token = jwtService.GenerateResetPasswordToken(user);

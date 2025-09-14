@@ -94,6 +94,7 @@
     "resetPasswordSubmit": "Resetuj hasło",
     "resetPasswordEmail": "Link do resetu hasła został wysłany na podany mail",
     "resetPasswordError": "Błąd podczas resetu hasła",
+    "resetPasswordEmailNotConfirmed": "Musisz potwierdzić adres e-mail, aby zresetować hasło",
     "newPassword": "Ustawiono nowe hasło, przekierowanie na stronę logowania",
     "differentPassword": "Wpisane hasła nie są identyczne",
     "saveChanges": "Zapisz zmiany",

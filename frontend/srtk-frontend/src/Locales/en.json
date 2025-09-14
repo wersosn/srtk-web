@@ -95,6 +95,7 @@
     "resetPasswordSubmit": "Reset password",
     "resetPasswordEmail": "A password reset link has been sent to the provided email",
     "resetPasswordError": "Password reset error",
+    "resetPasswordEmailNotConfirmed": "You must confirm your email address to reset the password",
     "newPassword": "New password set, redirecting to the login page",
     "differentPassword": "The passwords you entered are not identical",
     "saveChanges": "Save changes",

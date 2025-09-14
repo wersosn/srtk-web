@@ -86,9 +86,21 @@ namespace srtk.Controllers
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
             var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
-            await service.ForgotPassword(dto.Email, clientType);
-            logger.LogInformation("Wysłano mail z linkiem do resetu hasła na adres e-mail: {Email}", dto.Email);
-            return Ok("Mail z linkiem do resetu hasła został wysłany");
+            try
+            {
+                await service.ForgotPassword(dto.Email, clientType);
+                logger.LogInformation("Wysłano mail z linkiem do resetu hasła na adres e-mail: {Email}", dto.Email);
+                return Ok("Mail z linkiem do resetu hasła został wysłany");
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Błąd podczas resetu hasła dla: {Email}", dto.Email);
+                return StatusCode(500, "Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.");
+            }
         }
 
         [HttpPost("reset-password")]

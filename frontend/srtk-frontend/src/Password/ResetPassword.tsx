@@ -31,17 +31,16 @@ function ResetPassword() {
                 headers: { 'Content-Type': 'application/json', 'X-Client-Type': 'web' },
                 body: JSON.stringify({ token, newPassword }),
             });
-
+            const data = await response.json();
             if (!response.ok) {
-                const msg = await response.text();
-                throw new Error(msg);
+                alert(data.message || t("auth.resetPasswordEmailNotConfirmed"));
             }
 
             setInfo(t("auth.newPassword"));
             setTimeout(() => navigate('/login'), 1000);
         }
         catch (err: any) {
-            setError(err.message || t("auth.passwordResetError"));
+            setError(t("auth.passwordResetError"));
         }
     }
 
