@@ -65,26 +65,14 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const openingHour = track?.openingHour || '00:00';
     const closingHour = track?.closingHour || '23:59';
 
-    // Handler sprawdzający, czy data rozpoczęcia jest zgodna z godzinami funkcjonowania toru:
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
-        if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
-            setStartDate(val);
-            setDatesChanged(true);
-        } else {
-            alert(t("makeReservations.startDateNotAvailable"));
-        }
+        setStartDate(val);
     };
 
-    // Handler sprawdzający, czy data zakończenia jest zgodna z godzinami funkcjonowania toru:
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
-        if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
-            setEndDate(val);
-            setDatesChanged(true);
-        } else {
-            alert(t("makeReservations.endDateNotAvailable"));
-        }
+        setEndDate(val);
     };
 
     // Handler do obsługi zmiany ilości:
@@ -101,6 +89,17 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
             alert(t("makeReservations.datesError"));
             return false;
         }
+
+        if (!isValidDateTime(startDate, openingHour, closingHour, allowedDays)) {
+            alert(t("makeReservations.startDateNotAvailable"));
+            return;
+        }
+
+        if (!isValidDateTime(endDate, openingHour, closingHour, allowedDays)) {
+            alert(t("makeReservations.endDateNotAvailable"));
+            return;
+        }
+
         if (isAvailable === false) {
             alert(t("makeReservations.availabilityFalse"));
             return false;
@@ -128,7 +127,9 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        validateInputs();
+         if(!validateInputs()) {
+            return;
+        }
         const reservationBody = buildReservationBody();
 
         try {

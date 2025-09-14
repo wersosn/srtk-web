@@ -35,13 +35,11 @@ function MakeReservation() {
     const openingHour = track?.openingHour || '00:00';
     const closingHour = track?.closingHour || '23:59';
 
-    // Handler sprawdzający, czy data rozpoczęcia jest zgodna z godzinami funkcjonowania toru:
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setStartDate(val);
     };
 
-    // Handler sprawdzający, czy data zakończenia jest zgodna z godzinami funkcjonowania toru:
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setEndDate(val);
