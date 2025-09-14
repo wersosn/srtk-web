@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
+import { useAuth } from "./User/AuthContext";
+const BlobBackground = lazy(() => import("./BlobBackground"));
+const Navb = lazy(() => import("./Navbar/Navb"));
 import Login from "./User/Login";
 import Register from "./User/Register";
-import Navb from "./Navbar/Navb";
 import Footer from "./Footer/Footer";
 import Home from "./Home/Home";
 import Profile from "./Profile/Profile";
@@ -21,11 +23,9 @@ import RoleManagement from "./Roles/RolesManagement";
 import StatusesManagement from "./Statuses/StatusesManagement";
 import TrackManagement from "./Tracks/TracksManagement";
 import UserManagement from "./User/UserManagement";
-import BlobBackground from "./BlobBackground";
 import MakeReservation from "./Reservations/MakeReservation";
 import MyReservations from "./Reservations/MyReservations";
 import ReservationManagement from "./Reservations/ReservationManagement";
-import { useAuth } from "./User/AuthContext";
 
 function App() {
   const { logout } = useAuth();

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
 import { useTranslation } from "react-i18next";
-import ReservationCalendar from "../Calendar/ReservationCalendar";
+import ReservationCalendar from '../Calendar/ReservationCalendar';
 import CyclistsSvg from "../assets/track-cycling.svg";
 import Spinner from 'react-bootstrap/Spinner';
 import "./Home.css";
@@ -43,7 +43,6 @@ const Home: React.FC = () => {
             <img
               src={CyclistsSvg}
               alt="Kolarze na torze"
-              className="animated"
               id="freepik_stories-track-cycling"
             />
           </div>

@@ -23,13 +23,13 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 <img src={arrowL} alt="Poprzednia strona" style={{ width: '24px', height: '24px' }} />
             </button>
             <span className="page-info">
-                {currentPage}
+                {currentPage || 1}
             </span>
             <span className="page-info">
                 /
             </span>
             <span className="page-info">
-                {totalPages}
+                {totalPages || 1}
             </span>
             <button onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))} disabled={currentPage === totalPages} className="icon-button" title={t("universal.next")}>
                 <img src={arrowR} alt="Następna strona" style={{ width: '24px', height: '24px' }} />
