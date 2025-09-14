@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import deleteIcon from '../assets/delete.png';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
 
 interface DeleteStatusProps {
     statusId: number;
@@ -10,11 +11,10 @@ interface DeleteStatusProps {
 const DeleteStatus: React.FC<DeleteStatusProps> = ({ statusId, onDeleted }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     const handleDelete = async () => {
-        if (!window.confirm(t("status.deleteAlert"))) { 
+        if (!window.confirm(t("status.deleteAlert"))) {
             return;
         }
 
@@ -22,18 +22,8 @@ const DeleteStatus: React.FC<DeleteStatusProps> = ({ statusId, onDeleted }) => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/statuses/${statusId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            if (response.ok) {
-                onDeleted();
-            } else {
-                const text = await response.text();
-                setError(`${t("universal.error")} ${text || t("status.deleteError")}`);
-            }
+            await api.delete(`/statuses/${statusId}`);
+            onDeleted();
         } catch (err: any) {
             setError(`${t("universal.error")} ${err.message}`);
         } finally {
@@ -44,7 +34,7 @@ const DeleteStatus: React.FC<DeleteStatusProps> = ({ statusId, onDeleted }) => {
     return (
         <>
             <button onClick={handleDelete} disabled={loading} className="icon-button">
-                <img src={deleteIcon} alt="Usuń" style={{ width: '16px', height: '16px' }}/>
+                <img src={deleteIcon} alt="Usuń" style={{ width: '16px', height: '16px' }} />
             </button>
             {error && <div className="text-danger mt-1">{error}</div>}
         </>

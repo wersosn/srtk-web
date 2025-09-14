@@ -3,6 +3,7 @@ import type { Equipment } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../User/AuthContext";
 import { useFacilities } from "../Hooks/useFacilities";
+import api from "../Api/axios";
 
 interface AddEquipmentProps {
     onAddEquipment: (newEquipment: Equipment) => void;
@@ -33,32 +34,13 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
         const newEquipment = { name, type, cost, facilityId: facilityID };
 
         try {
-            const response = await fetch("/api/equipments", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(newEquipment)
-            });
-
-            if (response.ok) {
-                const createdEquipment: Equipment = await response.json();
-                setMessage(t("eq.eqAdded"));
-                setName("");
-                setType("");
-                setCost(0);
-                setFacilityId("");
-                onAddEquipment(createdEquipment);
-            } else {
-                let errorText = await response.text();
-                try {
-                    const errorData = JSON.parse(errorText);
-                    setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
-                } catch {
-                    setMessage(t("universal.error") + (errorText));
-                }
-            }
+            const { data: createdEquipment } = await api.post<Equipment>("/equipments", newEquipment);
+            setMessage(t("eq.eqAdded"));
+            setName("");
+            setType("");
+            setCost(0);
+            setFacilityId("");
+            onAddEquipment(createdEquipment);
         } catch (error: any) {
             setMessage(t("universal.error") + error.message);
         }
@@ -85,7 +67,7 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
                     <label htmlFor="eqName">{t("eq.name")}</label>
                     <input id="eqName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
 
-                    <label htmlFor="eqType">{t("eq.name")}</label>
+                    <label htmlFor="eqType">{t("eq.type")}</label>
                     <input id="eqType" value={type} onChange={e => setType(e.target.value)} required className="info-input" />
 
                     <label htmlFor="eqCost">{t("eq.cost")}</label>

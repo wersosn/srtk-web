@@ -11,6 +11,7 @@ import { useTrackAvailability } from '../Hooks/useTrackAvailability';
 import { useCost } from '../Hooks/useCost';
 import { useTrackDetails } from '../Hooks/useTrackDetails';
 import { useNotifications } from '../Hooks/useNotifications';
+import api from "../Api/axios";
 
 function MakeReservation() {
     const token = localStorage.getItem('token');
@@ -111,15 +112,7 @@ function MakeReservation() {
         const reservationBody = buildReservationBody();
 
         try {
-            const res = await fetch('/api/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(reservationBody),
-            });
-            if (!res.ok) throw new Error(t("makeReservations.reservationError"));
+            await api.post("/reservations", reservationBody);
             alert(t("makeReservations.reservationPositive"));
             sendNotifications();
             navigate('/');

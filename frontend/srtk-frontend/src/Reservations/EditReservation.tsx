@@ -6,6 +6,8 @@ import { useTrackAvailabilityEdit } from '../Hooks/useTrackAvailabilityEdit';
 import { useCost } from '../Hooks/useCost';
 import { useTrack } from '../Hooks/useTrack';
 import { useEquipmentsInFacility } from '../Hooks/useEquipmentsInFacility';
+import api from "../Api/axios";
+import type { Reservation } from '../Types/Types';
 
 interface EditReservationProps {
     reservationId: number;
@@ -130,22 +132,9 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         const reservationBody = buildReservationBody();
 
         try {
-            const response = await fetch(`/api/reservations/${reservationId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(reservationBody)
-            });
-            if (response.ok) {
-                const updatedReservation = await response.json();
-                onUpdated(updatedReservation);
-                setMessage('');
-            } else {
-                const error = await response.text();
-                setMessage(t("universal.error") + error);
-            }
+            const { data: updatedReservation } = await api.put<Reservation>(`/reservations/${reservationId}`, reservationBody);
+            onUpdated(updatedReservation);
+            setMessage('');
         } catch (err: any) {
             setMessage(t("universal.error") + err.message);
         }

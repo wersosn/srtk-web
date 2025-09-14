@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
+import type { Facility } from '../Types/Types';
 
 interface EditFacilityProps {
     facilityId: number;
@@ -15,29 +17,15 @@ const EditFacility: React.FC<EditFacilityProps> = ({ facilityId, currentName, cu
     const [city, setCity] = useState(currentCity);
     const [address, setAddress] = useState(currentAddress);
     const [message, setMessage] = useState('');
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`/api/facilities/${facilityId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ name, city, address })
-            });
-            if (response.ok) {
-                const updatedFacility = await response.json();
-                onUpdated(updatedFacility);
-                setMessage('');
-            } else {
-                const error = await response.text();
-                setMessage(t("universal.error") + error);
-            }
+            const { data: updatedFacility } = await api.put<Facility>(`/facilities/${facilityId}`, { name, city, address });
+            onUpdated(updatedFacility);
+            setMessage('');
         } catch (err: any) {
             setMessage(t("universal.error") + err.message);
         }

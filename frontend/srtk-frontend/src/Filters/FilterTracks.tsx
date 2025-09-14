@@ -14,14 +14,12 @@ const FilterTracks: React.FC<FilterTracksProps> = ({ onFilterChange }) => {
     const { t } = useTranslation();
     const { facilities } = useFacilities(token);
 
-    // Filtr torów po obiekcie:
     const handleFacilityChange = (value: string) => {
         const id = value ? Number(value) : undefined;
         setSelectedFacilityId(id);
         onFilterChange(id);
     };
 
-    // Reset filtrów:
     const handleReset = () => {
         setSelectedFacilityId(undefined);
         onFilterChange(undefined);

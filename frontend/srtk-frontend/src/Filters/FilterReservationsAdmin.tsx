@@ -15,28 +15,24 @@ const FilterReservationsAdmin: React.FC<FilterReservationsAdminProps> = ({ track
     const [selectedStartDate, setSelectedStartDate] = useState<string | undefined>();
     const { t } = useTranslation();
 
-    // Filtr torów:
     const handleTrackChange = (value: string) => {
         const id = value ? Number(value) : undefined;
         setSelectedTrackId(id);
         onFilterChange(id, selectedStatusId, selectedStartDate);
     };
 
-    // Filtr statusów:
     const handleStatusChange = (value: string) => {
         const id = value ? Number(value) : undefined;
         setSelectedStatusId(id);
         onFilterChange(selectedTrackId, id, selectedStartDate);
     };
 
-    // Filtr daty startu:
     const handleStartDateChange = (value: string) => {
         const date = value || undefined;
         setSelectedStartDate(date);
         onFilterChange(selectedTrackId, selectedStatusId, date);
     }
 
-    // Reset filtrów:
     const handleReset = () => {
         setSelectedTrackId(undefined);
         setSelectedStatusId(undefined);

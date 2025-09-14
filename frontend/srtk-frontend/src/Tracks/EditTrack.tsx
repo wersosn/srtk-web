@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
+import type { Track } from '../Types/Types';
 
 interface EditTrackProps {
     trackId: number;
@@ -24,29 +26,15 @@ const EditTrack: React.FC<EditTrackProps> = ({ trackId, currentName, currentType
     const allDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];
     const facilityId = currentFacilityId;
     const [message, setMessage] = useState('');
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`/api/tracks/${trackId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ name, typeofsurface, length, openingHour, closingHour, availableDays: availableDays.join(","), facilityId })
-            });
-            if (response.ok) {
-                const updatedTrack = await response.json();
-                onUpdated(updatedTrack);
-                setMessage('');
-            } else {
-                const error = await response.text();
-                setMessage(t("universal.error") + error);
-            }
+            const { data: updatedTrack } = await api.put<Track>(`/tracks/${trackId}`, { name, typeofsurface, length, openingHour, closingHour, availableDays: availableDays.join(","), facilityId });
+            onUpdated(updatedTrack);
+            setMessage('');
         } catch (err: any) {
             setMessage(t("universal.error") + err.message);
         }
@@ -76,26 +64,26 @@ const EditTrack: React.FC<EditTrackProps> = ({ trackId, currentName, currentType
                     <input id="trackClosingHour" type="time" value={closingHour} onChange={e => setClosingHour(e.target.value)} required className="info-input" />
                 </div>
                 <div className="mb-2">
-                        <label>{t("track.availableDays")}</label>
-                        <div className="d-flex flex-wrap gap-2 mt-1">
-                            {allDays.map(day => (
-                                <label key={day} className="form-check">
-                                    <input
-                                        type="checkbox"
-                                        checked={availableDays.includes(day)}
-                                        onChange={() =>
-                                            setAvailableDays(prev =>
-                                                prev.includes(day)
-                                                    ? prev.filter(d => d !== day)
-                                                    : [...prev, day]
-                                            )
-                                        }
-                                    />
-                                    <span style={{ marginLeft: "8px" }}>{day}</span>
-                                </label>
-                            ))}
-                        </div>
+                    <label>{t("track.availableDays")}</label>
+                    <div className="d-flex flex-wrap gap-2 mt-1">
+                        {allDays.map(day => (
+                            <label key={day} className="form-check">
+                                <input
+                                    type="checkbox"
+                                    checked={availableDays.includes(day)}
+                                    onChange={() =>
+                                        setAvailableDays(prev =>
+                                            prev.includes(day)
+                                                ? prev.filter(d => d !== day)
+                                                : [...prev, day]
+                                        )
+                                    }
+                                />
+                                <span style={{ marginLeft: "8px" }}>{day}</span>
+                            </label>
+                        ))}
                     </div>
+                </div>
                 <div className="d-flex gap-2">
                     <button type="submit">{t("universal.saveChanges")}</button>
                     <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>

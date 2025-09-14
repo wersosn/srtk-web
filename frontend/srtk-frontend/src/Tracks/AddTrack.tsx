@@ -1,10 +1,9 @@
 import React, { useState, useEffect, type FormEvent } from "react";
-import type { Track, Facility } from '../Types/Types';
-import { getAllFacilities } from '../Services/Api';
+import type { Track } from '../Types/Types';
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../User/AuthContext";
 import { useFacilities } from "../Hooks/useFacilities";
-
+import api from "../Api/axios";
 interface AddTrackProps {
     onAddTrack: (newTrack: Track) => void;
 }
@@ -38,35 +37,16 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
         const newTrack = { name, typeofsurface, length, openingHour, closingHour, availableDays: availableDays.join(","), facilityId: facilityID };
 
         try {
-            const response = await fetch("/api/tracks", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(newTrack)
-            });
-
-            if (response.ok) {
-                const createdTrack: Track = await response.json();
-                setMessage(t("track.trackAdded"));
-                setName("");
-                setTypeofsurface("");
-                setLength(0);
-                setOpeningHour("");
-                setClosingHour("");
-                setAvailableDays([]);
-                setFacilityId("");
-                onAddTrack(createdTrack);
-            } else {
-                let errorText = await response.text();
-                try {
-                    const errorData = JSON.parse(errorText);
-                    setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
-                } catch {
-                    setMessage(t("universal.error") + (errorText));
-                }
-            }
+            const { data: createdTrack } = await api.post<Track>("/tracks", newTrack);
+            setMessage(t("track.trackAdded"));
+            setName("");
+            setTypeofsurface("");
+            setLength(0);
+            setOpeningHour("");
+            setClosingHour("");
+            setAvailableDays([]);
+            setFacilityId("");
+            onAddTrack(createdTrack);
         } catch (error: any) {
             setMessage(t("universal.error") + error.message);
         }

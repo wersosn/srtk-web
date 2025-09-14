@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import deleteIcon from '../assets/delete.png';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
 
 interface DeleteTrackProps {
     trackId: number;
@@ -10,11 +11,10 @@ interface DeleteTrackProps {
 const DeleteTrack: React.FC<DeleteTrackProps> = ({ trackId, onDeleted }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     const handleDelete = async () => {
-        if (!window.confirm(t("track.deleteAlert"))) { 
+        if (!window.confirm(t("track.deleteAlert"))) {
             return;
         }
 
@@ -22,18 +22,8 @@ const DeleteTrack: React.FC<DeleteTrackProps> = ({ trackId, onDeleted }) => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/tracks/${trackId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            if (response.ok) {
-                onDeleted();
-            } else {
-                const text = await response.text();
-                setError(`${t("universal.error")} ${text || t("track.deleteError")}`);
-            }
+            await api.delete(`/tracks/${trackId}`);
+            onDeleted();
         } catch (err: any) {
             setError(`${t("universal.error")} ${err.message}`);
         } finally {
@@ -44,7 +34,7 @@ const DeleteTrack: React.FC<DeleteTrackProps> = ({ trackId, onDeleted }) => {
     return (
         <>
             <button onClick={handleDelete} disabled={loading} className="icon-button">
-                <img src={deleteIcon} alt="Usuń" style={{ width: '16px', height: '16px' }}/>
+                <img src={deleteIcon} alt="Usuń" style={{ width: '16px', height: '16px' }} />
             </button>
             {error && <div className="text-danger mt-1">{error}</div>}
         </>

@@ -15,14 +15,12 @@ const FilterUsers: React.FC<FilterUsersProps> = ({ onFilterChange }) => {
     const { t } = useTranslation();
     const { roles } = useRoles(token);
 
-    // Filtr torów po obiekcie:
     const handleRoleChange = (value: string) => {
         const id = value ? Number(value) : undefined;
         setSelectedRoleId(id);
         onFilterChange(id);
     };
 
-    // Reset filtrów:
     const handleReset = () => {
         setSelectedRoleId(undefined);
         onFilterChange(undefined);

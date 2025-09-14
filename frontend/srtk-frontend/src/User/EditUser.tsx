@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import type { Facility, Role } from '../Types/Types';
+import type { Facility, Role, User } from '../Types/Types';
 import { getAllFacilities, getAllRoles } from '../Services/Api';
 import { useTranslation } from "react-i18next";
 import { useAuth } from './AuthContext';
+import api from "../Api/axios";
 
 interface EditUserProps {
     userId: number;
@@ -49,7 +50,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 console.error(t("api.facilityError"));
             }
         };
-        
+
         const fetchRoles = async () => {
             try {
                 const data = await getAllRoles(token!);
@@ -82,22 +83,9 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
         }
 
         try {
-            const response = await fetch(`/api/users/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(bodyData)
-            });
-            if (response.ok) {
-                const updatedUser = await response.json();
-                onUpdated(updatedUser);
-                setMessage('');
-            } else {
-                const error = await response.text();
-                setMessage(t("universal.error") + error);
-            }
+            const { data: updatedUser } = await api.put<User>(`/users/${userId}`, bodyData);
+            onUpdated(updatedUser);
+            setMessage('');
         } catch (err: any) {
             setMessage(t("universal.error") + err.message);
         }

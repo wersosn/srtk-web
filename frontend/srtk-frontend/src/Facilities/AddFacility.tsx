@@ -1,6 +1,7 @@
 import React, { useState, type FormEvent } from "react";
 import type { Facility } from '../Types/Types';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
 
 interface AddFacilityProps {
     onAddFacility: (newFacility: Facility) => void;
@@ -11,7 +12,6 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
     const [city, setCity] = useState<string>("");
     const [address, setAddress] = useState<string>("");
     const [message, setMessage] = useState<string>("");
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     const handleSubmit = async (e: FormEvent) => {
@@ -20,31 +20,12 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
         const newFacility = { name, city, address };
 
         try {
-            const response = await fetch("/api/facilities", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(newFacility)
-            });
-
-            if (response.ok) {
-                const createdFacility: Facility = await response.json();
-                setMessage(t("facility.facilityAdded"));
-                setName("");
-                setCity("");
-                setAddress("");
-                onAddFacility(createdFacility);
-            } else {
-                let errorText = await response.text();
-                try {
-                    const errorData = JSON.parse(errorText);
-                    setMessage(t("universal.error") + (errorData.detail || JSON.stringify(errorData)));
-                } catch {
-                    setMessage(t("universal.error") + (errorText));
-                }
-            }
+            const { data: createdFacility } = await api.post<Facility>("/facilities", newFacility);
+            setMessage(t("facility.facilityAdded"));
+            setName("");
+            setCity("");
+            setAddress("");
+            onAddFacility(createdFacility);
         } catch (error: any) {
             setMessage(t("universal.error") + error.message);
         }

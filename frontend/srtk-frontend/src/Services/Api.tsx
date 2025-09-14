@@ -1,4 +1,4 @@
-import type { Reservation, Track, Equipment, EquipmentWithQuantity, Facility, Role, Status, User, Client, Admin, UserPreference } from "../Types/Types";
+import type { Reservation, Track, Equipment, EquipmentWithQuantity, Facility, Role, Status, Client, Admin, UserPreference } from "../Types/Types";
 
 // Ogólny fetch GET z tokenem:
 const fetchWithAuth = async (url: string, token: string) => {

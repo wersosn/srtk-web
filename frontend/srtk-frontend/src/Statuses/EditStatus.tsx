@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
+import type { Status } from '../Types/Types';
 
 interface EditStatusProps {
     statusId: number;
@@ -11,29 +13,15 @@ interface EditStatusProps {
 const EditStatus: React.FC<EditStatusProps> = ({ statusId, currentName, onUpdated, onCancel }) => {
     const [name, setName] = useState(currentName);
     const [message, setMessage] = useState('');
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`/api/statuses/${statusId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ name })
-            });
-            if (response.ok) {
-                const updatedStatus = await response.json();
-                onUpdated(updatedStatus);
-                setMessage('');
-            } else {
-                const error = await response.text();
-                setMessage(t("universal.error") + error);
-            }
+            const { data: updatedStatus } = await api.put<Status>(`/statuses/${statusId}`, { name });
+            onUpdated(updatedStatus);
+            setMessage('');
         } catch (err: any) {
             setMessage(t("universal.error") + err.message);
         }

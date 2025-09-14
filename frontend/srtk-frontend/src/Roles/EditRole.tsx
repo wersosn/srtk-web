@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from "react-i18next";
+import api from "../Api/axios";
+import type { Role } from '../Types/Types';
 
 interface EditRoleProps {
     roleId: number;
@@ -11,29 +13,15 @@ interface EditRoleProps {
 const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onCancel }) => {
     const [name, setName] = useState(currentName);
     const [message, setMessage] = useState('');
-    const token = localStorage.getItem('token');
     const { t } = useTranslation();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const response = await fetch(`/api/roles/${roleId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ name })
-            });
-            if (response.ok) {
-                const updatedRole = await response.json();
-                onUpdated(updatedRole);
-                setMessage('');
-            } else {
-                const error = await response.text();
-                setMessage(t("universal.error") + error);
-            }
+            const { data: updatedRole } = await api.put<Role>(`/roles/${roleId}`, { name });
+            onUpdated(updatedRole);
+            setMessage('');
         } catch (err: any) {
             setMessage(t("universal.error") + err.message);
         }

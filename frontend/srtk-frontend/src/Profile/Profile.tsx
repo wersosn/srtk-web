@@ -21,7 +21,6 @@ function Profile() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Pobieranie danych użytkownika:
     const fetchUserInfo = useCallback(async () => {
         if (!userId) {
             return;
@@ -49,13 +48,11 @@ function Profile() {
         }
     }, [userId, fetchUserInfo]);
 
-    // Obsługa zmiany danych:
     const handleEdit = (updatedUser: Client) => {
         setUser(updatedUser);
         alert(t("profile.infoUpdated"));
     };
 
-    // Obsługa zmiany języka:
     const handleLanguageChange = (lang: string) => {
         setLanguage(lang);
         i18n.changeLanguage(lang);
@@ -89,7 +86,6 @@ function Profile() {
         }
     };
 
-    // Obsługa zmiany ilości elementów na listach (np. rezerwacji itp.):
     const handleUpdatingElementsPerPage = async () => {
         if (elementsPerPage <= 0) {
             alert(t("profile.invalidElements"));
