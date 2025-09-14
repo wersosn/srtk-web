@@ -38,21 +38,13 @@ function MakeReservation() {
     // Handler sprawdzający, czy data rozpoczęcia jest zgodna z godzinami funkcjonowania toru:
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
-        if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
-            setStartDate(val);
-        } else {
-            alert(t("makeReservations.startDateNotAvailable"));
-        }
+        setStartDate(val);
     };
 
     // Handler sprawdzający, czy data zakończenia jest zgodna z godzinami funkcjonowania toru:
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
-        if (isValidDateTime(val, openingHour, closingHour, allowedDays)) {
-            setEndDate(val);
-        } else {
-            alert(t("makeReservations.endDateNotAvailable"));
-        }
+        setEndDate(val);
     };
 
     const validateInputs = () => {
@@ -60,6 +52,17 @@ function MakeReservation() {
             alert(t("makeReservations.allInfo"));
             return false;
         }
+
+        if (!isValidDateTime(startDate, openingHour, closingHour, allowedDays)) {
+            alert(t("makeReservations.startDateNotAvailable"));
+            return;
+        }
+
+        if (!isValidDateTime(endDate, openingHour, closingHour, allowedDays)) {
+            alert(t("makeReservations.endDateNotAvailable"));
+            return;
+        }
+
         if (new Date(startDate) >= new Date(endDate)) {
             alert(t("makeReservations.datesError"));
             return false;
@@ -108,7 +111,9 @@ function MakeReservation() {
     }
 
     const handleReservation = async () => {
-        validateInputs();
+        if(!validateInputs()) {
+            return;
+        }
         const reservationBody = buildReservationBody();
 
         try {
