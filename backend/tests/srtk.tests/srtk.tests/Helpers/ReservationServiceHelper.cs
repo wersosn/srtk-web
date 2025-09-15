@@ -28,6 +28,37 @@ namespace srtk.tests.Helpers
                 .Select(r => r.ToDto())
                 .ToListAsync();
         }
+        public override async Task<List<ReservationDto>> GetAllInTrack(int trackId)
+        {
+            return await context.Reservations
+                .Where(r => r.TrackId == trackId)
+                .Select(r => r.ToDto())
+                .ToListAsync();
+        }
+
+        public override async Task<List<ReservationDto>> GetAllWithStatus(int statusId)
+        {
+            return await context.Reservations
+                .Where(r => r.StatusId == statusId)
+                .Select(r => r.ToDto())
+                .ToListAsync();
+        }
+
+        public override async Task<List<ReservationDto>> GetByStartDateAndHour(DateTime date, TimeSpan hour)
+        {
+            return await context.Reservations
+                .Where(r => r.Start.Date == date.Date && r.Start.TimeOfDay == hour)
+                .Select(r => r.ToDto())
+                .ToListAsync();
+        }
+
+        public override async Task<List<ReservationDto>> GetByEndDateAndHour(DateTime date, TimeSpan hour)
+        {
+            return await context.Reservations
+                .Where(r => r.End.Date == date.Date && r.End.TimeOfDay == hour)
+                .Select(r => r.ToDto())
+                .ToListAsync();
+        }
 
         public override async Task<List<ReservationDto>> GetUserReservations(int userId)
         {
@@ -46,6 +77,11 @@ namespace srtk.tests.Helpers
             }).ToList();
 
             return dtos;
+        }
+
+        public override async Task<Reservation?> GetById(int id)
+        {
+            return await context.Reservations.FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public override Task<bool> IsTrackAvailable(int trackId, DateTime start, DateTime end, int? reservationId = null)

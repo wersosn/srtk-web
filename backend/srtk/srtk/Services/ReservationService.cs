@@ -34,7 +34,7 @@ namespace srtk.Services
                 .ToListAsync();
         }
 
-        public async Task<List<ReservationDto>> GetAllInTrack(int trackId)
+        public async virtual Task<List<ReservationDto>> GetAllInTrack(int trackId)
         {
             return await context.Reservations
                 .Where(r => r.TrackId == trackId)
@@ -47,7 +47,7 @@ namespace srtk.Services
                 .ToListAsync();
         }
 
-        public async Task<List<ReservationDto>> GetAllWithStatus(int statusId)
+        public async virtual Task<List<ReservationDto>> GetAllWithStatus(int statusId)
         {
             return await context.Reservations
                 .Where(r => r.StatusId == statusId)
@@ -80,7 +80,7 @@ namespace srtk.Services
                 .ToListAsync();
         }
 
-        public async Task<List<ReservationDto>> GetByStartDateAndHour(DateTime date, TimeSpan hour)
+        public async virtual Task<List<ReservationDto>> GetByStartDateAndHour(DateTime date, TimeSpan hour)
         {
             return await context.Reservations
                 .Where(r => r.Start.Date == date.Date && r.Start.TimeOfDay == hour)
@@ -92,7 +92,7 @@ namespace srtk.Services
                 .ToListAsync();
         }
 
-        public async Task<List<ReservationDto>> GetByEndDateAndHour(DateTime date, TimeSpan hour)
+        public async virtual Task<List<ReservationDto>> GetByEndDateAndHour(DateTime date, TimeSpan hour)
         {
             return await context.Reservations
                 .Where(r => r.End.Date == date.Date && r.End.TimeOfDay == hour)
@@ -230,7 +230,7 @@ namespace srtk.Services
             return reservation;
         }
 
-        public async Task<Reservation?> Update(int id, [FromBody] ReservationDto dto, string currentUserRole)
+        public async virtual Task<Reservation?> Update(int id, [FromBody] ReservationDto dto, string currentUserRole)
         {
             await using var transaction = await context.Database.BeginTransactionAsync();
             try

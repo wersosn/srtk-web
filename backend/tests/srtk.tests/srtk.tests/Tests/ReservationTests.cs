@@ -1,17 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using srtk.DTO;
+﻿using srtk.DTO;
 using srtk.Models;
 using srtk.Services;
 using srtk.tests.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
-using DocumentFormat.OpenXml;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Microsoft.Extensions.Configuration;
 
 namespace srtk.tests.Tests
 {
@@ -96,6 +87,7 @@ namespace srtk.tests.Tests
 
             var track = new TrackDto
             {
+                Id = 1,
                 Name = "Tor 1",
                 Length = 100,
                 TypeOfSurface = "Beton",
@@ -107,6 +99,7 @@ namespace srtk.tests.Tests
 
             var reservation = new Reservation
             {
+                Id = 1,
                 Start = DateTime.Now,
                 End = DateTime.MaxValue,
                 UserId = user.Id,
@@ -116,6 +109,7 @@ namespace srtk.tests.Tests
 
             var reservation2 = new Reservation
             {
+                Id = 2,
                 Start = DateTime.MinValue,
                 End = DateTime.MaxValue,
                 UserId = user.Id,
@@ -159,6 +153,7 @@ namespace srtk.tests.Tests
 
             var reservation = new Reservation
             {
+                Id = 1,
                 Start = DateTime.Now,
                 End = DateTime.Now.AddHours(2),
                 UserId = user.Id,
@@ -168,10 +163,11 @@ namespace srtk.tests.Tests
 
             var reservation2 = new Reservation
             {
+                Id = 2,
                 Start = DateTime.MinValue,
                 End = DateTime.Now.AddHours(5),
                 UserId = user.Id,
-                TrackId = t.Id
+                TrackId = 234
             };
             await service.Add(reservation2);
 
@@ -200,18 +196,21 @@ namespace srtk.tests.Tests
 
             var status = new StatusDto
             {
+                Id = 1,
                 Name = "Zarezerwowano"
             };
             await statusService.Add(status);
 
             var status2 = new StatusDto
             {
+                Id = 2,
                 Name = "Anulowano"
             };
             await statusService.Add(status2);
 
             var reservation = new Reservation
             {
+                Id = 1,
                 Start = DateTime.Now,
                 End = DateTime.Now.AddHours(2),
                 UserId = user.Id,
@@ -222,6 +221,7 @@ namespace srtk.tests.Tests
 
             var reservation2 = new Reservation
             {
+                Id = 2,
                 Start = DateTime.MinValue,
                 End = DateTime.Now.AddHours(5),
                 UserId = user.Id,
@@ -390,6 +390,7 @@ namespace srtk.tests.Tests
 
             var track = new TrackDto
             {
+                Id = 1,
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
                 Length = 1000,
@@ -401,6 +402,7 @@ namespace srtk.tests.Tests
 
             var reservation = new Reservation
             {
+                Id = 1,
                 Start = DateTime.Now.ToUniversalTime(),
                 End = DateTime.MaxValue.ToUniversalTime(),
                 UserId = user.Id,
@@ -435,6 +437,7 @@ namespace srtk.tests.Tests
 
             var track = new TrackDto
             {
+                Id = 1,
                 Name = "Tor kolarski",
                 TypeOfSurface = "Gładka",
                 Length = 1000,
@@ -456,6 +459,7 @@ namespace srtk.tests.Tests
 
             var updatedReservation = new ReservationDto
             {
+                Id = 1,
                 Start = DateTime.MinValue,
                 End = DateTime.MaxValue,
                 TrackId = track.Id
@@ -512,6 +516,59 @@ namespace srtk.tests.Tests
 
             Assert.Empty(context.Reservations);
             output.WriteLine("Wynik: Usunięto rezerwację");
+        }
+
+        // Test - anulowanie rezerwacji:
+        [Fact]
+        public async Task Canceling_Reservation()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new ReservationServiceHelper(context, emailService);
+            var trackService = new TrackService(context);
+            var statusService = new StatusService(context);
+            var userService = new UserService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "test123",
+                RoleId = 1
+            };
+            await userService.Add(user);
+
+            var track = new TrackDto
+            {
+                Id = 1,
+                Name = "Tor kolarski",
+                TypeOfSurface = "Gładka",
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
+            };
+            await trackService.Add(track);
+
+            var status = new StatusDto
+            {
+                Id = 1,
+                Name = "Anulowano"
+            };
+            await statusService.Add(status);
+
+            var reservation = new Reservation
+            {
+                Id = 1,
+                Start = DateTime.Now,
+                End = DateTime.MaxValue,
+                UserId = user.Id,
+                TrackId = track.Id
+            };
+            await service.Add(reservation);
+
+            var cancelled = await service.Cancel(reservation.Id);
+
+            Assert.True(cancelled);
+            Assert.Equal("Anulowano", reservation.Status.Name);
+            output.WriteLine("Wynik: Anulowano rezerwację");
         }
 
         // Test - sprawdzenie eksportu w formacie .xlsx:

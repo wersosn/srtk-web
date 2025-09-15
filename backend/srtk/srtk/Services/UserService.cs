@@ -221,6 +221,33 @@ namespace srtk.Services
             };
         }
 
+        public async Task<UserPreferenceDto?> AddElementsPerPage(int userId, int elementsPerPage)
+        {
+            if (elementsPerPage <= 0)
+            {
+                throw new ArgumentException("Ilość elementów musi być > 0");
+            }
+
+            var exists = await context.UserPreferences.AnyAsync(u => u.UserId == userId);
+            if (exists)
+            {
+                throw new InvalidOperationException("Preferencja dla tego użytkownika już istnieje.");
+            }
+
+            var userPreference = new UserPreference
+            {
+                UserId = userId,
+                ElementsPerPage = elementsPerPage
+            };
+            context.UserPreferences.Add(userPreference);
+            await context.SaveChangesAsync();
+            return new UserPreferenceDto
+            {
+                UserId = userPreference.UserId,
+                ElementsPerPage = userPreference.ElementsPerPage
+            };
+        }
+
         public async Task<UserPreferenceDto?> UpdateElementsPerPage(int userId, int elementsPerPage)
         {
             if (elementsPerPage <= 0)
@@ -232,18 +259,9 @@ namespace srtk.Services
 
             if (userPreference == null)
             {
-                userPreference = new UserPreference
-                {
-                    UserId = userId,
-                    ElementsPerPage = elementsPerPage
-                };
-                context.UserPreferences.Add(userPreference);
+                return await AddElementsPerPage(userId, elementsPerPage);
             }
-            else
-            {
-                userPreference.ElementsPerPage = elementsPerPage;
-            }
-
+            userPreference.ElementsPerPage = elementsPerPage;
             await context.SaveChangesAsync();
             return new UserPreferenceDto
             {
