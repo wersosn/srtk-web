@@ -25,10 +25,10 @@ function ConfirmedEmail() {
                     headers: { 'Content-Type': 'application/json', 'X-Client-Type': 'web' },
                     body: JSON.stringify({ token }),
                 });
-
+                
+                const data = await response.json();
                 if (!response.ok) {
-                    const msg = await response.text();
-                    throw new Error(msg);
+                    alert(data.message);
                 }
                 setConfirmed(true);
                 setTimeout(() => navigate('/'), 5000);

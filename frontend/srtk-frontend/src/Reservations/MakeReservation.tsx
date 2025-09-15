@@ -25,7 +25,7 @@ function MakeReservation() {
     const [rentEquipment, setRentEquipment] = useState(false);
     const { equipmentList } = useEquipments(selectedTrackId, rentEquipment, tracks, token);
     const [equipmentQuantities, setEquipmentQuantities] = useState<Record<number, number>>({});
-    const isAvailable = useTrackAvailability(selectedTrackId, startDate, endDate, token);
+    const isAvailable = useTrackAvailability(tracks, selectedTrackId, startDate, endDate, token);
     const cost = useCost(equipmentQuantities, equipmentList);
     const trackInfo = useTrackDetails(selectedTrackId, tracks, t);
     const { addNotification } = useNotifications(token, userId!, t);
@@ -53,12 +53,12 @@ function MakeReservation() {
 
         if (!isValidDateTime(startDate, openingHour, closingHour, allowedDays)) {
             alert(t("makeReservations.startDateNotAvailable"));
-            return;
+            return false;
         }
 
         if (!isValidDateTime(endDate, openingHour, closingHour, allowedDays)) {
             alert(t("makeReservations.endDateNotAvailable"));
-            return;
+            return false;
         }
 
         if (new Date(startDate) >= new Date(endDate)) {

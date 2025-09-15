@@ -8,6 +8,8 @@ import { useTrack } from '../Hooks/useTrack';
 import { useEquipmentsInFacility } from '../Hooks/useEquipmentsInFacility';
 import api from "../Api/axios";
 import type { Reservation } from '../Types/Types';
+import { useTrackDetails } from '../Hooks/useTrackDetails';
+import { useTracks } from '../Hooks/useTracks';
 
 interface EditReservationProps {
     reservationId: number;
@@ -23,6 +25,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const { t } = useTranslation();
     const [startDate, setStartDate] = useState(formatToDatetimeLocal(currentStart));
     const [endDate, setEndDate] = useState(formatToDatetimeLocal(currentEnd));
+    const { tracks } = useTracks(token!);
     const track = useTrack(trackId, token);
     const [rentEquipment, setRentEquipment] = useState(false);
     const equipmentList = useEquipmentsInFacility(rentEquipment, track, token);
@@ -31,7 +34,8 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const cost = useCost(equipmentQuantities, equipmentList);
-    const { isAvailable } = useTrackAvailabilityEdit(trackId, startDate, endDate, reservationId, token!);
+    const trackInfo = useTrackDetails(trackId, tracks, t);
+    const { isAvailable } = useTrackAvailabilityEdit(track!, trackId, startDate, endDate, reservationId, token!);
 
     useEffect(() => {
         if (!reservationId) {
@@ -68,14 +72,15 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setStartDate(val);
+        setDatesChanged(true);
     };
 
     const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setEndDate(val);
+        setDatesChanged(true);
     };
 
-    // Handler do obsługi zmiany ilości:
     const handleQuantityChange = (equipmentId: number, value: string) => {
         const qty = parseInt(value, 10);
         setEquipmentQuantities((prev) => ({
@@ -92,12 +97,12 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
         if (!isValidDateTime(startDate, openingHour, closingHour, allowedDays)) {
             alert(t("makeReservations.startDateNotAvailable"));
-            return;
+            return false;
         }
 
         if (!isValidDateTime(endDate, openingHour, closingHour, allowedDays)) {
             alert(t("makeReservations.endDateNotAvailable"));
-            return;
+            return false;
         }
 
         if (isAvailable === false) {
@@ -127,7 +132,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-         if(!validateInputs()) {
+        if (!validateInputs()) {
             return;
         }
         const reservationBody = buildReservationBody();
@@ -146,6 +151,8 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     return (
         <>
             <form onSubmit={handleSubmit}>
+                {trackInfo && <p>{trackInfo}</p>}
+
                 <label>{t("makeReservations.start")}</label>
                 <input type="datetime-local" className="info-input" value={startDate} onChange={handleStartDateChange} />
 
@@ -153,7 +160,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                 <input type="datetime-local" className="info-input" value={endDate} onChange={handleEndDateChange} />
 
                 {datesChanged && isAvailable === false && (
-                    <p className="text-danger">{t("makeReservations.noAvailable")}</p>
+                    <p className="text-danger">{t("makeReservations.notAvailable")}</p>
                 )}
                 {datesChanged && isAvailable === true && (
                     <p className="text-success">{t("makeReservations.available")}</p>

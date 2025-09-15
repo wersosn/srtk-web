@@ -46,7 +46,7 @@
     "trackDays": " and on days: ",
     "start": "Start Date",
     "end": "End Date",
-    "notAvailable": "This track is already booked for the selected time.",
+    "notAvailable": "The track is not available for the selected time.",
     "available": "The track is available at this time.",
     "eq": "I want to rent equipment",
     "selectEq": "Equipment to choose:",

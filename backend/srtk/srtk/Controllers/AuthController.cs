@@ -35,7 +35,7 @@ namespace srtk.Controllers
                 return BadRequest(error);
             }
             logger.LogInformation("Zarejestrowano pomyślnie użytkownika z adresem e-mail: {Email}", dto.Email);
-            return Ok(new { message = "Zarejestrowano pomyślnie" });
+            return Ok("Zarejestrowano pomyślnie");
         }
 
         [HttpPost("login")]
@@ -62,24 +62,40 @@ namespace srtk.Controllers
         public async Task<IActionResult> Logout()
         {
             logger.LogInformation("Wylogowano pomyślnie użytkownika");
-            return Ok(new { message = "Wylogowano pomyślnie" });
+            return Ok("Wylogowano pomyślnie");
         }
 
         [HttpPost("email-confirmation")]
         public async Task<IActionResult> EmailConfirmation([FromBody] EmailConfirmationDto dto)
         {
             var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
-            await service.EmailConfirmation(dto.Email, clientType);
-            logger.LogInformation("Wysłano mail z potwierdzeniem adresu e-mail na adres e-mail: {Email}", dto.Email);
-            return Ok("Mail z linkiem do potwierdzenia e-maila został wysłany");
+            try
+            {
+                await service.EmailConfirmation(dto.Email, clientType);
+                logger.LogInformation("Wysłano mail z potwierdzeniem adresu e-mail na adres e-mail: {Email}", dto.Email);
+                return Ok("Mail z linkiem do potwierdzenia e-maila został wysłany");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Błąd podczas potwierdzania adresu e-mail: {Email}", dto.Email);
+                return StatusCode(500, "Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.");
+            }
         }
 
         [HttpPost("confirm-email")]
         public async Task<IActionResult> EmailConfirmed([FromBody] EmailConfirmationDto dto)
         {
-            await service.EmailConfirmed(dto.Token);
-            logger.LogInformation("Potwierdzono adres e-mail: {Email}", dto.Email);
-            return Ok("Potwierdzono adres e-mail");
+            try
+            {
+                await service.EmailConfirmed(dto.Token);
+                logger.LogInformation("Potwierdzono adres e-mail: {Email}", dto.Email);
+                return Ok("Potwierdzono adres e-mail");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Błąd podczas potwierdzania adresu e-mail: {Email}", dto.Email);
+                return StatusCode(500, "Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.");
+            }
         }
 
         [HttpPost("forgot-password")]
@@ -106,9 +122,21 @@ namespace srtk.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
-            await service.ResetPassword(dto.Token, dto.NewPassword);
-            logger.LogInformation("Pomyślnie zresetowano hasło");
-            return Ok("Zresetowano hasło");
+            try
+            {
+                await service.ResetPassword(dto.Token, dto.NewPassword);
+                logger.LogInformation("Pomyślnie zresetowano hasło");
+                return Ok("Zresetowano hasło");
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Błąd podczas resetu hasła");
+                return StatusCode(500, "Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.");
+            }
         }
     }
 }

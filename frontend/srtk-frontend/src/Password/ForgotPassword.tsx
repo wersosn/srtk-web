@@ -35,8 +35,7 @@ function ForgotPassword() {
             });
 
             if (!response.ok) {
-                const msg = await response.text();
-                throw new Error(msg);
+                alert(data.message);
             }
 
             setInfo(t("auth.resetPasswordEmail"));
