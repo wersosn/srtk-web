@@ -138,7 +138,7 @@ namespace srtk.Services
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
-        public async virtual Task<Reservation> Add(Reservation reservation)
+        public async virtual Task<Reservation> Add(Reservation reservation, string language = null)
         {
             using var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
@@ -205,20 +205,33 @@ namespace srtk.Services
             var track = await context.Tracks.FirstOrDefaultAsync(t => t.Id == reservation.TrackId);
             if (user != null)
             {
-                _ = Task.Run(async () =>
+                string title, body;
+                if (language.Equals("en", StringComparison.OrdinalIgnoreCase))
                 {
-                    try
-                    {
-                        await emailService.SendEmail(
-                            user.Email,
-                            "Potwierdzenie rezerwacji toru",
-                            $@"
+                    title = "Track reservation confirmation";
+                    body = $@"
+                            <div style='font-family: Arial, sans-serif; padding: 10px'>
+                                <h2>Hello {user.Email}!</h2>
+                                <p>Thank you for reserving the track <strong>{track?.Name}</strong>.</p>
+                                <p>You can check your reservation details in the 'My Reservations' section :)</p>
+                            </div>";
+                }
+                else
+                {
+                    title = "Potwierdzenie rezerwacji toru";
+                    body = $@"
                             <div style='font-family: Arial, sans-serif; padding: 10px'>
                                 <h2>Witaj {user.Email}!</h2>
                                 <p>Dziękujemy za rezerwację toru <strong>{track?.Name}</strong>.</p>
                                 <p>Szczegóły rezerwacji możesz sprawdzić w zakładce 'Moje rezerwacje' :)</p>
-                            </div>"
-                        );
+                            </div>";
+                }
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await emailService.SendEmail(user.Email, title, body);
                     }
                     catch (Exception ex)
                     {
@@ -230,7 +243,7 @@ namespace srtk.Services
             return reservation;
         }
 
-        public async virtual Task<Reservation?> Update(int id, [FromBody] ReservationDto dto, string currentUserRole)
+        public async virtual Task<Reservation?> Update(int id, [FromBody] ReservationDto dto, string currentUserRole, string language = null)
         {
             await using var transaction = await context.Database.BeginTransactionAsync();
             try
@@ -319,14 +332,24 @@ namespace srtk.Services
 
                     if (user != null)
                     {
-                        _ = Task.Run(async () =>
+                        string title, body;
+                        if (language.Equals("en", StringComparison.OrdinalIgnoreCase))
                         {
-                            try
-                            {
-                                await emailService.SendEmail(
-                                    user.Email,
-                                    "Zmodyfikowano szczegóły rezerwacji toru",
-                                    $@"
+                            title = "Track reservation details modified";
+                            body = $@"
+                                    <div style='font-family: Arial, sans-serif; padding: 10px'>
+                                        <h2>Hello {user.Email}!</h2>
+                                        <p>Your reservation for the track <strong>{track?.Name}</strong> has been modified.</p>
+                                        <p>Current reservation details:</p>
+                                        <p>Date: {reservation.Start} - {reservation.End}</p>
+                                        <p>Cost: {reservation.Cost} zł</p>
+                                        <p>Equipment: {equipmentListHtml}</p>
+                                    </div>";
+                        }
+                        else
+                        {
+                            title = "Zmodyfikowano szczegóły rezerwacji toru";
+                            body = $@"
                                     <div style='font-family: Arial, sans-serif; padding: 10px'>
                                         <h2>Witaj {user.Email}!</h2>
                                         <p>Twoja rezerwacja toru <strong>{track?.Name}</strong> została zmodyfikowana.</p>
@@ -334,8 +357,14 @@ namespace srtk.Services
                                         <p>Data: {reservation.Start} - {reservation.End}</p>
                                         <p>Koszt: {reservation.Cost} zł</p>
                                         <p>Sprzęty: {equipmentListHtml}</p>
-                                    </div>"
-                                );
+                                    </div>";
+                        }
+
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                await emailService.SendEmail(user.Email, title, body);
                             }
                             catch (Exception ex)
                             {

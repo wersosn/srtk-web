@@ -52,7 +52,7 @@ namespace srtk.tests.Tests
                 Password = "Test123"
             };
 
-            var result = await service.Register(dto, "test");
+            var result = await service.Register(dto, "test", "pl");
 
             Assert.Null(result);
             Assert.Single(context.Users);
@@ -76,7 +76,7 @@ namespace srtk.tests.Tests
                 LastName = "Testowy",
                 Password = "Test123"
             };
-            await service.Register(dto, "test");
+            await service.Register(dto, "test", "pl");
 
             var dtoUsed = new RegisterDto
             {
@@ -86,7 +86,7 @@ namespace srtk.tests.Tests
                 Password = "Test12345"
             };
 
-            var result = await service.Register(dtoUsed, "test");
+            var result = await service.Register(dtoUsed, "test", "pl");
 
             Assert.NotNull(result);
             Assert.Single(context.Users);

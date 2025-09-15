@@ -9,6 +9,7 @@ function ForgotPassword() {
     const [error, setError] = useState('');
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const lang = localStorage.getItem("language") ?? "pl";
 
     const handleReset = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,7 +31,7 @@ function ForgotPassword() {
 
             const response = await fetch('/api/auth/forgot-password', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Client-Type': 'web' },
+                headers: { 'Content-Type': 'application/json', 'X-Client-Type': 'web', 'X-Language': lang },
                 body: JSON.stringify({ email }),
             });
 

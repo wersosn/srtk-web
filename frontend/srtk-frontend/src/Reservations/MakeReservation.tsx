@@ -29,6 +29,7 @@ function MakeReservation() {
     const cost = useCost(equipmentQuantities, equipmentList);
     const trackInfo = useTrackDetails(selectedTrackId, tracks, t);
     const { addNotification } = useNotifications(token, userId!, t);
+    const lang = localStorage.getItem("language") ?? "pl";
 
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
@@ -115,7 +116,7 @@ function MakeReservation() {
         const reservationBody = buildReservationBody();
 
         try {
-            await api.post("/reservations", reservationBody);
+            await api.post("/reservations", reservationBody, { headers: { 'X-Language': lang }});
             alert(t("makeReservations.reservationPositive"));
             sendNotifications();
             navigate('/');

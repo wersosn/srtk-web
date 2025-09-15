@@ -15,7 +15,7 @@ namespace srtk.tests.Helpers
     {
         public ReservationServiceHelper(AppDbContext context, EmailService emailService) : base(context, emailService) { }
 
-        public override async Task<Reservation> Add(Reservation reservation)
+        public override async Task<Reservation> Add(Reservation reservation, string language = null)
         {
             context.Reservations.Add(reservation);
             await context.SaveChangesAsync();

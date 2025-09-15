@@ -26,9 +26,9 @@ function ConfirmedEmail() {
                     body: JSON.stringify({ token }),
                 });
                 
-                const data = await response.json();
                 if (!response.ok) {
-                    alert(data.message);
+                    const msg = await response.text();
+                    throw new Error(msg);
                 }
                 setConfirmed(true);
                 setTimeout(() => navigate('/'), 5000);

@@ -95,6 +95,9 @@ builder.Host.UseSerilog();
 // Rejestracja fontów do generowania pdf:
 GlobalFontSettings.FontResolver = new CustomFontResolver();
 
+// T³umaczenie (do maili):
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

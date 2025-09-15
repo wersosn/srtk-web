@@ -1,10 +1,6 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
 using srtk.DTO;
 using srtk.Models;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace srtk.Services
@@ -28,7 +24,7 @@ namespace srtk.Services
             this.config = config;
         }
 
-        public async Task<string?> Register(RegisterDto dto, string clientType)
+        public async Task<string?> Register(RegisterDto dto, string clientType, string language)
         {
             var usedEmail = await context.Users.AnyAsync(u => u.Email == dto.Email);
             if (usedEmail)
@@ -48,7 +44,7 @@ namespace srtk.Services
             };
             await userService.Add(user);
 
-            await EmailConfirmation(user.Email, clientType);
+            await EmailConfirmation(user.Email, clientType, language);
             return null;
         }
 
@@ -88,7 +84,7 @@ namespace srtk.Services
         }
 
         // Żadanie potwierdzenia maila:
-        public async Task EmailConfirmation(string email, string clientType)
+        public async Task EmailConfirmation(string email, string clientType, string language)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
@@ -107,19 +103,34 @@ namespace srtk.Services
                 confirmLink = $"{config["Frontend:BaseUrl"]}/confirm-email?token={token}";
             }
 
+            string title, body;
+
+            if (language.Equals("en", StringComparison.OrdinalIgnoreCase))
+            {
+                title = "Successful registration confirmation";
+                body = $@"
+                        <div style='font-family: Arial, sans-serif; padding: 10px'>
+                            <h2>Hello {user.Email}!</h2>
+                            <p>Thank you for registering on our service. You can now make a reservation for a cycling track :)</p>
+                            <p>Click the link below to confirm your email:</p>
+                            <a href='{confirmLink}'>{confirmLink}</a>
+                        </div>";
+            }
+            else
+            {
+                title = "Potwierdzenie pomyślnej rejestracji";
+                body = $@"
+                        <div style='font-family: Arial, sans-serif; padding: 10px'>
+                            <h2>Witaj {user.Email}!</h2>
+                            <p>Dziękujemy za rejestrację w naszym serwisie. Możesz teraz dokonać rezerwacji toru kolarskiego :)</p>
+                            <p>Kliknij w poniższy link, aby potwierdzić swój e-mail:</p>
+                            <a href='{confirmLink}'>{confirmLink}</a>
+                       </div>";
+            }
+
             _ = Task.Run(async () =>
             {
-                await emailService.SendEmail(
-                    user.Email,
-                    "Potwierdzenie pomyślnej rejestracji",
-                    $@"
-                    <div style='font-family: Arial, sans-serif; padding: 10px'>
-                        <h2>Witaj {user.Email}!</h2>
-                        <p>Dziękujemy za rejestrację w naszym serwisie. Możesz teraz dokonać rezerwacji toru kolarskiego :)</p>
-                        <p>Kliknij w poniższy link, aby potwierdzić swój e-mail:</p>
-                        <a href='{confirmLink}'>{confirmLink}</a>
-                   </div>"
-                );
+                await emailService.SendEmail(user.Email, title, body);
             });
         }
 
@@ -149,7 +160,7 @@ namespace srtk.Services
         }
 
         // Żądanie resetu hasła użytkownika:
-        public async Task ForgotPassword(string email, string clientType)
+        public async Task ForgotPassword(string email, string clientType, string language)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
@@ -173,18 +184,30 @@ namespace srtk.Services
                 resetLink = $"{config["Frontend:BaseUrl"]}/reset-password?token={token}";
             }
 
+            string title, body;
+            if (language.Equals("en", StringComparison.OrdinalIgnoreCase))
+            {
+                title = "Password reset";
+                body = $@"
+                        <div style='font-family: Arial, sans-serif; padding: 10px'>
+                            <h2>Password reset</h2>
+                            <p>Click the link below to set a new password:</p>
+                            <a href='{resetLink}'>{resetLink}</a>
+                        </div>";
+            }
+            else
+            {
+                title = "Reset hasła";
+                body = $@"
+                        <div style='font-family: Arial, sans-serif; padding: 10px'>
+                            <h2>Reset hasła</h2>
+                            <p>Kliknij poniższy link, aby ustawić nowe hasło:</p>
+                            <a href='{resetLink}'>{resetLink}</a>
+                       </div>";
+            }
             _ = Task.Run(async () =>
             {
-                await emailService.SendEmail(
-                    user.Email,
-                    "Reset hasła",
-                    $@"
-                    <div style='font-family: Arial, sans-serif; padding: 10px'>
-                        <h2>Reset hasła</h2>
-                        <p>Kliknij poniższy link, aby ustawić nowe hasło:</p>
-                        <a href='{resetLink}'>{resetLink}</a>
-                   </div>"
-                );
+                await emailService.SendEmail(user.Email, title, body);
             });
         }
 

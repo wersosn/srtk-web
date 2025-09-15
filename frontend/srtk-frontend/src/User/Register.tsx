@@ -12,6 +12,7 @@ const Register = () => {
     const [info, setInfo] = useState('');
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const lang = localStorage.getItem("language") ?? "pl";
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -20,7 +21,7 @@ const Register = () => {
         try {
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-Client-Type': 'web', 'X-Language': lang },
                 body: JSON.stringify({ email, password, name, lastName }),
             });
 

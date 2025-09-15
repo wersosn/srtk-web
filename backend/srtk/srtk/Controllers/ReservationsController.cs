@@ -114,9 +114,10 @@ namespace srtk.Controllers
         [HttpPost]
         public async Task<ActionResult<Reservation>> AddReservation(Reservation reservation)
         {
+            var language = Request.Headers["X-Language"].FirstOrDefault() ?? "pl";
             try
             {
-                var r = await service.Add(reservation);
+                var r = await service.Add(reservation, language);
                 logger.LogInformation("Dodano nową rezerwację toru {TrackId}:  {Start} - {End}", r.TrackId, r.Start, r.End);
                 return CreatedAtAction(nameof(GetReservationById), new { id = r.Id }, r);
             }
@@ -140,7 +141,8 @@ namespace srtk.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReservation(int id, [FromBody] ReservationDto dto)
         {
-            var reservation = await service.Update(id, dto, User.IsInRole("Admin") ? "Admin" : "Client");
+            var language = Request.Headers["X-Language"].FirstOrDefault() ?? "pl";
+            var reservation = await service.Update(id, dto, User.IsInRole("Admin") ? "Admin" : "Client", language);
             if (reservation == null)
             {
                 logger.LogWarning("Nie znaleziono rezerwacji z Id {Id}", id);

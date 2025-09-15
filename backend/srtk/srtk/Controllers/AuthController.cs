@@ -28,7 +28,8 @@ namespace srtk.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
-            var error = await service.Register(dto, clientType);
+            var language = Request.Headers["X-Language"].FirstOrDefault() ?? "pl";
+            var error = await service.Register(dto, clientType, language);
             if (error != null)
             {
                 logger.LogWarning("Nie udało się zarejestrować użytkownika z adresem e-mail: {Email}", dto.Email);
@@ -69,9 +70,10 @@ namespace srtk.Controllers
         public async Task<IActionResult> EmailConfirmation([FromBody] EmailConfirmationDto dto)
         {
             var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
+            var language = Request.Headers["X-Language"].FirstOrDefault() ?? "pl";
             try
             {
-                await service.EmailConfirmation(dto.Email, clientType);
+                await service.EmailConfirmation(dto.Email, clientType, language);
                 logger.LogInformation("Wysłano mail z potwierdzeniem adresu e-mail na adres e-mail: {Email}", dto.Email);
                 return Ok("Mail z linkiem do potwierdzenia e-maila został wysłany");
             }
@@ -102,9 +104,10 @@ namespace srtk.Controllers
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
         {
             var clientType = Request.Headers["X-Client-Type"].FirstOrDefault() ?? "unknown";
+            var language = Request.Headers["X-Language"].FirstOrDefault() ?? "pl";
             try
             {
-                await service.ForgotPassword(dto.Email, clientType);
+                await service.ForgotPassword(dto.Email, clientType, language);
                 logger.LogInformation("Wysłano mail z linkiem do resetu hasła na adres e-mail: {Email}", dto.Email);
                 return Ok("Mail z linkiem do resetu hasła został wysłany");
             }

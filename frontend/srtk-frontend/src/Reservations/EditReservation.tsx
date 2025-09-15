@@ -36,6 +36,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const cost = useCost(equipmentQuantities, equipmentList);
     const trackInfo = useTrackDetails(trackId, tracks, t);
     const { isAvailable } = useTrackAvailabilityEdit(track!, trackId, startDate, endDate, reservationId, token!);
+    const lang = localStorage.getItem("language") ?? "pl";
 
     useEffect(() => {
         if (!reservationId) {
@@ -138,7 +139,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         const reservationBody = buildReservationBody();
 
         try {
-            const { data: updatedReservation } = await api.put<Reservation>(`/reservations/${reservationId}`, reservationBody);
+            const { data: updatedReservation } = await api.put<Reservation>(`/reservations/${reservationId}`, reservationBody, { headers: { 'X-Language': lang }});
             onUpdated(updatedReservation);
             setMessage('');
         } catch (err: any) {
