@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test'
 
 test('Pomyślne logowanie', async ({ page }) => {
-    // Symulacja serwera:
     await page.route('**/api/auth/login', route => {
         route.fulfill({
             status: 200,
@@ -10,7 +9,6 @@ test('Pomyślne logowanie', async ({ page }) => {
         })
     });
 
-    // Testowanie logowania:
     await page.goto('/login');
 
     await page.fill('input[placeholder="Email"]', 'test@test.com');
@@ -21,7 +19,6 @@ test('Pomyślne logowanie', async ({ page }) => {
 })
 
 test('Nieprawidłowe logowanie', async ({ page }) => {
-    // Symulacja serwera:
     await page.route('**/api/auth/login', route => {
         route.fulfill({
             status: 400,
@@ -30,7 +27,6 @@ test('Nieprawidłowe logowanie', async ({ page }) => {
         })
     });
 
-    // Testowanie logowania z nieprawidłowymi danymi:
     await page.goto('/login');
 
     await page.fill('input[placeholder="Email"]', 'test@test.com');

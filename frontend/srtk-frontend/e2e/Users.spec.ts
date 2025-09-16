@@ -5,7 +5,7 @@ import { fakeJwtToken, fakeAdminJwtToken } from './Test-helper';
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
 
-    await page.evaluate((token) => {
+    await page.addInitScript((token) => {
         localStorage.setItem('token', token);
     }, fakeJwtToken);
 });
@@ -35,7 +35,15 @@ test('Pomyślne pobranie listy wszystkich użytkowników', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/usersManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/usersManagement');
 
     await expect(page.locator('li.list-group-item >> text=ania@nowak.pl')).toBeVisible();
     await expect(page.locator('li.list-group-item >> text=jan@nowak.pl')).toBeVisible();
@@ -46,7 +54,7 @@ test('Pomyślne pobranie listy wszystkich użytkowników', async ({ page }) => {
 test('Pomyślne pobranie listy adminów w danym obiekcie', async ({ page }) => {
     await page.goto('/');
 
-    await page.evaluate((token) => {
+    await page.addInitScript((token) => {
         localStorage.setItem('token', token);
     }, fakeAdminJwtToken);
 
@@ -74,7 +82,15 @@ test('Pomyślne pobranie listy adminów w danym obiekcie', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/usersManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/usersManagement');
 
     await expect(page.locator('li.list-group-item >> text=ania@nowak.pl')).toBeVisible();
     await expect(page.locator('li.list-group-item >> text=jan@nowak.pl')).toBeVisible();
@@ -137,7 +153,15 @@ test('Pomyślna edycja danych klienta (bez zmiany roli)', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/usersManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/usersManagement');
 
     await page.click('button:has(img[alt="Edytuj"])');
 
@@ -191,7 +215,15 @@ test('Pomyślne usunięcie użytkownika', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/usersManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/usersManagement');
     page.once('dialog', dialog => {
         expect(dialog.type()).toBe('confirm');
         expect(dialog.message()).toContain('Czy na pewno chcesz usunąć tego użytkownika?');

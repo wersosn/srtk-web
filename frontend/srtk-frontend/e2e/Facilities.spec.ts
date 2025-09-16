@@ -5,7 +5,7 @@ import { fakeJwtToken } from './Test-helper';
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
 
-    await page.evaluate((token) => {
+    await page.addInitScript((token) => {
         localStorage.setItem('token', token);
     }, fakeJwtToken);
 });
@@ -22,9 +22,16 @@ test('Pomyślne pobranie listy obiektów', async ({ page }) => {
             route.continue();
         }
     });
-    
-    await page.goto('/adminPanel/facilitiesManagement');
-    //await page.screenshot({ path: 'debug.png' });
+
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/facilitiesManagement');
 
     await expect(page.locator('li.list-group-item >> text=Obiekt')).toBeVisible();
 })
@@ -35,7 +42,7 @@ test('Pomyślne dodanie nowego obiektu', async ({ page }) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify([{  id: 134, name: 'Mały obiekt kolarski', city: 'Białystok', address: 'ul. Zwierzyniecka' }]),
+                body: JSON.stringify([{ id: 134, name: 'Mały obiekt kolarski', city: 'Białystok', address: 'ul. Zwierzyniecka' }]),
             });
         } else if (route.request().method() === 'GET') {
             await route.fulfill({
@@ -48,7 +55,15 @@ test('Pomyślne dodanie nowego obiektu', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/facilitiesManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/facilitiesManagement');
 
     await page.fill('input#facilityName', 'Duży obiekt kolarski');
     await page.fill('input#facilityCity', 'Białystok');
@@ -87,7 +102,15 @@ test('Pomyślna edycja obiektu', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/facilitiesManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/facilitiesManagement');
 
     await page.click('button:has(img[alt="Edytuj"])');
 
@@ -127,7 +150,15 @@ test('Pomyślne usunięcie obiektu', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/facilitiesManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/facilitiesManagement');
 
     page.once('dialog', dialog => {
         expect(dialog.type()).toBe('confirm');

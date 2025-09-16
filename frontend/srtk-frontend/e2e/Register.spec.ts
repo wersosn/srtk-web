@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test'
 
 test('Pomyślna rejestracja', async ({ page }) => {
-    // Symulacja serwera:
     await page.route('**/api/auth/register', route => {
         route.fulfill({
             status: 200,
@@ -10,7 +9,6 @@ test('Pomyślna rejestracja', async ({ page }) => {
         })
     });
 
-    // Testowanie rejestracji:
     await page.goto('/register');
 
     await page.fill('input[placeholder="Email"]', 'test@test.com');
@@ -23,7 +21,6 @@ test('Pomyślna rejestracja', async ({ page }) => {
 })
 
 test('Nieprawidłowa rejestracja', async ({ page }) => {
-    // Symulacja serwera:
     await page.route('**/api/auth/register', route => {
         route.fulfill({
             status: 400,
@@ -32,7 +29,6 @@ test('Nieprawidłowa rejestracja', async ({ page }) => {
         })
     });
 
-    // Testowanie rejestracj z już użytym mailem:
     await page.goto('/register');
 
     await page.fill('input[placeholder="Email"]', 'test@test.com');

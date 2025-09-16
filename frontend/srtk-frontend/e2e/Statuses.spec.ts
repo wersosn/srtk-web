@@ -5,7 +5,7 @@ import { fakeJwtToken } from './Test-helper';
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
 
-    await page.evaluate((token) => {
+   await page.addInitScript((token) => {
         localStorage.setItem('token', token);
     }, fakeJwtToken);
 });
@@ -22,8 +22,16 @@ test('Pomyślne pobranie listy statusów rezerwacji', async ({ page }) => {
             await route.abort();
         }
     });
+
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
     
-    await page.goto('/adminPanel/statusesManagement');
+    await page.goto('http://localhost:5173/adminPanel/statusesManagement');
 
     await expect(page.locator('text=Anulowano')).toBeVisible();
 });
@@ -47,7 +55,15 @@ test('Pomyślne dodanie nowego statusu', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/statusesManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/statusesManagement');
 
     await page.fill('input#statusName', 'Anulowano');
     await page.click('button:has-text("Zapisz")');
@@ -83,7 +99,15 @@ test('Pomyślna edycja statusu rezerwacji', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/statusesManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/statusesManagement');
 
     await page.click('button:has(img[alt="Edytuj"])');
 
@@ -121,7 +145,15 @@ test('Pomyślne usunięcie statusu rezerwacji', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/statusesManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.goto('http://localhost:5173/adminPanel/statusesManagement');
 
     page.once('dialog', dialog => {
         expect(dialog.type()).toBe('confirm');

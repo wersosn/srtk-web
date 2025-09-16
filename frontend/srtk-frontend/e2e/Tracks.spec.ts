@@ -5,7 +5,7 @@ import { fakeJwtToken, fakeAdminJwtToken } from './Test-helper';
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
    
-    await page.evaluate((token) => {
+    await page.addInitScript((token) => {
         localStorage.setItem('token', token);
     }, fakeJwtToken);
 });
@@ -25,8 +25,16 @@ test('Pomyślne pobranie listy wszystkich torów', async ({ page }) => {
             route.continue();
         }
     });
+
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
     
-    await page.goto('/adminPanel/tracksManagement');
+    await page.goto('http://localhost:5173/adminPanel/tracksManagement');
 
     await expect(page.locator('li.list-group-item >> text=Tor')).toBeVisible();
     await expect(page.locator('li.list-group-item >> text=Inny')).toBeVisible();
@@ -35,7 +43,7 @@ test('Pomyślne pobranie listy wszystkich torów', async ({ page }) => {
 test('Pomyślne pobranie listy torów w danym obiekcie', async ({ page }) => {
     await page.goto('/');
 
-    await page.evaluate((token) => {
+    await page.addInitScript((token) => {
         localStorage.setItem('token', token);
     }, fakeAdminJwtToken);
     
@@ -51,7 +59,15 @@ test('Pomyślne pobranie listy torów w danym obiekcie', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/tracksManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+    
+    await page.goto('http://localhost:5173/adminPanel/tracksManagement');
     await expect(page.locator('li.list-group-item >> text=Tor Kartingowy Szybka Strefa')).toBeVisible();
 });
 
@@ -86,7 +102,15 @@ test('Pomyślne dodanie nowego toru', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/tracksManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+    
+    await page.goto('http://localhost:5173/adminPanel/tracksManagement');
 
     await page.selectOption('select#facilitySelect', { label: 'Obiekt A' });
     await page.fill('input#trackName', 'Inny');
@@ -149,7 +173,15 @@ test('Pomyślna edycja toru', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/tracksManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+    
+    await page.goto('http://localhost:5173/adminPanel/tracksManagement');
 
     await page.click('button:has(img[alt="Edytuj"])');
 
@@ -193,7 +225,15 @@ test('Pomyślne usunięcie toru', async ({ page }) => {
         }
     });
 
-    await page.goto('/adminPanel/tracksManagement');
+    await page.route('**/api/users/**/preferences', async route => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+    
+    await page.goto('http://localhost:5173/adminPanel/tracksManagement');
 
     page.once('dialog', dialog => {
         expect(dialog.type()).toBe('confirm');
