@@ -73,7 +73,7 @@ namespace srtk.tests.Tests
 
         // Test - dodawanie nowej roli:
         [Fact]
-        public async Task Adding_New_Facility()
+        public async Task Adding_New_Role()
         {
             var context = DbContextHelper.GetDbContext();
             var service = new RoleService(context);
@@ -92,7 +92,7 @@ namespace srtk.tests.Tests
 
         // Test - edycja roli:
         [Fact]
-        public async Task Updating_Facility()
+        public async Task Updating_Role()
         {
             var context = DbContextHelper.GetDbContext();
             var service = new RoleService(context);
