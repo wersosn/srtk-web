@@ -175,6 +175,7 @@ test('Pomyślna edycja danych klienta (bez zmiany roli)', async ({ page }) => {
     await expect(page.locator('text=ola@nowak.pl')).toBeVisible();
 })
 
+// Ten test raz działa, a raz nie - nie renderuje strony z niewiadomych przyczyn (?)
 test('Pomyślne usunięcie użytkownika', async ({ page }) => {
     let users = [{ id: 1235, email: "ania@nowak.pl", name: 'Anna', surname: "Nowak", phoneNumber: "12345" }];
 

@@ -124,7 +124,7 @@ function MyReservations() {
                                                 <button onClick={() => handleExport(Number(Reservation.id))} className="icon-button" title={t("reservation.export")}>
                                                     <img src={downloadIcon} alt="Eksport" style={{ width: '16px', height: '16px' }} />
                                                 </button>
-                                                {Reservation.statusName !== "Anulowano" && (
+                                                {Reservation.statusName !== "Anulowano" && new Date(Reservation.start) >= new Date() && (
                                                     <>
                                                         <button onClick={() => setEditingReservation(Reservation)} disabled={loading} className="icon-button" title={t("universal.edit")}>
                                                             <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />

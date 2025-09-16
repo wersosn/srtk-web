@@ -137,7 +137,7 @@ function ReservationManagement() {
                                                     <div onClick={() => setShowDetails(prev => (prev?.id === reservation.id ? null : reservation))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                                         {t("reservation.reserv")} {formatToDatetimeLocal(reservation.start)} - {formatToDatetimeLocal(reservation.end)}
                                                         <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
-                                                            {reservation.statusName !== "Anulowano" && (
+                                                            {reservation.statusName !== "Anulowano" && new Date(reservation.start) >= new Date() && (
                                                                 <>
                                                                     <button onClick={() => setEditingReservation(reservation)} disabled={loading} className="icon-button" title={t("universal.edit")}>
                                                                         <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
