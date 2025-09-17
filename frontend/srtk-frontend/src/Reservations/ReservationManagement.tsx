@@ -143,7 +143,7 @@ function ReservationManagement() {
                                                                         <img src={editIcon} alt="Edytuj" style={{ width: '16px', height: '16px' }} />
                                                                     </button>
                                                                     <button onClick={() => handleCancel(reservation.id)} disabled={loading} className="icon-button" title={t("universal.cancel")}>
-                                                                        <img src={cancelIcon} alt="Cancel" style={{ width: '16px', height: '16px' }} />
+                                                                        <img src={cancelIcon} alt="Anuluj" style={{ width: '16px', height: '16px' }} />
                                                                     </button>
                                                                 </>
                                                             )}
