@@ -30,6 +30,7 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 - React + Vite
 - TypeScript
 - HTML, CSS
+- Axios
 - React Bootstrap
 - FullCalendar
 - i18n
