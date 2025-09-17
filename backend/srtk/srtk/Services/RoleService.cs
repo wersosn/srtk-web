@@ -32,6 +32,11 @@ namespace srtk.Services
 
         public async Task<RoleDto> Add(RoleDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                throw new Exception("Nie podano nazwy roli");
+            }
+
             var role = dto.ToRole();
             context.Roles.Add(role);
             await context.SaveChangesAsync();
@@ -40,6 +45,11 @@ namespace srtk.Services
 
         public async Task<RoleDto?> Update(int id, RoleDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                throw new Exception("Nie podano nazwy roli");
+            }
+
             var role = await context.Roles.FindAsync(id);
             if (role == null)
             {

@@ -26,6 +26,14 @@ public class AppDbContext : DbContext
             .HasIndex(u => u.Email)
             .IsUnique();
 
+        modelBuilder.Entity<Role>()
+           .HasIndex(u => u.Name)
+           .IsUnique();
+
+        modelBuilder.Entity<Status>()
+           .HasIndex(u => u.Name)
+           .IsUnique();
+
         modelBuilder.Entity<Reservation>()
             .HasIndex(r => new { r.TrackId, r.Start, r.End })
             .IsUnique();

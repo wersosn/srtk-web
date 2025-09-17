@@ -38,6 +38,11 @@ namespace srtk.Services
 
         public async Task<TrackDto> Add(TrackDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.TypeOfSurface) || dto.Length <= 0 || string.IsNullOrWhiteSpace(dto.AvailableDays))
+            {
+                throw new Exception("Nie uzupełniono wszystkich wymaganych pól");
+            }
+
             var track = dto.ToTrack();
             context.Tracks.Add(track);
             await context.SaveChangesAsync();
@@ -46,6 +51,11 @@ namespace srtk.Services
 
         public async Task<TrackDto?> Update(int id, TrackDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.TypeOfSurface) || dto.Length <= 0 || string.IsNullOrWhiteSpace(dto.AvailableDays))
+            {
+                throw new Exception("Nie uzupełniono wszystkich wymaganych pól");
+            }
+
             var track = await context.Tracks.FindAsync(id);
             if (track == null)
             {

@@ -32,6 +32,11 @@ namespace srtk.Services
 
         public async Task<StatusDto> Add(StatusDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                throw new Exception("Nie podano nazwy statusu");
+            }
+
             var status = dto.ToStatus();
             context.Statuses.Add(status);
             await context.SaveChangesAsync();
@@ -40,6 +45,11 @@ namespace srtk.Services
 
         public async Task<StatusDto?> Update(int id, StatusDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                throw new Exception("Nie podano nazwy statusu");
+            }
+
             var status = await context.Statuses.FindAsync(id);
             if (status == null)
             {

@@ -20,9 +20,9 @@ namespace srtk.tests.Tests
             this.output = output;
         }
 
-        // Test - pobranie wszystkich użytkowników:
+        // Test - pobranie wszystkich powiadomień:
         [Fact]
-        public async Task Getting_All_Facilities()
+        public async Task Getting_All_Notifications()
         {
             var context = DbContextHelper.GetDbContext();
             var userService = new UserService(context);
@@ -49,6 +49,19 @@ namespace srtk.tests.Tests
             Assert.NotNull(result);
             Assert.Single(result);
             output.WriteLine("Wynik (ilość powiadomień): " + result.Count);
+        }
+
+        // Test - próba pobrania wszystkich powiadomień, gdy lista jest pusta:
+        [Fact]
+        public async Task Getting_All_Notifications_Empty_List()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new NotificationService(context);
+
+            var result = await service.GetAll();
+
+            Assert.Empty(result);
+            output.WriteLine("Wynik: Brak powiadomień");
         }
 
         // Test - pobranie powiadomień konkretnego użytkownika:
@@ -80,6 +93,37 @@ namespace srtk.tests.Tests
             Assert.NotNull(result);
             Assert.Single(result);
             output.WriteLine($"Wynik - ilość powiadomień użytkownika {user.Email}: " + result.Count);
+        }
+
+        // Test - pobranie powiadomień konkretnego użytkownika z błędym Id:
+        [Fact]
+        public async Task Getting_All_For_User_With_Invalid_Id()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var userService = new UserService(context);
+            var service = new NotificationService(context);
+            var user = new User
+            {
+                Id = 333,
+                Email = "test@test.pl",
+                Password = "abc123",
+                RoleId = 1
+            };
+            await userService.Add(user);
+
+            var notif = new NotificationDto
+            {
+                Title = "Dodano rezerwację",
+                Description = "Dodano nową rezerwację na tor kolarski",
+                UserId = user.Id,
+                Language = "pl"
+            };
+            await service.Add(notif);
+
+            var result = await service.GetAllForUser(5);
+
+            Assert.Empty(result);
+            output.WriteLine($"Wynik: Brak powiadomeń, ze względu na błędne Id użytkownika");
         }
 
         // Test - pobranie nieprzeczytanych powiadomień danego użytkownika:

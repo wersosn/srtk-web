@@ -35,7 +35,7 @@ const EditStatus: React.FC<EditStatusProps> = ({ statusId, currentName, onUpdate
                     <input id="statusName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">Z{t("universal.saveChanges")}</button>
+                    <button type="submit">{t("universal.saveChanges")}</button>
                     <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>
