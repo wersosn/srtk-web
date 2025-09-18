@@ -40,6 +40,11 @@ namespace srtk.Services
 
         public async Task<EquipmentDto> Add(EquipmentDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Type) || dto.Cost < 0)
+            {
+                throw new Exception("Nie uzupełniono wszystkich wymaganych pól");
+            }
+
             var equipment = dto.ToEquipment();
             context.Equipments.Add(equipment);
             await context.SaveChangesAsync();
@@ -48,6 +53,11 @@ namespace srtk.Services
 
         public async Task<EquipmentDto?> Update(int id, [FromBody] EquipmentDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Type) || dto.Cost < 0)
+            {
+                throw new Exception("Nie uzupełniono wszystkich wymaganych pól");
+            }
+
             var equipment = await context.Equipments.FindAsync(id);
             if (equipment == null)
             {

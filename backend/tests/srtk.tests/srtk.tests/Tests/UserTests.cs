@@ -2,11 +2,6 @@
 using srtk.Models;
 using srtk.Services;
 using srtk.tests.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace srtk.tests.Tests
@@ -47,6 +42,19 @@ namespace srtk.tests.Tests
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             output.WriteLine("Wynik (ilość użytkowników): " + result.Count);
+        }
+
+        // Test - próba pobrania wszystkich użytkowników, gdy lista jest pusta:
+        [Fact]
+        public async Task Getting_All_Users_Empty_List()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+
+            var result = await service.GetAll();
+
+            Assert.Empty(result);
+            output.WriteLine("Wynik: Brak użytkowników");
         }
 
         // Test - pobranie wszystkich klientów:
@@ -175,6 +183,34 @@ namespace srtk.tests.Tests
             output.WriteLine($"Wynik: {result.Email}, {result.RoleId}");
         }
 
+        // Test - pobranie konkretnego użytkownika, z nieprawidłowym Id:
+        [Fact]
+        public async Task Getting_User_ById_With_Invalid_Id()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "abc123",
+                RoleId = 1
+            };
+            await service.Add(user);
+
+            var user2 = new User
+            {
+                Email = "ania@nowak.pl",
+                Password = "321cba",
+                RoleId = 1
+            };
+            await service.Add(user2);
+
+            var result = await service.GetById(3);
+
+            Assert.Null(result);
+            output.WriteLine($"Wynik: Brak użytkownika z podanym Id");
+        }
+
         // Test - dodawanie nowego użytkownika:
         [Fact]
         public async Task Adding_New_User()
@@ -196,6 +232,28 @@ namespace srtk.tests.Tests
             Assert.Equal(1, result.RoleId);
             Assert.Single(context.Users);
             output.WriteLine("Wynik: Dodano nowego użytkownika");
+        }
+
+        // Test - dodawanie nowego użytkownika bez adresu e-mail:
+        [Fact]
+        public async Task Adding_New_User_Without_Email()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+            var user = new User
+            {
+                Email = null,
+                Password = "abc123",
+                RoleId = 1
+            };
+
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                await service.Add(user);
+            });
+
+            Assert.Contains("Nie podano adresu e-mail", exception.Message);
+            output.WriteLine("Wynik: Nie dodano nowego użytkownika, ze względu na brak adresu e-mail");
         }
 
         // Test - edycja użytkownika:
@@ -274,6 +332,26 @@ namespace srtk.tests.Tests
 
             Assert.Empty(context.Users);
             output.WriteLine("Wynik: Usunięto użytkownika");
+        }
+
+        // Test - usuwanie nieistniejącego użytkownika:
+        [Fact]
+        public async Task Deleting_Track_With_Invalid_id()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "abc123",
+                RoleId = 1
+            };
+            await service.Add(user);
+
+            var deleted = await service.Delete(3);
+
+            Assert.False(deleted);
+            output.WriteLine($"Wynik: Nie można usunąć użytkownika z podanym Id (użytkownik o takim Id nie istnieje)");
         }
     }
 }

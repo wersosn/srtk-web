@@ -63,6 +63,11 @@ namespace srtk.Services
 
         public async Task<User> Add(User user)
         {
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                throw new Exception("Nie podano adresu e-mail");
+            }
+
             context.Users.Add(user);
             await context.SaveChangesAsync();
             return user;

@@ -69,6 +69,19 @@ namespace srtk.tests.Tests
             output.WriteLine("Wynik (ilość rezerwacji): " + result.Count);
         }
 
+        // Test - próba pobrania wszystkich rezerwacji, gdy lista jest pusta:
+        [Fact]
+        public async Task Getting_All_Reservations_Empty_List()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new ReservationServiceHelper(context, emailService);
+
+            var result = await service.GetAll();
+
+            Assert.Empty(result);
+            output.WriteLine("Wynik: Brak rezerwacji");
+        }
+
         // Test - pobranie konkretnej rezerwacji po Id:
         [Fact]
         public async Task Getting_Reservation_ById()
@@ -121,6 +134,60 @@ namespace srtk.tests.Tests
 
             Assert.NotNull(result);
             output.WriteLine($"Wynik: {result.Start}, {result.End}, {result.Track.Name}, {result.User.Email}");
+        }
+
+        // Test - pobranie konkretnej rezerwacji, z nieprawidłowym Id:
+        [Fact]
+        public async Task Getting_Reservation_ById_With_Invalid_Id()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new ReservationServiceHelper(context, emailService);
+            var userService = new UserService(context);
+            var trackService = new TrackService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "test123",
+                RoleId = 1
+            };
+            await userService.Add(user);
+
+            var track = new TrackDto
+            {
+                Id = 1,
+                Name = "Tor 1",
+                Length = 100,
+                TypeOfSurface = "Beton",
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
+            };
+            await trackService.Add(track);
+
+            var reservation = new Reservation
+            {
+                Id = 1,
+                Start = DateTime.Now,
+                End = DateTime.MaxValue,
+                UserId = user.Id,
+                TrackId = track.Id
+            };
+            await service.Add(reservation);
+
+            var reservation2 = new Reservation
+            {
+                Id = 2,
+                Start = DateTime.MinValue,
+                End = DateTime.MaxValue,
+                UserId = user.Id,
+                TrackId = track.Id
+            };
+            await service.Add(reservation2);
+
+            var result = await service.GetById(333);
+
+            Assert.Null(result);
+            output.WriteLine($"Wynik: Brak rezerwacji z podanym Id");
         }
 
         // Test - pobranie rezerwacji po Torze:
@@ -419,6 +486,52 @@ namespace srtk.tests.Tests
             output.WriteLine("Wynik: Dodano nową rezerwację");
         }
 
+        // Test - dodawanie nowej rezerwacji z nieprawidłowym Id toru:
+        [Fact]
+        public async Task Adding_New_Reservation_Without_StartDate_And_EndDate()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new ReservationServiceHelper(context, emailService);
+            var trackService = new TrackService(context);
+            var userService = new UserService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "test123",
+                RoleId = 1
+            };
+            await userService.Add(user);
+
+            var track = new TrackDto
+            {
+                Id = 1,
+                Name = "Tor kolarski",
+                TypeOfSurface = "Gładka",
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
+            };
+            await trackService.Add(track);
+
+            var reservation = new Reservation
+            {
+                Id = 1,
+                Start = DateTime.Now.ToUniversalTime(),
+                End = DateTime.MaxValue.ToUniversalTime(),
+                UserId = user.Id,
+                TrackId = -1
+            };
+
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                await service.Add(reservation);
+            });
+
+            Assert.Contains("Nie uzupełniono wszystkich wymaganych pól", exception.Message);
+            output.WriteLine("Wynik: Nie dodano nowej rezerwacji, ze względu na błędne Id toru");
+        }
+
         // Test - edycja rezerwacji:
         [Fact]
         public async Task Updating_Reservation()
@@ -516,6 +629,49 @@ namespace srtk.tests.Tests
 
             Assert.Empty(context.Reservations);
             output.WriteLine("Wynik: Usunięto rezerwację");
+        }
+
+        // Test - usuwanie nieistniejącej rezerwacji:
+        [Fact]
+        public async Task Deleting_Reservation_With_Invalid_id()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new ReservationServiceHelper(context, emailService);
+            var trackService = new TrackService(context);
+            var userService = new UserService(context);
+            var user = new User
+            {
+                Email = "test@test.pl",
+                Password = "test123",
+                RoleId = 1
+            };
+            await userService.Add(user);
+
+            var track = new TrackDto
+            {
+                Name = "Tor kolarski",
+                TypeOfSurface = "Gładka",
+                Length = 1000,
+                OpeningHour = new TimeSpan(8, 0, 0),
+                ClosingHour = new TimeSpan(20, 0, 0),
+                AvailableDays = "Poniedziałek,Wtorek,Czwartek"
+            };
+            await trackService.Add(track);
+
+            var reservation = new Reservation
+            {
+                Id = 1,
+                Start = DateTime.Now,
+                End = DateTime.MaxValue,
+                UserId = user.Id,
+                TrackId = track.Id
+            };
+            await service.Add(reservation);
+
+            var deleted = await service.Delete(3);
+
+            Assert.False(deleted);
+            output.WriteLine($"Wynik: Nie można usunąć rezerwacji z podanym Id (rezerwacja o takim Id nie istnieje)");
         }
 
         // Test - anulowanie rezerwacji:

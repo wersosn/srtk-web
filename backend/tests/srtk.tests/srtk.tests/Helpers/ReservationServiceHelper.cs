@@ -17,6 +17,11 @@ namespace srtk.tests.Helpers
 
         public override async Task<Reservation> Add(Reservation reservation, string language = null)
         {
+            if (string.IsNullOrWhiteSpace(reservation.Start.ToLongDateString()) || string.IsNullOrWhiteSpace(reservation.End.ToLongDateString()) || reservation.TrackId < 0)
+            {
+                throw new Exception("Nie uzupełniono wszystkich wymaganych pól");
+            }
+
             context.Reservations.Add(reservation);
             await context.SaveChangesAsync();
             return reservation;

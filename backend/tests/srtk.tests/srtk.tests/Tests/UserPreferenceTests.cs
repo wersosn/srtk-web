@@ -82,5 +82,30 @@ namespace srtk.tests.Tests
             Assert.Equal(5, result.ElementsPerPage);
             output.WriteLine("Wynik (ilość elementów na stronie): " + result.ElementsPerPage);
         }
+
+        // Test - próba aktualizacji preferencji użytkownika na wartość ujemną:
+        [Fact]
+        public async Task Update_Elements_Per_Page_With_Invalid_Value()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new UserService(context);
+            var user = new User
+            {
+                Id = 1,
+                Email = "test@test.pl",
+                Password = "test123",
+                RoleId = 1
+            };
+            var u = await service.Add(user);
+            var up = await service.AddElementsPerPage(user.Id, 15);
+
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await service.UpdateElementsPerPage(user.Id, -5);
+            });
+
+            Assert.Contains("Ilość elementów musi być > 0", exception.Message);
+            output.WriteLine("Wynik: nie zmodyfikowano ilości elementów na stronie, ze względu na nieprawidłową wartość");
+        }
     }
 }

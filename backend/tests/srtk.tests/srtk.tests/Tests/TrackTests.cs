@@ -2,11 +2,6 @@
 using srtk.Models;
 using srtk.Services;
 using srtk.tests.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace srtk.tests.Tests
@@ -363,6 +358,5 @@ namespace srtk.tests.Tests
             Assert.False(deleted);
             output.WriteLine($"Wynik: Nie można usunąć toru z podanym Id (tor o takim Id nie istnieje)");
         }
-
     }
 }

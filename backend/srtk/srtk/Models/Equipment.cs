@@ -16,6 +16,7 @@ namespace srtk.Models
         [StringLength(100)]
         public string Type { get; set; }
 
+        [Required]
         public double Cost { get; set; }
 
         [ForeignKey(nameof(Facility))]

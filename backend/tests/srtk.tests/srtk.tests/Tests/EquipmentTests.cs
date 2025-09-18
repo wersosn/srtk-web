@@ -2,13 +2,7 @@
 using srtk.Models;
 using srtk.Services;
 using srtk.tests.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace srtk.tests.Tests
 {
@@ -48,6 +42,19 @@ namespace srtk.tests.Tests
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             output.WriteLine("Wynik (ilość sprzętów): " + result.Count);
+        }
+
+        // Test - próba pobrania wszystkich sprzętów, gdy lista jest pusta:
+        [Fact]
+        public async Task Getting_All_Equipmentss_Empty_List()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new EquipmentService(context);
+
+            var result = await service.GetAll();
+
+            Assert.Empty(result);
+            output.WriteLine("Wynik: Brak sprzętów");
         }
 
         // Test - pobranie wszystkich sprzętów należących do danego obiektu:
@@ -119,6 +126,36 @@ namespace srtk.tests.Tests
             output.WriteLine($"Wynik: {result.Name}, {result.Type}, {result.Cost}");
         }
 
+        // Test - pobranie konkretnego sprzętu, z nieprawidłowym Id:
+        [Fact]
+        public async Task Getting_Equipment_ById_With_Invalid_Id()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new EquipmentService(context);
+            var eq = new EquipmentDto
+            {
+                Id = 1,
+                Name = "Rower",
+                Type = "Górski",
+                Cost = 50
+            };
+            await service.Add(eq);
+
+            var eq2 = new EquipmentDto
+            {
+                Id = 1235,
+                Name = "Rower",
+                Type = "BMX",
+                Cost = 80
+            };
+            await service.Add(eq2);
+
+            var result = await service.GetById(3);
+
+            Assert.Null(result);
+            output.WriteLine($"Wynik: Brak sprzętu z podanym Id");
+        }
+
         // Test - dodawanie nowego sprzętu:
         [Fact]
         public async Task Adding_New_Equipment()
@@ -140,6 +177,28 @@ namespace srtk.tests.Tests
             Assert.Equal(60, result.Cost);
             Assert.Single(context.Equipments);
             output.WriteLine("Wynik: Dodano nowy sprzęt");
+        }
+
+        // Test - dodawanie nowego sprzętu bez rodzaju:
+        [Fact]
+        public async Task Adding_New_Equipment_Without_Type()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new EquipmentService(context);
+            var eq = new EquipmentDto
+            {
+                Name = "Rower",
+                Type = null,
+                Cost = 60
+            };
+
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                await service.Add(eq);
+            });
+
+            Assert.Contains("Nie uzupełniono wszystkich wymaganych pól", exception.Message);
+            output.WriteLine("Wynik: Nie dodano nowego sprzętu, ze względu na brak podanego rodzaju");
         }
 
         // Test - edycja sprzętu:
@@ -174,6 +233,37 @@ namespace srtk.tests.Tests
             output.WriteLine("Wynik: Zmodyfikowano sprzęt");
         }
 
+        // Test - edycja sprzętu (usunięcie nazwy):
+        [Fact]
+        public async Task Updating_Equipment_Without_Name()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new EquipmentService(context);
+            var eq = new EquipmentDto
+            {
+                Id = 1,
+                Name = "Rower",
+                Type = "Miejski",
+                Cost = 60
+            };
+            await service.Add(eq);
+
+            var updatedEq = new EquipmentDto
+            {
+                Name = null,
+                Type = "Crossowy",
+                Cost = 100
+            };
+
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                await service.Update(eq.Id, updatedEq);
+            });
+
+            Assert.Contains("Nie uzupełniono wszystkich wymaganych pól", exception.Message);
+            output.WriteLine("Wynik: Nie zmodyfikowano sprzętu, ze względu na brak nazwy");
+        }
+
         // Test - usuwanie sprzętu:
         [Fact]
         public async Task Deleting_Equipment()
@@ -193,6 +283,27 @@ namespace srtk.tests.Tests
 
             Assert.Empty(context.Equipments);
             output.WriteLine("Wynik: Usunięto sprzęt");
+        }
+
+        // Test - usuwanie nieistniejącego sprzętu:
+        [Fact]
+        public async Task Deleting_Equipment_With_Invalid_id()
+        {
+            var context = DbContextHelper.GetDbContext();
+            var service = new EquipmentService(context);
+            var eq = new EquipmentDto
+            {
+                Id = 1,
+                Name = "Rower",
+                Type = "Miejski",
+                Cost = 60
+            };
+            await service.Add(eq);
+
+            var deleted = await service.Delete(3);
+
+            Assert.False(deleted);
+            output.WriteLine($"Wynik: Nie można usunąć sprzętu z podanym Id (sprzęt o takim Id nie istnieje)");
         }
     }
 }

@@ -164,7 +164,7 @@ test.skip('Pomyślna edycja rezerwacji', async ({ page }) => {
         route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify([{ id: 1, name: 'Tor Kartingowy Szybka Strefa', availableDays: ['Mon','Tue','Wed','Thu','Fri'], openingHour: '08:00', closingHour: '20:00' }])
+            body: JSON.stringify([{ id: 1, name: 'Tor Kartingowy Szybka Strefa', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], openingHour: '08:00', closingHour: '20:00' }])
         });
     });
 
@@ -252,18 +252,33 @@ test('Pomyślne anulowanie rezerwacji', async ({ page }) => {
         });
     });
 
+    await page.route('**/api/statuses', async route => {
+        if (route.request().method() === 'GET') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([{ id: 1, name: 'Zarezerwowano' }, { id: 2, name: 'Anulowano' }]),
+            });
+        } else {
+            await route.abort();
+        }
+    });
+
+    let statuses = [{ id: 1, name: "Zarezerwowano" }, { id: 2, name: "Anulowano" }];
+
     let reservations = [
         {
-            id: 2223,
-            start: '2025-11-12T12:00:00Z',
-            end: '2025-11-12T15:00:00Z',
+            id: 456,
+            start: '2028-11-12T12:00:00Z',
+            end: '2028-11-12T15:00:00Z',
             cost: 600,
             userId: 12,
             trackId: 1,
             statusId: 1,
+            statusName: "Zarezerwowano",
             user: null,
             track: null,
-            status: null,
+            status: statuses[0],
             equipmentReservations: []
         }
     ]
@@ -280,9 +295,10 @@ test('Pomyślne anulowanie rezerwacji', async ({ page }) => {
         }
     });
 
-    await page.route('**/api/reservations/2223/cancel', route => {
+    await page.route('**/api/reservations/456/cancel', route => {
         if (route.request().method() === 'PUT') {
             reservations[0].statusId = 2;
+            reservations[0].statusName = "Anulowano";
             route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -310,6 +326,7 @@ test('Pomyślne anulowanie rezerwacji', async ({ page }) => {
         dialog.accept();
     });
 
+    await page.screenshot({path: "cancel.png"})
     await page.click('button:has(img[alt="Anuluj"])');
     await expect(page.locator(`button:has(img[alt="Anuluj"])`)).toHaveCount(0);
 });
@@ -375,6 +392,7 @@ test('Pomyślne usunięcie rezerwacji', async ({ page }) => {
     });
 
     await page.goto('http://localhost:5173/adminPanel/reservationsManagement');
+    await expect(page.locator('em', { hasText: 'Tor Kartingowy Szybka Strefa' })).toBeVisible();
 
     page.once('dialog', dialog => {
         expect(dialog.type()).toBe('confirm');
@@ -384,7 +402,7 @@ test('Pomyślne usunięcie rezerwacji', async ({ page }) => {
 
     await page.click('button:has(img[alt="Usuń"])');
 
-    const start = formatToDatetimeLocal('2025-08-12T12:00:00Z');
-    const end = formatToDatetimeLocal('2025-08-12T15:00:00Z');
+    const start = formatToDatetimeLocal('2028-08-12T12:00:00Z');
+    const end = formatToDatetimeLocal('2028-08-12T15:00:00Z');
     await expect(page.locator(`text=Rezerwacja: ${formatToDatetimeLocal(start)} - ${formatToDatetimeLocal(end)}`)).toHaveCount(0);
 });
