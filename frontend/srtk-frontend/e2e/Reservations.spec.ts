@@ -227,7 +227,6 @@ test.skip('Pomyślna edycja rezerwacji', async ({ page }) => {
     await expect(page.locator('em', { hasText: 'Tor Kartingowy Szybka Strefa' })).toBeVisible();
 
     await page.click('button:has(img[alt="Edytuj"])');
-    await page.screenshot({ path: "editReservation3.png", fullPage: true });
 
     const newStart = '2028-11-12T13:00';
     const newEnd = '2028-11-12T16:00';
@@ -326,7 +325,6 @@ test('Pomyślne anulowanie rezerwacji', async ({ page }) => {
         dialog.accept();
     });
 
-    await page.screenshot({path: "cancel.png"})
     await page.click('button:has(img[alt="Anuluj"])');
     await expect(page.locator(`button:has(img[alt="Anuluj"])`)).toHaveCount(0);
 });

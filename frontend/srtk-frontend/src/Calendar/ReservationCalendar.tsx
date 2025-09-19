@@ -7,18 +7,18 @@ import plLocale from '@fullcalendar/core/locales/pl';
 import enLocale from '@fullcalendar/core/locales/en-gb';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
-import type { Reservation } from '../Types/Types';
+import type { Reservation, Track } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
 import { getReservationsInTrack } from "../Services/Api";
 import { useTranslation } from "react-i18next";
-import { useTracks } from '../Hooks/useTracks';
 import refreshIconDark from "../assets/refresh.png";
 import refreshIconLight from "../assets/refreshLight.png";
 import { usePrefersDark } from '../Hooks/usePrefersDark';
+import api from "../Api/axios";
 
 function ReservationCalendar() {
     const token = localStorage.getItem('token');
-    const { tracks } = useTracks(token!);
+    const [tracks, setTracks] = useState<Track[]>([]);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
     const [events, setEvents] = useState<any[]>([]);
@@ -29,6 +29,19 @@ function ReservationCalendar() {
 
     const isDark = usePrefersDark();
     const icon = isDark ? refreshIconLight : refreshIconDark;
+
+    const fetchTracks = async () => {
+        try {
+            const response = await api.get(`/tracks`);
+            setTracks(response.data); 
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        fetchTracks();
+    }, []);
 
     const fetchReservationsInTrack = async () => {
         setError(null);
@@ -108,7 +121,7 @@ function ReservationCalendar() {
                             ))}
                         </select>
                         <button className="icon-button" onClick={refreshReservations} style={{ width: '24px', height: '40px' }} title={t("home.refresh")}>
-                            <img src={icon} alt="Edytuj" style={{ width: '24px', height: '24px' }}/>
+                            <img src={icon} alt="Edytuj" style={{ width: '24px', height: '24px' }} />
                         </button>
                     </div>
                 </div>

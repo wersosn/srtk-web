@@ -15,8 +15,12 @@ export function useTrackAvailabilityEdit(track: Track, trackId: number | null, s
             return;
         }
 
-        if (!isValidDateTime(startDate, openingHour, closingHour, allowedDays)) {
+        if(new Date(startDate) >= new Date(endDate)) {
             setIsAvailable(false);
+            return;
+        }
+
+        if (!isValidDateTime(startDate, openingHour, closingHour, allowedDays)) {
             return;
         }
 
@@ -31,7 +35,7 @@ export function useTrackAvailabilityEdit(track: Track, trackId: number | null, s
             end: new Date(endDate).toISOString(),
         });
 
-        if (reservationId) {
+        if (reservationId !== null && reservationId !== undefined) {
             params.append('reservationId', reservationId.toString());
         }
 
