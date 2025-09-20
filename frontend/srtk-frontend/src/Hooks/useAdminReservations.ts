@@ -15,7 +15,7 @@ export function useAdminReservations(tracks: Track[], token: string | null, t: a
 
         try {
             const reservationsPromises = tracks.map(async (track) => {
-                const data = await getReservationsInTrack(track.id, token);
+                const data = await getReservationsInTrack(track.id);
                 return { trackId: track.id, reservations: data };
             });
 
@@ -24,7 +24,7 @@ export function useAdminReservations(tracks: Track[], token: string | null, t: a
             const grouped: Record<number, Reservation[]> = {};
             results.forEach(({ trackId, reservations }) => {
                 grouped[trackId] = reservations.sort(
-                    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
+                    (a:any, b:any) => new Date(a.start).getTime() - new Date(b.start).getTime()
                 );
             });
 

@@ -13,7 +13,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const { t } = useTranslation();
     const [name, setName] = useState<string>("");
     const [typeofsurface, setTypeofsurface] = useState<string>("");
-    const [length, setLength] = useState<number | "">("");
+    const [length, setLength] = useState<number | 0>(0);
     const [openingHour, setOpeningHour] = useState<string>("");
     const [closingHour, setClosingHour] = useState<string>("");
     const [availableDays, setAvailableDays] = useState<string[]>([]);
@@ -22,6 +22,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
     const [facilityID, setFacilityId] = useState<number | "">("");
     const { facilities } = useFacilities(token);
     const [message, setMessage] = useState<string>("");
+    const isFormValid = !!name && !!typeofsurface && length > 0 && !!openingHour && !!closingHour && availableDays.length > 0 && (facilityId !== 0 || facilityID);
 
     useEffect(() => {
         if (token) {
@@ -31,8 +32,19 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
         }
     }, [token]);
 
+    const validateInputs = () => {
+        if (length <= 0) {
+            alert(t("track.positiveLength"));
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        if(!validateInputs()) {
+            return;
+        }
 
         const newTrack = { name, typeofsurface, length, openingHour, closingHour, availableDays: availableDays.join(","), facilityId: facilityID };
 
@@ -107,7 +119,7 @@ const AddTrack: React.FC<AddTrackProps> = ({ onAddTrack }) => {
                         </div>
                     </div>
                 </div>
-                <button type="submit">{t("universal.save")}</button>
+                <button disabled={!isFormValid} type="submit">{t("universal.save")}</button>
                 <div>{message}</div>
             </form>
         </>

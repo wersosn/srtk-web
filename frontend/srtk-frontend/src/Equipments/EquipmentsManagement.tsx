@@ -23,6 +23,7 @@ function EquipmentsManagement() {
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { filteredEquipments, setFilteredEquipments } = useFilteredEquipments(equipmentList);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredEquipments, elementsPerPage);
+    const sortedEqs = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
 
     const handleAdd = (newEquipment: Equipment) => {
         setEquipmentList(prev => [...prev, newEquipment]);
@@ -66,7 +67,7 @@ function EquipmentsManagement() {
                 <>
                     <h5 className="mt-4">{t("eq.list")}</h5>
                     <ul className="list-group">
-                        {paginatedItems.map((Equipment) => (
+                        {sortedEqs.map((Equipment) => (
                             <li key={Equipment.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === Equipment.id ? null : Equipment))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {Equipment.name}

@@ -13,6 +13,7 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
     const [address, setAddress] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const { t } = useTranslation();
+    const isFormValid = !!name && !!city && !!address;
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -44,7 +45,7 @@ const AddFacility: React.FC<AddFacilityProps> = ({ onAddFacility }) => {
                     <label htmlFor="facilityAddress">{t("facility.address")}</label>
                     <input id="facilityAddress" value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
                 </div>
-                <button type="submit">{t("universal.save")}</button>
+                <button type="submit" disabled={!isFormValid}>{t("universal.save")}</button>
                 <div>{message}</div>
             </form>
         </>

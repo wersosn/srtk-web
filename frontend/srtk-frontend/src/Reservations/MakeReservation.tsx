@@ -30,6 +30,7 @@ function MakeReservation() {
     const trackInfo = useTrackDetails(selectedTrackId, tracks, t);
     const { addNotification } = useNotifications(token, userId!, t);
     const lang = localStorage.getItem("language") ?? "pl";
+    const isFormValid = !!selectedTrackId && !!startDate && !!endDate;
 
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
@@ -200,7 +201,7 @@ function MakeReservation() {
                                 {t("makeReservations.finalCost")} {cost.toFixed(2)} zł
                             </div>
 
-                            <button onClick={handleReservation}>{t("makeReservations.reserve")}</button>
+                            <button disabled={!isFormValid} onClick={handleReservation}>{t("makeReservations.reserve")}</button>
                         </>
                     )
                     }

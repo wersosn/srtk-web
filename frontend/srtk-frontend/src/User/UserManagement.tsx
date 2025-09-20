@@ -35,6 +35,9 @@ function UserManagement() {
         setCurrentPage: setCurrentAdminPage
     } = usePagination(admins, elementsPerPage);
 
+    const sortedClients = [...paginatedClients].sort((a, b) => a.email.localeCompare(b.email, 'pl'));
+    const sortedAdmins = [...paginatedAdmins].sort((a, b) => a.email.localeCompare(b.email, 'pl'));
+
     const handleEdit = (updated: Client | Admin) => {
         if (updated.roleId === 1) {
             setAdmins(prev => prev.filter(a => a.id !== updated.id));
@@ -90,7 +93,7 @@ function UserManagement() {
                 ) : (
                     <>
                         <ul className="list-group mb-4">
-                            {paginatedClients.map(client => (
+                            {sortedClients.map(client => (
                                 <li key={client.id} className="list-group-item p-0">
                                     <div
                                         onClick={() => setShowDetails(prev => (prev?.id === client.id ? null : client))}
@@ -130,7 +133,7 @@ function UserManagement() {
                 ) : (
                     <>
                         <ul className="list-group">
-                            {paginatedAdmins.map(admin => (
+                            {sortedAdmins.map(admin => (
                                 <li key={admin.id} className="list-group-item p-0">
                                     <div
                                         onClick={() => setShowDetails(prev => (prev?.id === admin.id ? null : admin))}

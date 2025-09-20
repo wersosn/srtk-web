@@ -19,6 +19,7 @@ function RoleManagement() {
     const { userId } = useAuth();
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(roles, elementsPerPage);
+    const sortedRoles = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
 
     const handleAdd = (newRole: Role) => {
         setRoles(prev => [...prev, newRole]);
@@ -43,7 +44,7 @@ function RoleManagement() {
                 <>
                     <h5 className="mt-4">{t("role.list")}</h5>
                     <ul className="list-group">
-                        {paginatedItems.map((role) => (
+                        {sortedRoles.map((role) => (
                             <li key={role.id} className="list-group-item d-flex justify-content-between align-items-center">
                                 {role.name}
                                 <div className="d-flex gap-2">

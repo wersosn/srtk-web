@@ -14,11 +14,12 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
     const { t } = useTranslation();
     const [name, setName] = useState<string>("");
     const [type, setType] = useState<string>("");
-    const [cost, setCost] = useState<number | "">("");
+    const [cost, setCost] = useState<number>(0);
     const { facilityId } = useAuth();
     const [facilityID, setFacilityId] = useState<number | "">("");
     const { facilities } = useFacilities(token);
     const [message, setMessage] = useState<string>("");
+    const isFormValid = !!name && !!type && cost >= 0 && (facilityId !== 0 || facilityID);
 
     useEffect(() => {
         if (token) {
@@ -28,8 +29,19 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
         }
     }, [token]);
 
+    const validateInputs = () => {
+        if (cost < 0) {
+            alert(t("eq.positiveCost"));
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        if (!validateInputs()) {
+            return;
+        }
 
         const newEquipment = { name, type, cost, facilityId: facilityID };
 
@@ -73,7 +85,7 @@ const AddEquipment: React.FC<AddEquipmentProps> = ({ onAddEquipment }) => {
                     <label htmlFor="eqCost">{t("eq.cost")}</label>
                     <input id="eqCost" type="number" value={cost} onChange={e => setCost(Number(e.target.value))} className="info-input" />
                 </div>
-                <button type="submit">{t("universal.save")}</button>
+                <button type="submit" disabled={!isFormValid}>{t("universal.save")}</button>
                 <div>{message}</div>
             </form>
         </>

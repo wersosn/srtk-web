@@ -11,6 +11,7 @@ const AddRole: React.FC<AddRoleProps> = ({ onAddRole }) => {
     const [name, setName] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const { t } = useTranslation();
+    const isFormValid = !!name;
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -32,7 +33,7 @@ const AddRole: React.FC<AddRoleProps> = ({ onAddRole }) => {
                     <label htmlFor="roleName">{t("role.name")}</label>
                     <input id="roleName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
-                <button type="submit">{t("universal.save")}</button>
+                <button type="submit" disabled={!isFormValid}>{t("universal.save")}</button>
                 <div>{message}</div>
             </form>
         </>

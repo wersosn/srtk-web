@@ -23,6 +23,7 @@ function TrackManagement() {
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { filteredTracks, setFilteredTracks } = useFilteredTracks(tracks);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredTracks, elementsPerPage);
+    const sortedTracks = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
 
     const handleAdd = (newTrack: Track) => {
         setTracks(prev => [...prev, newTrack]);
@@ -66,7 +67,7 @@ function TrackManagement() {
                 <>
                     <h5 className="mt-4">{t("track.list")}</h5>
                     <ul className="list-group">
-                        {paginatedItems.map((track) => (
+                        {sortedTracks.map((track) => (
                             <li key={track.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === track.id ? null : track))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {track.name}

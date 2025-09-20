@@ -8,7 +8,7 @@ import enLocale from '@fullcalendar/core/locales/en-gb';
 import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation, Track } from '../Types/Types';
-import { formatToDatetimeLocal } from '../Reservations/DateHelper';
+import { formatToDatetimeLocal, getHiddenDays, parseAvailableDays } from '../Reservations/DateHelper';
 import { getReservationsInTrack } from "../Services/Api";
 import { useTranslation } from "react-i18next";
 import refreshIconDark from "../assets/refresh.png";
@@ -17,7 +17,7 @@ import { usePrefersDark } from '../Hooks/usePrefersDark';
 import api from "../Api/axios";
 
 function ReservationCalendar() {
-    const token = localStorage.getItem('token');
+    const { t } = useTranslation();
     const [tracks, setTracks] = useState<Track[]>([]);
     const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
@@ -25,7 +25,11 @@ function ReservationCalendar() {
     const [error, setError] = useState<string | null>(null);
     const lang = localStorage.getItem('language');
     const locale = lang == "pl" ? plLocale : enLocale;
-    const { t } = useTranslation();
+    const [openingHour, setOpeningHour] = useState<string>();
+    const [closingHour, setClosingHour] = useState<string>();
+    const [allowedDays, setAllowedDays] = useState<number[]>([]);
+    const [hiddenDays, setHiddenDays] = useState<number[]>([]);
+    const sortedTracks = [...tracks].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
 
     const isDark = usePrefersDark();
     const icon = isDark ? refreshIconLight : refreshIconDark;
@@ -33,7 +37,7 @@ function ReservationCalendar() {
     const fetchTracks = async () => {
         try {
             const response = await api.get(`/tracks`);
-            setTracks(response.data); 
+            setTracks(response.data);
         } catch (error) {
             console.error(error);
         }
@@ -53,14 +57,20 @@ function ReservationCalendar() {
         }
 
         const track = tracks.find(t => t.id === selectedTrackId);
-        if (!track) return;
+        if (!track) {
+            return;
+        }
 
+        setOpeningHour(track?.openingHour || "00:00");
+        setClosingHour(track?.closingHour || "23:59");
+
+        const parsedDays = parseAvailableDays(track.availableDays);
+        setAllowedDays(parsedDays);
+        setHiddenDays(getHiddenDays(parsedDays));
         try {
-            if (token) {
-                const data = await getReservationsInTrack(selectedTrackId, token);
-                const filtered = data.filter((reservation: any) => reservation.statusName !== "Anulowano");
-                setReservationList(filtered);
-            }
+            const data = await getReservationsInTrack(selectedTrackId);
+            const filtered = data.filter((reservation: any) => reservation.statusName !== "Anulowano");
+            setReservationList(filtered);
         } catch (err: any) {
             setError(err.message || t("universal.error"));
         }
@@ -114,7 +124,7 @@ function ReservationCalendar() {
                     <div className="d-flex gap-3">
                         <select id="track-select" className="info-input" value={selectedTrackId ?? ''} onChange={handleTrackChange}>
                             <option value="">{t("home.choseTrack")}</option>
-                            {tracks.map(track => (
+                            {sortedTracks.map(track => (
                                 <option key={track.id} value={track.id}>
                                     {track.name}
                                 </option>
@@ -133,13 +143,23 @@ function ReservationCalendar() {
                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                         locale={locale}
                         initialView="timeGridWeek"
+                        slotMinTime={openingHour || "00:00:00"}
+                        slotMaxTime={closingHour || "23:59:00"}
+                        //hiddenDays={hiddenDays} // Pokazuje tylko dni, gdy tor pracuje
+                        businessHours={{
+                            daysOfWeek: allowedDays,
+                            startTime: openingHour, // To pozwala na wyświetlenie wszystkich dni, ale te w których tor nie pracuje są zaszarzone
+                            endTime: closingHour,
+                        }}
+                        height="auto"
+                        contentHeight="auto"
+                        expandRows={true}
                         selectable={false}
                         events={events}
                         eventBackgroundColor='#ED8A62'
                         eventBorderColor='#030303'
                         eventTextColor='#030303'
-                        eventClick={handleEventClick}
-                        height="auto" />
+                        eventClick={handleEventClick} />
                 </div>
             </div>
         </>

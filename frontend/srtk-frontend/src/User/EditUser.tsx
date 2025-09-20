@@ -69,6 +69,19 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
         }
     }, [roleId, adminInFacility]);
 
+    const isFormValid = (() => {
+        if (!email) {
+            return false;
+        }
+        if (roleId === 1) {
+            return !!name && !!surname;
+        }
+        if (roleId === 2) {
+            return authFacilityId !== 0 ? true : !!facilityId;
+        }
+        return false;
+    })();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const bodyData: any = { email, roleId, };
@@ -148,7 +161,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, currentEmail, currentName, 
                 </div>
 
                 <div className="d-flex gap-2">
-                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="submit" disabled={!isFormValid}>{t("universal.saveChanges")}</button>
                     <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>

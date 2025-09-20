@@ -1,3 +1,4 @@
+import axios from "axios";
 import type { Reservation, Track, Equipment, EquipmentWithQuantity, Facility, Role, Status, Client, Admin, UserPreference } from "../Types/Types";
 
 // Ogólny fetch GET z tokenem:
@@ -40,8 +41,13 @@ export const getUserReservations = async (userId: number, token: string): Promis
     return fetchWithAuth(`/api/reservations/user?userId=${userId}`, token);
 };
 
-export const getReservationsInTrack = async (trackId: number, token: string): Promise<Reservation[]> => {
+/*export const getReservationsInTrack = async (trackId: number, token: string): Promise<Reservation[]> => {
     return fetchWithAuth(`/api/reservations/inTrack?trackId=${trackId}`, token);
+};*/
+
+export const getReservationsInTrack = async (trackId: number) => {
+    const response = await axios.get(`/api/reservations/inTrack?trackId=${trackId}`);
+    return response.data;
 };
 
 export interface TrackAvailabilityResponse {

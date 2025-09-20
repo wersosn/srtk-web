@@ -20,9 +20,21 @@ const EditEquipment: React.FC<EditEquipmentProps> = ({ equipmentId, currentName,
     const facilityId = currentFacilityId;
     const [message, setMessage] = useState('');
     const { t } = useTranslation();
+    const isFormValid = !!name && !!type && cost >= 0;
+
+    const validateInputs = () => {
+        if (cost < 0) {
+            alert(t("eq.positiveCost"));
+            return false;
+        }
+        return true;
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!validateInputs()) {
+            return;
+        }
 
         try {
             const { data: updatedEquipment } = await api.put<Equipment>(`/equipments/${equipmentId}`, { name, type, cost, facilityId });
@@ -46,10 +58,10 @@ const EditEquipment: React.FC<EditEquipmentProps> = ({ equipmentId, currentName,
                 </div>
                 <div>
                     <label htmlFor="eqCost">{t("eq.cost")}</label>
-                    <input id="eqCost" value={cost} onChange={e => setCost(Number(e.target.value))} className="info-input" />
+                    <input id="eqCost" type="number" value={cost} onChange={e => setCost(Number(e.target.value))} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="submit" disabled={!isFormValid}>{t("universal.saveChanges")}</button>
                     <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>

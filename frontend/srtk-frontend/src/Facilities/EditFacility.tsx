@@ -18,6 +18,7 @@ const EditFacility: React.FC<EditFacilityProps> = ({ facilityId, currentName, cu
     const [address, setAddress] = useState(currentAddress);
     const [message, setMessage] = useState('');
     const { t } = useTranslation();
+    const isFormValid = !!name && !!city && !!address;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,7 +48,7 @@ const EditFacility: React.FC<EditFacilityProps> = ({ facilityId, currentName, cu
                     <input id="facilityAddress" value={address} onChange={e => setAddress(e.target.value)} required maxLength={50} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="submit" disabled={!isFormValid}>{t("universal.saveChanges")}</button>
                     <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>

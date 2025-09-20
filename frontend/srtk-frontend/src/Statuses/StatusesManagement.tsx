@@ -19,6 +19,7 @@ function StatusesManagement() {
     const { userId } = useAuth();
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(statuses, elementsPerPage);
+    const sortedStatuses = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
 
     const handleAdd = (newStatus: Status) => {
         setStatuses(prev => [...prev, newStatus]);
@@ -43,7 +44,7 @@ function StatusesManagement() {
                 <>
                     <h5 className="mt-4">{t("status.list")}</h5>
                     <ul className="list-group">
-                        {paginatedItems.map((status) => (
+                        {sortedStatuses.map((status) => (
                             <li key={status.id} className="list-group-item d-flex justify-content-between align-items-center">
                                 {status.name}
                                 <div className="d-flex gap-2">

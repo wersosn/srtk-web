@@ -25,7 +25,6 @@ export function useTrackAvailabilityEdit(track: Track, trackId: number | null, s
         }
 
         if (!isValidDateTime(endDate, openingHour, closingHour, allowedDays)) {
-            setIsAvailable(false);
             return;
         }
 

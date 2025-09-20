@@ -14,6 +14,7 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
     const [name, setName] = useState(currentName);
     const [message, setMessage] = useState('');
     const { t } = useTranslation();
+    const isFormValid = !!name;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,7 +36,7 @@ const EditRole: React.FC<EditRoleProps> = ({ roleId, currentName, onUpdated, onC
                     <input id="roleName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="submit" disabled={!isFormValid}>{t("universal.saveChanges")}</button>
                     <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>

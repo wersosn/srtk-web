@@ -13,6 +13,11 @@ export function parseAvailableDays(daysStr: string): number[] {
     return daysStr.split(',').map(d => d.trim()).map(d => dayMap[d]).filter(n => n !== undefined);
 }
 
+export function getHiddenDays(allowedDays: number[]): number[] {
+    const allDays = [0, 1, 2, 3, 4, 5, 6];
+    return allDays.filter(d => !allowedDays.includes(d));
+}
+
 export function isValidDateTime(dateStr: string, openingHour: string, closingHour: string, allowedDays: number[]) {
     if (!dateStr) return false;
     const date = new Date(dateStr);

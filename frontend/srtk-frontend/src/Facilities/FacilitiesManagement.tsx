@@ -20,6 +20,7 @@ function FacilitiesManagement() {
     const [showDetails, setShowDetails] = useState<Facility | null>(null);
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(facilities, elementsPerPage);
+    const sortedFacilities = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
 
     const handleAdd = (newFacility: Facility) => {
         setFacilities(prev => [...prev, newFacility]);
@@ -44,7 +45,7 @@ function FacilitiesManagement() {
                 <>
                     <h5 className="mt-4">{t("facility.list")}</h5>
                     <ul className="list-group">
-                        {paginatedItems.map((facility) => (
+                        {sortedFacilities.map((facility) => (
                             <li key={facility.id} className="list-group-item p-0">
                                 <div onClick={() => setShowDetails(prev => (prev?.id === facility.id ? null : facility))} className="d-flex justify-content-between align-items-center px-3 py-2">
                                     {facility.name}

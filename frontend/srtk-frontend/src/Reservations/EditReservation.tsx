@@ -37,7 +37,8 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const trackInfo = useTrackDetails(trackId, tracks, t);
     const { isAvailable } = useTrackAvailabilityEdit(track!, trackId, startDate, endDate, reservationId, token!);
     const lang = localStorage.getItem("language") ?? "pl";
-
+    const isFormValid = !!startDate && !!endDate;
+    
     useEffect(() => {
         if (!reservationId) {
             return;
@@ -200,7 +201,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
                     {t("makeReservations.finalCost")} {cost.toFixed(2)} zł
                 </div>
                 <div className="d-flex gap-2">
-                    <button type="submit">{t("universal.saveChanges")}</button>
+                    <button type="submit" disabled={!isFormValid}>{t("universal.saveChanges")}</button>
                     <button type="button" onClick={onCancel}>{t("universal.cancel")}</button>
                 </div>
                 <div>{message}</div>

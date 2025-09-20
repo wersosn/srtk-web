@@ -58,6 +58,11 @@ button:hover {
   color: light-dark(#dde2e5, #1f2f40);
 }
 
+button:disabled {
+  background-color: #c8c8c8;
+  color: #333333;
+}
+
 h2, h5 {
   text-align: center;
   color: light-dark(#1f2f40, #dde2e5);
@@ -114,6 +119,11 @@ label {
 }
 
 .icon-button:hover {
+  background: none;
+  border: none;
+}
+
+.icon-button:disabled {
   background: none;
   border: none;
 }

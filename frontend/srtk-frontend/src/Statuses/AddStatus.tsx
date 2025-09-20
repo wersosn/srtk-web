@@ -11,6 +11,7 @@ const AddStatus: React.FC<AddStatusProps> = ({ onAddStatus }) => {
     const [name, setName] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const { t } = useTranslation();
+    const isFormValid = !!name;
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -32,7 +33,7 @@ const AddStatus: React.FC<AddStatusProps> = ({ onAddStatus }) => {
                     <label htmlFor="statusName">{t("status.name")}</label>
                     <input id="statusName" value={name} onChange={e => setName(e.target.value)} required maxLength={100} className="info-input" />
                 </div>
-                <button type="submit">{t("universal.save")}</button>
+                <button type="submit" disabled={!isFormValid}>{t("universal.save")}</button>
                 <div>{message}</div>
             </form>
         </>
