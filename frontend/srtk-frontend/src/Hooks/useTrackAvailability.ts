@@ -18,6 +18,11 @@ export function useTrackAvailability(tracks: Track[], selectedTrackId: number | 
                 return;
             }
 
+            if (new Date(startDate) >= new Date(endDate)) {
+                setIsAvailable(false);
+                return;
+            }
+
             if (!isValidDateTime(startDate, openingHour, closingHour, allowedDays)) {
                 setIsAvailable(false);
                 return;

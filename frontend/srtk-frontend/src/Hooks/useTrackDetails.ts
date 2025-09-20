@@ -17,7 +17,7 @@ export function useTrackDetails(selectedTrackId: number | null, tracks: any[], t
         const openingHour = track?.openingHour || "00:00";
         const closingHour = track?.closingHour || "23:59";
 
-        setTrackInfo(`${t("makeReservations.trackHours")}${openingHour} - ${closingHour} ${t("makeReservations.trackDays")}${allowedDays}`);
+        setTrackInfo(`🕓 ${t("makeReservations.trackHours")}${openingHour} - ${closingHour} ${t("makeReservations.trackDays")}${allowedDays}`);
     }, [selectedTrackId, tracks, t]);
 
     return trackInfo;

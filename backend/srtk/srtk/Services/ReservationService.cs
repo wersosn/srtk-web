@@ -114,7 +114,8 @@ namespace srtk.Services
                     r.TrackId == trackId &&
                     (reservationId == null || r.Id != reservationId) &&
                     r.Start < end &&
-                    r.End > start
+                    r.End > start &&
+                    (r.Status!.Name != "Anulowano")
                 );
         }
 

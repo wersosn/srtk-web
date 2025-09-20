@@ -6,6 +6,7 @@ import bellIconDark from '../assets/bell-dark.png'
 import './NotificationBell.css';
 import { useAuth } from "../User/AuthContext";
 import { usePrefersDark } from "../Hooks/usePrefersDark";
+import DeleteNotification from "./DeleteNotification";
 
 function NotificationBell() {
     const { userId } = useAuth();
@@ -15,9 +16,27 @@ function NotificationBell() {
     const { t } = useTranslation();
     const token = localStorage.getItem('token');
     const lang = localStorage.getItem('language');
+    const [unreadCount, setUnreadCount] = useState<number>(0);
 
     const isDark = usePrefersDark();
     const icon = isDark ? bellIconLight : bellIconDark;
+
+    useEffect(() => {
+        const fetchUnreadCount = async () => {
+            if (!userId) return;
+            try {
+                const res = await fetch(`/api/notifications/${userId}/unread`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error(t("api.notificationError"));
+                const count = await res.json();
+                setUnreadCount(count.length / 2);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchUnreadCount();
+    }, [userId]);
 
     const loadNotifications = async () => {
         setLoading(true);
@@ -78,6 +97,7 @@ function NotificationBell() {
         setIsOpen(prev => !prev);
         if (!isOpen) {
             await markAllAsRead();
+            setUnreadCount(0);
         }
     };
 
@@ -97,6 +117,11 @@ function NotificationBell() {
         <>
             <button id="notification-bell" className="icon-button me-3" onClick={toggleNotifications} title={t("navbar.notification")}>
                 <img src={icon} alt="Powiadomienia" style={{ width: '24px', height: '24px' }} />
+                {unreadCount > 0 && (
+                    <span className="notification-badge">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                )}
             </button>
 
             {isOpen && (
@@ -116,8 +141,15 @@ function NotificationBell() {
                                         .sort((a, b) => new Date(b.timeStamp).getTime() - new Date(a.timeStamp).getTime())
                                         .map(n => (
                                             <li key={n.id}>
-                                                <div className="notif-text">
-                                                    <strong>{n.title}</strong><br />
+                                                <div className="notif-header notif-text">
+                                                    <strong>{n.title}</strong>
+                                                    <div style={{ width: '16px', height: '16px' }}>
+                                                        <DeleteNotification
+                                                            notificationId={n.id}
+                                                            onDeleted={() => setNotifications(prev => prev.filter(r => r.id !== n.id))} />
+                                                    </div>
+                                                </div>
+                                                <div className="notif-body notif-text">
                                                     <small>{n.description}</small><br />
                                                     <small><em>{new Date(n.timeStamp).toLocaleTimeString()}</em></small>
                                                 </div>

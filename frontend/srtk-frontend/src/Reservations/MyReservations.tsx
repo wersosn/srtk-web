@@ -18,6 +18,7 @@ import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { useFilteredReservations } from '../Hooks/useFilteredReservations';
 import { usePagination } from '../Hooks/usePagination';
 import Pagination from '../Pagination/Pagination';
+import { useNotifications } from '../Hooks/useNotifications';
 
 function MyReservations() {
     const token = localStorage.getItem('token');
@@ -32,6 +33,7 @@ function MyReservations() {
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { filteredReservations, setFilteredReservations } = useFilteredReservations(reservations);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredReservations, elementsPerPage);
+    const { addNotification } = useNotifications(token, userId!, t);
 
     const handleEdit = (updated: Reservation) => {
         const updatedReservation = reservations.map(r => r.id === updated.id ? updated : r);
@@ -62,6 +64,30 @@ function MyReservations() {
         setFilteredReservations(reservations);
     }, [reservations]);
 
+    const sendNotifications = async (reservation: Reservation) => {
+        if (!reservation || !tracks || !userId) {
+            return;
+        }
+
+        //console.log("loading...")
+        try {
+            await addNotification(
+                `Anulowano rezerwację toru ${getTrackName(tracks, reservation.trackId, t)}`,
+                `Anulowano rezerwację rozpoczynającą się ${formatToDatetimeLocal(reservation.start)}`,
+                "pl"
+            );
+
+            await addNotification(
+                `The track reservation ${getTrackName(tracks, reservation.trackId, t)} has been cancelled`,
+                `The reservation starting on ${formatToDatetimeLocal(reservation.start)} has been cancelled`,
+                "en"
+            );
+        }
+        catch (err: any) {
+            console.error("Błąd dodawania powiadomienia:", err);
+        }
+    }
+
     const handleCancel = async (reservationId: number) => {
         if (!window.confirm(t("reservation.cancelAlert"))) {
             return;
@@ -75,8 +101,11 @@ function MyReservations() {
                 },
             });
             if (response.ok) {
+                const reservation = reservations.find(r => r.id === reservationId);
+                sendNotifications(reservation!);
                 refreshReservations();
                 setRefreshCalendarCounter(prev => prev + 1);
+
             } else {
                 const error = await response.text();
                 setError(t("universal.error") + error);
@@ -157,7 +186,7 @@ function MyReservations() {
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={(newPage) => setCurrentPage(newPage)}
-                                t={t}/>
+                                t={t} />
 
                             <hr />
                             {editingReservation && (

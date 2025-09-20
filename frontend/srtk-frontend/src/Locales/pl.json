@@ -261,6 +261,7 @@
     "notifications": "Powiadomienia",
     "noNotifications": "Brak powiadomień",
     "resTitle": "Zarezerwowano tor",
-    "resDesc": "Twoja rezerwacja zaczyna się w dniu "
+    "resDesc": "Twoja rezerwacja zaczyna się w dniu ",
+    "deleteAlert": "Czy na pewno chcesz usunąć te powiadomienie?"
   }
 }
