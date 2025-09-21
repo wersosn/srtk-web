@@ -11,11 +11,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   text-align: center;
 }
 
-.calendar-container {     
+.calendar-container {
   min-width: 1000px;
   margin: 2rem auto;
   padding: 1rem;
@@ -40,4 +40,10 @@
 
 .fc-timegrid-event .fc-event-main {
   padding: 2px 4px;
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    min-width: auto;
+  }
 }

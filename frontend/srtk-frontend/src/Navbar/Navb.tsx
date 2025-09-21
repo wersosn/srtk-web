@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../User/AuthContext';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import { useTranslation } from "react-i18next";
@@ -34,7 +34,7 @@ const Navb: React.FC = () => {
             <>
               <Nav.Link href="/myReservations">{t("navbar.myReservations")}</Nav.Link>
               <Nav.Link className="me-2" href="/adminPanel">{t("navbar.adminPanel")}</Nav.Link>
-              <NotificationBell/>
+              <NotificationBell />
               <button onClick={handleLogout}>{t("navbar.logout")}</button>
             </>
           ) : isLoggedIn && userRole === 'Client' ? (

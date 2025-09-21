@@ -15,6 +15,7 @@ import refreshIconDark from "../assets/refresh.png";
 import refreshIconLight from "../assets/refreshLight.png";
 import { usePrefersDark } from '../Hooks/usePrefersDark';
 import api from "../Api/axios";
+import { useIsMobile } from '../Hooks/useIsMobile';
 
 function ReservationCalendar() {
     const { t } = useTranslation();
@@ -33,6 +34,9 @@ function ReservationCalendar() {
 
     const isDark = usePrefersDark();
     const icon = isDark ? refreshIconLight : refreshIconDark;
+
+    const isMobile = useIsMobile();
+    const type = isMobile ? "timeGridDay" : "timeGridWeek";
 
     const fetchTracks = async () => {
         try {
@@ -131,7 +135,7 @@ function ReservationCalendar() {
                             ))}
                         </select>
                         <button className="icon-button" onClick={refreshReservations} style={{ width: '24px', height: '40px' }} title={t("home.refresh")}>
-                            <img src={icon} alt="Edytuj" style={{ width: '24px', height: '24px' }} />
+                            <img src={icon} alt="Odśwież" style={{ width: '24px', height: '24px' }} />
                         </button>
                     </div>
                 </div>
@@ -142,7 +146,7 @@ function ReservationCalendar() {
                     <FullCalendar
                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                         locale={locale}
-                        initialView="timeGridWeek"
+                        initialView={type}
                         slotMinTime={openingHour || "00:00:00"}
                         slotMaxTime={closingHour || "23:59:00"}
                         //hiddenDays={hiddenDays} // Pokazuje tylko dni, gdy tor pracuje
