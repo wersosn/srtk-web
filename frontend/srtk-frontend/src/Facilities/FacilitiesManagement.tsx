@@ -20,7 +20,7 @@ function FacilitiesManagement() {
     const [showDetails, setShowDetails] = useState<Facility | null>(null);
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(facilities, elementsPerPage);
-    const sortedFacilities = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+    const sortedFacilities = [...paginatedItems].sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? '', 'pl'));
 
     const handleAdd = (newFacility: Facility) => {
         setFacilities(prev => [...prev, newFacility]);

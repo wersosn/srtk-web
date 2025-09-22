@@ -23,7 +23,7 @@ function EquipmentsManagement() {
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { filteredEquipments, setFilteredEquipments } = useFilteredEquipments(equipmentList);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredEquipments, elementsPerPage);
-    const sortedEqs = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+    const sortedEqs = [...paginatedItems].sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? '', 'pl'));
 
     const handleAdd = (newEquipment: Equipment) => {
         setEquipmentList(prev => [...prev, newEquipment]);

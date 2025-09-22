@@ -37,6 +37,9 @@ test('Pomyślne pobranie listy obiektów', async ({ page }) => {
 })
 
 test('Pomyślne dodanie nowego obiektu', async ({ page }) => {
+    page.on('pageerror', err => console.log("PAGE ERROR:", err));
+    page.on('console', msg => console.log("BROWSER LOG:", msg.text()));
+    
     await page.route('**/api/facilities', async route => {
         if (route.request().method() === 'POST') {
             await route.fulfill({

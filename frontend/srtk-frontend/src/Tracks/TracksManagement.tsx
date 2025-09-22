@@ -23,7 +23,7 @@ function TrackManagement() {
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const { filteredTracks, setFilteredTracks } = useFilteredTracks(tracks);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredTracks, elementsPerPage);
-    const sortedTracks = [...paginatedItems].sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+    const sortedTracks = [...paginatedItems].sort((a, b) => (a?.name ?? '').localeCompare(b?.name ?? '', 'pl'));
 
     const handleAdd = (newTrack: Track) => {
         setTracks(prev => [...prev, newTrack]);
