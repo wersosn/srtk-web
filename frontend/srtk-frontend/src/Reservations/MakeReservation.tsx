@@ -33,7 +33,7 @@ function MakeReservation() {
     const isFormValid = !!selectedTrackId && !!startDate && !!endDate;
 
     const track = tracks.find(t => t.id === selectedTrackId);
-    const allowedDays = track ? parseAvailableDays(track.availableDays) : [];
+    const allowedDays = track?.availableDays ? parseAvailableDays(track.availableDays) : [];
     const openingHour = track?.openingHour || '00:00';
     const closingHour = track?.closingHour || '23:59';
 

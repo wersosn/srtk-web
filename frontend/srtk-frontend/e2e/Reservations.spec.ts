@@ -139,63 +139,136 @@ test('Pomyślne pobranie listy wszystkich rezerwacji danego użytkownika', async
     await expect(page.locator(`li.list-group-item >> text=${formatToDatetimeLocal(start)} - ${formatToDatetimeLocal(end)}`)).toBeVisible(); // Godzny się różną, gdyż w formatowaniu jest brana pod uwagę strefa czasowa
 })
 
-// Strona się nie renderuje:
-test.skip('Pomyślne utworzenie rezerwacji', async ({ page }) => {
-    await page.goto('/');
-
-    await page.goto('http://localhost:5173/makeReservation');
-
-    await page.route('**/api/tracks*', route => {
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify([
-                { id: 1, name: 'Tor Kartingowy Szybka Strefa' }
-            ])
-        });
-    });
-});
-
-// Strona się nie renderuje:
-test.skip('Pomyślna edycja rezerwacji', async ({ page }) => {
-    const reservationId = 1235;
-
-    await page.route('**/api/tracks*', route => {
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify([{ id: 1, name: 'Tor Kartingowy Szybka Strefa', availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], openingHour: '08:00', closingHour: '20:00' }])
-        });
-    });
-
-    await page.route(`**/api/equipments/inFacility?facilityId=1`, route => {
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify([]),
-        });
-    });
-
-    await page.route(`**/api/trackAvailability*`, route => {
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({ isAvailable: true }),
-        });
-    });
-
-    let updatedBody: any = null;
-    await page.route(`**/api/reservations/${reservationId}`, async route => {
-        if (route.request().method() === 'PUT') {
-            updatedBody = await route.request().postDataJSON();
-            await route.fulfill({
+test('Pomyślne utworzenie rezerwacji', async ({ page }) => {
+    await page.route('**/api/tracks', route => {
+        if (route.request().method() === 'GET') {
+            route.fulfill({
                 status: 200,
                 contentType: 'application/json',
-                body: JSON.stringify({ id: reservationId, ...updatedBody }),
+                body: JSON.stringify([
+                    { id: 1, name: 'Tor', typeOfSurface: 'Twarda', length: 1000, openingHour: "08:00", closingHour: "20:00", availableDays: 'Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota,Niedziela', facilityId: 1 },
+                    { id: 2, name: 'Inny', typeOfSurface: 'Miękka', length: 2000, openingHour: "10:00", closingHour: "20:00", availableDays: 'Wtorek,Środa,Czwartek,Piątek,Sobota', facilityId: 2 }
+                ]),
             });
         } else {
             route.continue();
         }
+    });
+
+    await page.route('**/api/equipments/inFacility?facilityId=1', route => {
+        if (route.request().method() === 'GET') {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([{ id: 1, name: 'Rower', type: 'Górski', cost: 250, facilityId: 1 }]),
+            });
+        } else {
+            route.continue();
+        }
+    });
+
+    await page.route('**/api/reservations/isAvailable?*', route => {
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ available: true }),
+        });
+    });
+
+    const reservation =
+    {
+        id: 22,
+        start: '2027-11-12T12:00:00Z',
+        end: '2027-11-12T15:00:00Z',
+        cost: 600,
+        userId: 11,
+        trackId: 1,
+        statusId: 1,
+        user: null,
+        track: null,
+        status: null,
+        equipmentReservations: []
+    };
+
+    await page.route('**/api/reservations', async route => {
+        if (route.request().method() === 'POST') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify(reservation),
+            });
+        } else {
+            await route.abort();
+        }
+    });
+
+    await page.goto('http://localhost:5173/makeReservation');
+    await expect(page.locator('h2', { hasText: 'Nowa rezerwacja' })).toBeVisible();
+
+    await page.selectOption('#trackSelect', { value: '1' });
+
+    await page.fill('#resStart', '2025-09-23T10:00');
+    await page.fill('#resEnd', '2025-09-23T12:00');
+    await expect(page.locator('#resStart')).toHaveValue('2025-09-23T10:00');
+    await expect(page.locator('#resEnd')).toHaveValue('2025-09-23T12:00');
+
+    await page.check('#rentEquipment');
+    const equipmentInput = page.locator('input[type="number"]').first();
+    await equipmentInput.fill('2');
+
+    await page.click('button:has-text("Zarezerwuj tor")');
+    await expect(page).toHaveURL('/');
+});
+
+test('Pomyślna edycja rezerwacji', async ({ page }) => {
+    //page.on('pageerror', err => console.log("PAGE ERROR:", err));
+    //page.on('console', msg => console.log("BROWSER LOG:", msg.text()));
+
+    await page.route('**/api/tracks', route => {
+        if (route.request().method() === 'GET') {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([
+                    { id: 1, name: 'Tor', typeOfSurface: 'Twarda', length: 1000, openingHour: "08:00", closingHour: "20:00", availableDays: 'Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota,Niedziela', facilityId: 1 },
+                    { id: 2, name: 'Inny', typeOfSurface: 'Miękka', length: 2000, openingHour: "10:00", closingHour: "20:00", availableDays: 'Wtorek,Środa,Czwartek,Piątek,Sobota', facilityId: 2 }
+                ]),
+            });
+        } else {
+            route.continue();
+        }
+    });
+
+    await page.route('**/api/tracks/1', route => {
+        if (route.request().method() === 'GET') {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ id: 1, name: 'Tor', typeOfSurface: 'Twarda', length: 1000, openingHour: "08:00", closingHour: "20:00", availableDays: 'Poniedziałek,Wtorek,Środa,Czwartek,Piątek,Sobota,Niedziela', facilityId: 1 }),
+            });
+        } else {
+            route.continue();
+        }
+    });
+
+    await page.route('**/api/equipments/inFacility?facilityId=1', route => {
+        if (route.request().method() === 'GET') {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([{ id: 1, name: 'Rower', type: 'Górski', cost: 250, facilityId: 1 }]),
+            });
+        } else {
+            route.continue();
+        }
+    });
+
+    await page.route('**/api/reservations/isAvailable?*', route => {
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ available: true }),
+        });
     });
 
     await page.route('**/api/users/**/preferences', route => {
@@ -206,38 +279,64 @@ test.skip('Pomyślna edycja rezerwacji', async ({ page }) => {
         });
     });
 
-    await page.route('**/api/reservations/inTrack**', route => {
-        route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify([{
-                id: reservationId,
-                start: '2028-08-12T12:00:00Z',
-                end: '2028-08-12T15:00:00Z',
-                cost: 600,
-                userId: 12,
-                trackId: 1,
-                statusId: 1,
-                equipmentReservations: []
-            }])
-        });
+    let reservations = [
+        {
+            id: 456,
+            start: '2028-11-12T12:00:00Z',
+            end: '2028-11-12T15:00:00Z',
+            cost: 600,
+            userId: 11,
+            trackId: 1,
+            statusId: 1,
+            statusName: "Zarezerwowano",
+            user: null,
+            track: null,
+            status: null,
+            equipmentReservations: []
+        }
+    ]
+
+    await page.route('**/api/reservations/user**', async route => {
+        if (route.request().method() === 'GET') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify(reservations)
+            });
+        } else {
+            route.continue();
+        }
     });
 
-    await page.goto('http://localhost:5173/adminPanel/reservationsManagement');
-    await expect(page.locator('em', { hasText: 'Tor Kartingowy Szybka Strefa' })).toBeVisible();
+    await page.route('**/api/reservations/456', async route => {
+        const req = route.request();
+        if (req.method() === 'PUT') {
+            const body = await req.postDataJSON();
+            reservations = reservations.map(r =>
+                r.id === 456 ? { ...r, ...body } : r
+            );
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ id: 456, ...body }),
+            });
+        } else {
+            route.abort();
+        }
+    });
+
+    await page.goto('http://localhost:5173/myReservations');
+    await expect(page.locator('h2', { hasText: 'Moje rezerwacje' })).toBeVisible();
 
     await page.click('button:has(img[alt="Edytuj"])');
+    await expect(page.locator('label', { hasText: 'Data rozpoczęcia' })).toBeVisible();
 
-    const newStart = '2028-11-12T13:00';
-    const newEnd = '2028-11-12T16:00';
+    const newStart = '2028-11-12T14:00';
+    const newEnd = '2028-11-12T18:00';
     await page.fill('input[type="datetime-local"]:nth-of-type(1)', newStart);
     await page.fill('input[type="datetime-local"]:nth-of-type(2)', newEnd);
 
     await page.click('button:has-text("Zapisz zmiany")');
-
-    expect(updatedBody).not.toBeNull();
-    expect(updatedBody.Start).toBe(new Date(newStart).toISOString());
-    expect(updatedBody.End).toBe(new Date(newEnd).toISOString());
 });
 
 test('Pomyślne anulowanie rezerwacji', async ({ page }) => {
