@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
-import './Reservations.css';
-import cycleImage from '../assets/cycle.svg';
 import { useTracks } from '../Hooks/useTracks';
 import { useAuth } from '../User/AuthContext';
 import { useEquipments } from '../Hooks/useEquipments';
@@ -11,7 +9,14 @@ import { useTrackAvailability } from '../Hooks/useTrackAvailability';
 import { useCost } from '../Hooks/useCost';
 import { useTrackDetails } from '../Hooks/useTrackDetails';
 import { useNotifications } from '../Hooks/useNotifications';
+import { usePrefersDark } from '../Hooks/usePrefersDark';
+import { Modal } from "react-bootstrap";
+import ReservationCalendarModal from '../Calendar/ReservationCalendarModal';
+import './Reservations.css';
 import api from "../Api/axios";
+import cycleImage from '../assets/cycle.svg';
+import calendarIcon from '../assets/calendar-day.png';
+import calendarIconLight from '../assets/calendar-day-light.png';
 
 function MakeReservation() {
     const token = localStorage.getItem('token');
@@ -31,11 +36,23 @@ function MakeReservation() {
     const { addNotification } = useNotifications(token, userId!, t);
     const lang = localStorage.getItem("language") ?? "pl";
     const isFormValid = !!selectedTrackId && !!startDate && !!endDate;
+    const [showCalendarModal, setShowCalendarModal] = useState(false);
+
+    const isDark = usePrefersDark();
+    const icon = isDark ? calendarIconLight : calendarIcon;
 
     const track = tracks.find(t => t.id === selectedTrackId);
     const allowedDays = track?.availableDays ? parseAvailableDays(track.availableDays) : [];
     const openingHour = track?.openingHour || '00:00';
     const closingHour = track?.closingHour || '23:59';
+
+    const handleOpenCalendar = () => {
+        setShowCalendarModal(true)
+    };
+
+    const handleCloseCalendar = () => {
+        setShowCalendarModal(false);
+    }
 
     const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -111,13 +128,13 @@ function MakeReservation() {
     }
 
     const handleReservation = async () => {
-        if(!validateInputs()) {
+        if (!validateInputs()) {
             return;
         }
         const reservationBody = buildReservationBody();
 
         try {
-            await api.post("/reservations", reservationBody, { headers: { 'X-Language': lang }});
+            await api.post("/reservations", reservationBody, { headers: { 'X-Language': lang } });
             alert(t("makeReservations.reservationPositive"));
             sendNotifications();
             navigate('/');
@@ -139,8 +156,26 @@ function MakeReservation() {
                         <p className="text-danger">{error}</p>
                     ) : (
                         <>
-                            <label style={{ textAlign: "center" }}>{t("makeReservations.track")}</label>
-                            <br />
+                            <div className="d-flex align-items-center gap-1">
+                                <label style={{ margin: 0 }}>{t("makeReservations.track")}</label>
+                                {selectedTrackId !== null && selectedTrackId !== 0 && (
+                                    <>
+                                        <button className="icon-button" onClick={handleOpenCalendar}>
+                                            <img src={icon} alt="Kalendarz" style={{ width: '16px', height: '16px' }} />
+                                        </button>
+                                        <Modal show={showCalendarModal} onHide={handleCloseCalendar} size="xl" centered>
+                                            <Modal.Header closeButton className={isDark ? 'modal-dark-header' : 'modal-light-header'}>
+                                                <Modal.Title>{t("calendar.modalTitle")}</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body className={isDark ? 'modal-dark' : 'modal-light'}>
+                                                {selectedTrackId && (
+                                                    <ReservationCalendarModal trackId={selectedTrackId} />
+                                                )}
+                                            </Modal.Body>
+                                        </Modal>
+                                    </>
+                                )}
+                            </div>
                             <select id="trackSelect" className="info-input" value={selectedTrackId ?? ''} onChange={(e) => setSelectedTrackId(Number(e.target.value))}>
                                 <option value="">{t("makeReservations.selectTrack")}</option>
                                 {tracks.map(track => (

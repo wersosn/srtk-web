@@ -10,7 +10,6 @@ import api from "../Api/axios";
 import type { Reservation } from '../Types/Types';
 import { useTrackDetails } from '../Hooks/useTrackDetails';
 import { useTracks } from '../Hooks/useTracks';
-
 interface EditReservationProps {
     reservationId: number;
     currentStart: string;
@@ -38,7 +37,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
     const { isAvailable } = useTrackAvailabilityEdit(track!, trackId, startDate, endDate, reservationId, token!);
     const lang = localStorage.getItem("language") ?? "pl";
     const isFormValid = !!startDate && !!endDate;
-    
+
     useEffect(() => {
         if (!reservationId) {
             return;
@@ -140,7 +139,7 @@ const EditReservation: React.FC<EditReservationProps> = ({ reservationId, curren
         const reservationBody = buildReservationBody();
 
         try {
-            const { data: updatedReservation } = await api.put<Reservation>(`/reservations/${reservationId}`, reservationBody, { headers: { 'X-Language': lang }});
+            const { data: updatedReservation } = await api.put<Reservation>(`/reservations/${reservationId}`, reservationBody, { headers: { 'X-Language': lang } });
             onUpdated(updatedReservation);
             setMessage('');
         } catch (err: any) {

@@ -263,5 +263,10 @@
     "resTitle": "Zarezerwowano tor",
     "resDesc": "Twoja rezerwacja zaczyna się w dniu ",
     "deleteAlert": "Czy na pewno chcesz usunąć te powiadomienie?"
+  },
+
+   "calendar": {
+    "modalTitle": "Kalendarz rezerwacji",
+    "btnTitle": "Sprawdź dostępność toru"
   }
 }

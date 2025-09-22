@@ -155,7 +155,7 @@
     "cost": "Cost:",
     "edit": "Edit reservation",
     "date": "Reservation date:",
-    "reserv": "Reservation:",
+    "reserv": "Reservation",
     "deleteAlert": "Are you sure you want to delete this reservation?",
     "deleteError": "Failed to delete the reservation",
     "reservationManagement": "Reservation management",
@@ -267,5 +267,10 @@
     "resTitle": "Track reserved",
     "resDesc": "Your reservation starts on ",
     "deleteAlert": "Are you sure you want to delete this notification?"
+  },
+
+  "calendar": {
+    "modalTitle": "Reservation calendar",
+    "btnTitle": "Check track availability"
   }
 }

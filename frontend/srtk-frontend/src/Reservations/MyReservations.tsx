@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import editIcon from '../assets/edit.png';
 import downloadIcon from '../assets/download.png';
 import cancelIcon from "../assets/cancel.png";
+import calendarIcon from '../assets/calendar-day.png';
+import calendarIconLight from '../assets/calendar-day-light.png';
 import MyReservationCalendar from '../Calendar/MyReservationCalendar';
 import EditReservation from './EditReservation';
 import DeleteReservation from './DeleteReservation';
@@ -19,6 +21,9 @@ import { useFilteredReservations } from '../Hooks/useFilteredReservations';
 import { usePagination } from '../Hooks/usePagination';
 import Pagination from '../Pagination/Pagination';
 import { useNotifications } from '../Hooks/useNotifications';
+import { Modal } from 'react-bootstrap';
+import { usePrefersDark } from '../Hooks/usePrefersDark';
+import ReservationCalendarModal from '../Calendar/ReservationCalendarModal';
 
 function MyReservations() {
     const token = localStorage.getItem('token');
@@ -34,6 +39,18 @@ function MyReservations() {
     const { filteredReservations, setFilteredReservations } = useFilteredReservations(reservations);
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredReservations, elementsPerPage);
     const { addNotification } = useNotifications(token, userId!, t);
+    const [showCalendarModal, setShowCalendarModal] = useState(false);
+
+    const isDark = usePrefersDark();
+    const icon = isDark ? calendarIconLight : calendarIcon;
+
+    const handleOpenCalendar = () => {
+        setShowCalendarModal(true)
+    };
+
+    const handleCloseCalendar = () => {
+        setShowCalendarModal(false);
+    }
 
     const handleEdit = (updated: Reservation) => {
         const updatedReservation = reservations.map(r => r.id === updated.id ? updated : r);
@@ -192,6 +209,25 @@ function MyReservations() {
                             {editingReservation && (
                                 <>
                                     <h5 className="mt-4">{t("reservation.edit")}</h5>
+                                    <div className="d-flex align-items-center gap-1">
+                                        {editingReservation.trackId !== null && editingReservation.trackId !== 0 && (
+                                            <>
+                                                <button className="icon-button" onClick={handleOpenCalendar} title={t("calendar.btnTitle")}>
+                                                    <img src={icon} alt="Kalendarz" style={{ width: '16px', height: '16px' }} />
+                                                </button>
+                                                <Modal show={showCalendarModal} onHide={handleCloseCalendar} size="xl" centered>
+                                                    <Modal.Header closeButton className={isDark ? 'modal-dark-header' : 'modal-light-header'}>
+                                                        <Modal.Title>{t("calendar.modalTitle")}</Modal.Title>
+                                                    </Modal.Header>
+                                                    <Modal.Body className={isDark ? 'modal-dark' : 'modal-light'}>
+                                                        {editingReservation.trackId && (
+                                                            <ReservationCalendarModal trackId={editingReservation.trackId} />
+                                                        )}
+                                                    </Modal.Body>
+                                                </Modal>
+                                            </>
+                                        )}
+                                    </div>
                                     <EditReservation
                                         key={editingReservation.id}
                                         reservationId={editingReservation.id}
