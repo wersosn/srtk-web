@@ -175,6 +175,25 @@ test('Pomyślne utworzenie rezerwacji', async ({ page }) => {
         });
     });
 
+    await page.route('**/api/notifications', async (route) => {
+        const req = route.request();
+        if (req.method() === 'POST') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ success: true }),
+            });
+        } else if (req.method() === 'GET') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([]),
+            });
+        } else {
+            route.continue();
+        }
+    });
+
     const reservation =
     {
         id: 22,
@@ -277,6 +296,33 @@ test('Pomyślna edycja rezerwacji', async ({ page }) => {
             contentType: 'application/json',
             body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
         });
+    });
+
+    await page.route('**/api/notifications/', route => {
+        route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ userId: 11, elementsPerPage: 10 }),
+        });
+    });
+
+    await page.route('**/api/notifications', async (route) => {
+        const req = route.request();
+        if (req.method() === 'POST') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ success: true }),
+            });
+        } else if (req.method() === 'GET') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([]),
+            });
+        } else {
+            route.continue();
+        }
     });
 
     let reservations = [
@@ -387,6 +433,25 @@ test('Pomyślne anulowanie rezerwacji', async ({ page }) => {
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify(reservations)
+            });
+        } else {
+            route.continue();
+        }
+    });
+
+    await page.route('**/api/notifications', async (route) => {
+        const req = route.request();
+        if (req.method() === 'POST') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ success: true }),
+            });
+        } else if (req.method() === 'GET') {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify([]),
             });
         } else {
             route.continue();

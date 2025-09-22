@@ -42,7 +42,7 @@ const FilterReservations: React.FC<FilterReservationsProps> = ({ reservations, t
 
     return (
         <>
-            <div className="d-flex align-items-center gap-1">
+            <div className="d-flex flex-column flex-sm-row align-items-start align-sm-items-center gap-1">
                 <input type="date" value={selectedStartDate ?? ""} onChange={(e) => handleStartDateChange(e.target.value)} className="info-input" />
 
                 <select value={selectedTrackId ?? ""} onChange={(e) => handleTrackChange(e.target.value)} className="info-input">

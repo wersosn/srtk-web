@@ -28,7 +28,7 @@ const FilterUsers: React.FC<FilterUsersProps> = ({ onFilterChange }) => {
 
     return (
         <>
-            <div className="d-flex align-items-center gap-1">
+            <div className="d-flex flex-column flex-sm-row align-items-start align-sm-items-center gap-1">
                 <select value={selectedRoleId ?? ""} onChange={(e) => handleRoleChange(e.target.value)} className="info-input">
                     <option value="">{t("filters.allUsers")}</option>
                     {roles.map(role => (

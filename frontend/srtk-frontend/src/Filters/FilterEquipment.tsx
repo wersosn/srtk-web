@@ -27,7 +27,7 @@ const FilterEquipments: React.FC<FilterEquipmentsProps> = ({ onFilterChange }) =
 
     return (
         <>
-            <div className="d-flex align-items-center gap-1">
+            <div className="d-flex flex-column flex-sm-row align-items-start align-sm-items-center gap-1">
                 <select value={selectedFacilityId ?? ""} onChange={(e) => handleFacilityChange(e.target.value)} className="info-input">
                     <option value="">{t("filters.allFacilities")}</option>
                     {facilities.map(facility => (

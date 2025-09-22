@@ -50,7 +50,7 @@ p {
 }
 
 .profile-nav .nav-link {
-  color: light-dark(#dde2e5,#1f2f40);
+  color: light-dark(#dde2e5, #1f2f40);
   text-decoration: none;
   padding: 0.5rem;
   border-radius: 8px;
@@ -81,4 +81,21 @@ p {
 .setting-item {
   margin-bottom: 1rem;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .profile-card-wrapper {
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .profile-image-container {
+    display: none;
+  }
+
+  .profile-main {
+    width: 100%;
+    padding: 1rem;
+  }
 }

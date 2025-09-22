@@ -104,58 +104,57 @@ function Profile() {
     return (
       <>
         <div className="profile-container">
-
           <div className="profile-card-wrapper">
             <div className="profile-image-container">
-              <img src={profileImage} alt="Logowanie" className="profile-image" />
+                <img src={profileImage} alt="Logowanie" className="profile-image" />
             </div>
 
             <main className="profile-main">
-              <h2 className="mt-4">{t("profile.myProfile")}</h2>
-              <hr />
+                <h2 className="mt-4">{t("profile.myProfile")}</h2>
+                <hr />
 
-              {loading ? (
-                <p>{t("profile.loading")}</p>
-              ) : error ? (
-                <p className="text-danger">{error}</p>
-              ) : (
-                user && (
-                  <>
-                    <h5>{t("profile.edit")}</h5>
-                    <EditMyInfo
-                      key={user.id}
-                      userId={user.id}
-                      currentEmail={user.email}
-                      currentName={user.name}
-                      currentSurname={user.surname}
-                      currentPhoneNumber={user.phoneNumber}
-                      onUpdated={handleEdit} />
+                {loading ? (
+                  <p>{t("profile.loading")}</p>
+                ) : error ? (
+                  <p className="text-danger">{error}</p>
+                ) : (
+                  user && (
+                    <>
+                      <h5>{t("profile.edit")}</h5>
+                      <EditMyInfo
+                        key={user.id}
+                        userId={user.id}
+                        currentEmail={user.email}
+                        currentName={user.name}
+                        currentSurname={user.surname}
+                        currentPhoneNumber={user.phoneNumber}
+                        onUpdated={handleEdit} />
 
-                    <hr />
-                    <h5>{t("profile.settings")}</h5>
-                    <div className="setting-item">
-                        <label htmlFor="language">{t("profile.language")}</label>
-                        <select id="language" name="language" value={language} onChange={(e) => handleLanguageChange(e.target.value)} className="info-input">
-                            <option value="pl">Polski</option>
-                            <option value="en">English</option>
-                        </select>
-                    </div>
-
-                    <div className="setting-item">
-                        <label htmlFor="elementsPerPage">{t("profile.elementsPerPage")}</label>
-                        <div className="d-flex gap-2">
-                          <input id="elementsPerPage" name="elementsPerPage" value={elementsPerPage} type="number" onChange={(e) => setElementsPerPage(parseInt(e.target.value))} min={1} className="info-input"/>
-                          <button onClick={handleUpdatingElementsPerPage} className="btn-filter">{t("universal.save")}</button>
-                        </div>
-                    </div>
-
-                    {emailConfirmed !== null && emailConfirmed === false && (
+                      <hr />
+                      <h5>{t("profile.settings")}</h5>
                       <div className="setting-item">
-                          <button onClick={handleSendingEmail}>{t("profile.confirmation")}</button>
+                          <label htmlFor="language">{t("profile.language")}</label>
+                          <select id="language" name="language" value={language} onChange={(e) => handleLanguageChange(e.target.value)} className="info-input">
+                              <option value="pl">Polski</option>
+                              <option value="en">English</option>
+                          </select>
                       </div>
-                    )}
-                  </>
-                ))}
+
+                      <div className="setting-item">
+                          <label htmlFor="elementsPerPage">{t("profile.elementsPerPage")}</label>
+                          <div className="d-flex gap-2">
+                            <input id="elementsPerPage" name="elementsPerPage" value={elementsPerPage} type="number" onChange={(e) => setElementsPerPage(parseInt(e.target.value))} min={1} className="info-input"/>
+                            <button onClick={handleUpdatingElementsPerPage} className="btn-filter">{t("universal.save")}</button>
+                          </div>
+                      </div>
+
+                      {emailConfirmed !== null && emailConfirmed === false && (
+                        <div className="setting-item">
+                            <button onClick={handleSendingEmail}>{t("profile.confirmation")}</button>
+                        </div>
+                      )}
+                    </>
+                  ))}
             </main>
           </div>
         </div>
