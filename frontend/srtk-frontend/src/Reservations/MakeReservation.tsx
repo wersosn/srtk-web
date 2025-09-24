@@ -160,7 +160,7 @@ function MakeReservation() {
                                 <label style={{ margin: 0 }}>{t("makeReservations.track")}</label>
                                 {selectedTrackId !== null && selectedTrackId !== 0 && (
                                     <>
-                                        <button className="icon-button" onClick={handleOpenCalendar}>
+                                        <button className="icon-button" onClick={handleOpenCalendar} title={t("calendar.btnTitle")}>
                                             <img src={icon} alt="Kalendarz" style={{ width: '16px', height: '16px' }} />
                                         </button>
                                         <Modal show={showCalendarModal} onHide={handleCloseCalendar} size="xl" centered>

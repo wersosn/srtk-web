@@ -26,7 +26,7 @@ const Navb: React.FC = () => {
   };
 
   return (
-    <Navbar expand="lg" className="custom-navbar">
+    <Navbar  className="custom-navbar">
       <Container fluid className="px-4">
         <Navbar.Brand href="/" className="fw-bold">SRTK</Navbar.Brand>
         <Nav className="ms-auto align-items-center">

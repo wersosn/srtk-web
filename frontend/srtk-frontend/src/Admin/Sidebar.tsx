@@ -2,7 +2,11 @@ import { NavLink } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { useAuth } from '../User/AuthContext';
 
-function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     const { t } = useTranslation();
     const { facilityId } = useAuth();
     const getClassName = ({ isActive }: { isActive: boolean }) => (isActive ? "nav-link active no-wrap" : "nav-link no-wrap");
@@ -18,7 +22,7 @@ function Sidebar() {
     }
 
     return (
-        <nav className="admin-nav">
+        <nav className={`admin-nav ${isOpen ? "active" : ""}`}>
             <ul className="nav flex-column">
                 <li className="nav-item">
                     <NavLink to="." end className={getClassName}>
