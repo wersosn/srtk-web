@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getReservationsInTrack } from "../Services/Api";
+import { getReservationsInTrack } from "../Api/Api";
 import type { Reservation, Track } from "../Types/Types";
 
 export function useAdminReservations(tracks: Track[], token: string | null, t: any) {

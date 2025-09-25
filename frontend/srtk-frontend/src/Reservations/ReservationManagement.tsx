@@ -18,6 +18,7 @@ import { useAdminReservations } from '../Hooks/useAdminReservations';
 import { useUserPreferences } from '../Hooks/useUserPreferences';
 import { filterReservationsGrouped } from './FilterReservationsGrouped';
 import Pagination from '../Pagination/Pagination';
+import api from "../Api/axios";
 
 function ReservationManagement() {
     const token = localStorage.getItem('token');
@@ -32,6 +33,7 @@ function ReservationManagement() {
     const [showDetails, setShowDetails] = useState<Reservation | null>(null);
     const { elementsPerPage } = useUserPreferences(userId!, token, t);
     const [currentPages, setCurrentPages] = useState<Record<number, number>>({});
+    const lang = localStorage.getItem("language") ?? "pl";
 
     const isDark = usePrefersDark();
     const icon = isDark ? downloadIconLight : downloadIcon;
@@ -80,7 +82,7 @@ function ReservationManagement() {
     }
 
     const handleExport = (trackId: number) => {
-        window.location.href = `/api/reservations/export?trackId=${trackId}`;
+        window.location.href = `/api/reservations/export?trackId=${trackId}&language=${lang}`;
     };
 
     // Obsługa zmiany strony (dla rezerwacji z każdego toru oddzielnie):

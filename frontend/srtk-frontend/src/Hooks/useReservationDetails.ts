@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getReservationDetails } from "../Services/Api";
+import { getReservationDetails } from "../Api/Api";
 
 export function useReservationDetails(reservationId: number, token: string | null) {
     const [reservationOwner, setReservationOwner] = useState<number>();

@@ -413,7 +413,7 @@ namespace srtk.Services
             return true;
         }
 
-        public async Task<byte[]> ExportToExcel(int trackId)
+        public async Task<byte[]> ExportToExcel(int trackId, string language = null)
         {
             var reservations = await context.Reservations
                 .Include(r => r.Track)
@@ -422,23 +422,48 @@ namespace srtk.Services
                 .Where(r => r.TrackId == trackId)
                 .ToListAsync();
 
+            var translations = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["en"] = new Dictionary<string, string>
+                {
+                    ["SheetName"] = "Reservations",
+                    ["Track"] = "Track",
+                    ["Desc"] = "Reservations for track",
+                    ["ResId"] = "Reservation Id",
+                    ["Cost"] = "Cost",
+                    ["End"] = "End",
+                    ["Email"] = "User e-mail"
+                },
+                ["pl"] = new Dictionary<string, string>
+                {
+                    ["SheetName"] = "Rezerwacje",
+                    ["Track"] = "Tor",
+                    ["Desc"] = "Rezerwacje dla toru",
+                    ["ResId"] = "Id rezerwacji",
+                    ["Cost"] = "Koszt",
+                    ["End"] = "Koniec",
+                    ["Email"] = "E-mail użytkownika"
+                }
+            };
+
+            var t = translations[language];
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.AddWorksheet("Rezerwacje");
+                var worksheet = workbook.AddWorksheet(t["SheetName"]);
 
                 // Nagłówek tabeli:
-                var trackName = reservations.FirstOrDefault()?.Track?.Name ?? $"Tor {trackId}";
-                worksheet.Cell(1, 1).Value = $"Rezerwacje dla toru: {trackName}";
+                var trackName = reservations.FirstOrDefault()?.Track?.Name ?? $"{t["Track"]} {trackId}";
+                worksheet.Cell(1, 1).Value = $"{t["Desc"]}: {trackName}";
                 worksheet.Range(1, 1, 1, 6).Merge();
                 worksheet.Range(1, 1, 1, 6).Style.Font.SetBold();
                 worksheet.Range(1, 1, 1, 6).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
-                // Informacje:
-                worksheet.Cell(2, 1).Value = "Id rezerwacji";
+                // Nagłówki kolumn:
+                worksheet.Cell(2, 1).Value = t["ResId"];
                 worksheet.Cell(2, 2).Value = "Start";
-                worksheet.Cell(2, 3).Value = "Koniec";
-                worksheet.Cell(2, 4).Value = "Koszt";
-                worksheet.Cell(2, 5).Value = "Email użytkownika";
+                worksheet.Cell(2, 3).Value = t["End"];
+                worksheet.Cell(2, 4).Value = t["Cost"];
+                worksheet.Cell(2, 5).Value = t["Email"];
                 worksheet.Cell(2, 6).Value = "Status";
 
                 // Wpisywanie danych:
@@ -464,7 +489,7 @@ namespace srtk.Services
         }
 
         // TODO: Poprawić wygląd, aby ładniej wyglądało 
-        public async Task<byte[]> ExportToPdf(int reservationId)
+        public async Task<byte[]> ExportToPdf(int reservationId, string language = null)
         {
             var reservation = await context.Reservations
                 .Include(r => r.Track)
@@ -474,41 +499,72 @@ namespace srtk.Services
                 .ThenInclude(er => er.Equipment)
                 .FirstOrDefaultAsync(r => r.Id == reservationId);
 
+            var translations = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["en"] = new Dictionary<string, string>
+                {
+                    ["Title"] = "Track reservation",
+                    ["TitleCont"] = "on",
+                    ["SheetName"] = "Reservations",
+                    ["Track"] = "Track",
+                    ["Desc"] = "Reservations for track",
+                    ["ResId"] = "Reservation Id",
+                    ["Cost"] = "Cost",
+                    ["End"] = "End",
+                    ["Email"] = "User e-mail",
+                    ["Equipment"] = "Rented equipment",
+                    ["Quantity"] = "pcs.",
+                    ["NoName"] = "No name",
+                    ["NoEquipment"] = "No rented equipment"
+                },
+                ["pl"] = new Dictionary<string, string>
+                {
+                    ["Title"] = "Rezerwacja toru",
+                    ["TitleCont"] = "w dniu",
+                    ["Track"] = "Tor",
+                    ["Desc"] = "Rezerwacje dla toru",
+                    ["ResId"] = "Id rezerwacji",
+                    ["Cost"] = "Koszt",
+                    ["End"] = "Koniec",
+                    ["Email"] = "E-mail użytkownika",
+                    ["Equipment"] = "Wynajęty sprzęt",
+                    ["Quantity"] = "szt.",
+                    ["NoName"] = "Brak nazwy",
+                    ["NoEquipment"] = "Brak wynajętego sprzętu"
+                }
+            };
+
+            var t = translations[language];
+
             if (reservation == null)
             {
                 throw new Exception("Nie znaleziono rezerwacji");
             }
 
             var document = new PdfDocument();
-            document.Info.Title = $"Rezerwacja toru {reservation.Track?.Name} w dniu {reservation.Start.ToLocalTime().ToString("d", CultureInfo.CurrentCulture)}";
+            document.Info.Title = $"{t["Title"]} {reservation.Track?.Name} {t["TitleCont"]} {reservation.Start.ToLocalTime().ToString("d", CultureInfo.CurrentCulture)}";
 
             var page = document.AddPage();
             var gfx = XGraphics.FromPdfPage(page);
             var font = new XFont("Verdana", 14);
             int yPoint = 40;
 
-            // Nagłówek:
-            gfx.DrawString($"Rezerwacja ID: {reservation.Id}", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            gfx.DrawString($"{t["ResId"]}: {reservation.Id}", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
             yPoint += 25;
 
-            // Data startu:
             gfx.DrawString($"Start: {reservation.Start.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)}", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
             yPoint += 20;
 
-            // Dara zakończenia:
-            gfx.DrawString($"Koniec: {reservation.End.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)}", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            gfx.DrawString($"{t["End"]}: {reservation.End.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)}", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
             yPoint += 20;
 
-            // Koszt:
-            gfx.DrawString($"Koszt: {reservation.Cost} zł", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            gfx.DrawString($"{t["Cost"]}: {reservation.Cost} zł", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
             yPoint += 30;
 
-            // Tor:
-            gfx.DrawString($"Tor: {reservation.Track?.Name ?? "Brak danych"}", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            gfx.DrawString($"{t["Track"]}: {reservation.Track?.Name ?? t["NoName"]}", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
             yPoint += 30;
 
-            // Sprzęt:
-            gfx.DrawString("Wynajęty sprzęt:", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+            gfx.DrawString($"{t["Equipment"]}:", font, XBrushes.Black, new XRect(20, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
             yPoint += 20;
 
             // Gdy jakiś sprzęt został dodany: nazwa + ilość:
@@ -516,14 +572,14 @@ namespace srtk.Services
             {
                 foreach (var eqRes in reservation.EquipmentReservations)
                 {
-                    var eqName = eqRes.Equipment?.Name ?? "Brak nazwy";
-                    gfx.DrawString($"- {eqName}: {eqRes.Quantity} szt.", font, XBrushes.Black, new XRect(40, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+                    var eqName = eqRes.Equipment?.Name ?? t["NoName"];
+                    gfx.DrawString($"- {eqName}: {eqRes.Quantity} {t["Quantity"]}", font, XBrushes.Black, new XRect(40, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
                     yPoint += 20;
                 }
             }
             else
             {
-                gfx.DrawString("Brak wynajętego sprzętu.", font, XBrushes.Black, new XRect(40, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
+                gfx.DrawString($"{t["NoEquipment"]}", font, XBrushes.Black, new XRect(40, yPoint, page.Width, page.Height), XStringFormats.TopLeft);
                 yPoint += 20;
             }
 

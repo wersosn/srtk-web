@@ -9,7 +9,7 @@ import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation } from '../Types/Types';
 import { formatToDatetimeLocal } from '../Reservations/DateHelper';
-import { getUserReservations } from "../Services/Api";
+import { getUserReservations } from "../Api/Api";
 import { useTranslation } from "react-i18next";
 import { useAuth } from '../User/AuthContext';
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Role } from "../Types/Types";
-import { getAllRoles } from "../Services/Api";
+import { getAllRoles } from "../Api/Api";
 
 export const useRoles = (token: string | null) => {
     const [roles, setRoles] = useState<Role[]>([]);

@@ -24,6 +24,7 @@ import { useNotifications } from '../Hooks/useNotifications';
 import { Modal } from 'react-bootstrap';
 import { usePrefersDark } from '../Hooks/usePrefersDark';
 import ReservationCalendarModal from '../Calendar/ReservationCalendarModal';
+import api from "../Api/axios";
 
 function MyReservations() {
     const token = localStorage.getItem('token');
@@ -40,6 +41,7 @@ function MyReservations() {
     const { currentPage, totalPages, paginatedItems, setCurrentPage } = usePagination(filteredReservations, elementsPerPage);
     const { addNotification } = useNotifications(token, userId!, t);
     const [showCalendarModal, setShowCalendarModal] = useState(false);
+    const lang = localStorage.getItem("language") ?? "pl";
 
     const isDark = usePrefersDark();
     const icon = isDark ? calendarIconLight : calendarIcon;
@@ -133,7 +135,7 @@ function MyReservations() {
     }
 
     const handleExport = (reservationId: number) => {
-        window.location.href = `/api/reservations/exportPdf?reservationId=${reservationId}`;
+        window.location.href = `/api/reservations/exportPdf?reservationId=${reservationId}&language=${lang}`;
     };
 
     return (

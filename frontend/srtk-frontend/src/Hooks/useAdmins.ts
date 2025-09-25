@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import type { Admin} from "../Types/Types";
-import { getAllAdmins } from "../Services/Api";
+import type { Admin } from "../Types/Types";
+import { getAllAdmins } from "../Api/Api";
 import { useAuth } from "../User/AuthContext";
 
 export const useAdmins = (token: string | null) => {

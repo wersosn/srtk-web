@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { parseAvailableDays, isValidDateTime, formatToDatetimeLocal } from './DateHelper';
-import { getAllEquipmentsInReservation } from '../Services/Api';
+import { getAllEquipmentsInReservation } from '../Api/Api';
 import { useTranslation } from "react-i18next";
 import { useTrackAvailabilityEdit } from '../Hooks/useTrackAvailabilityEdit';
 import { useCost } from '../Hooks/useCost';

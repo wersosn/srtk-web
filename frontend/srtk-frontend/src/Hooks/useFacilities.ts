@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Facility } from "../Types/Types";
-import { getAllFacilities } from "../Services/Api";
+import { getAllFacilities } from "../Api/Api";
 
 export const useFacilities = (token: string | null) => {
     const [facilities, setFacilities] = useState<Facility[]>([]);

@@ -9,7 +9,7 @@ import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation, Track } from '../Types/Types';
 import { formatToDatetimeLocal, getHiddenDays, parseAvailableDays } from '../Reservations/DateHelper';
-import { getReservationsInTrack } from "../Services/Api";
+import { getReservationsInTrack } from "../Api/Api";
 import { useTranslation } from "react-i18next";
 import refreshIconDark from "../assets/refresh.png";
 import refreshIconLight from "../assets/refreshLight.png";

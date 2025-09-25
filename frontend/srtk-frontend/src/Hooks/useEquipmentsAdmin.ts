@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Equipment } from "../Types/Types";
-import { getAllEquipmentsForAdmin } from "../Services/Api";
+import { getAllEquipmentsForAdmin } from "../Api/Api";
 
 export const useEquipmentsAdmin = (facilityId: number, token: string | null) => {
     const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);

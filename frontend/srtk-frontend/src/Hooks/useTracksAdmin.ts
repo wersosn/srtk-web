@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Track } from "../Types/Types";
-import { getAllTracksForAdmin } from "../Services/Api";
+import { getAllTracksForAdmin } from "../Api/Api";
 
 export const useTracksAdmin = (token: string | null, facilityId: number | null) => {
     const [tracks, setTracks] = useState<Track[]>([]);

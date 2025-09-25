@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Status } from "../Types/Types";
-import { getAllStatuses } from "../Services/Api";
+import { getAllStatuses } from "../Api/Api";
 
 export const useStatuses = (token: string | null) => {
     const [statuses, setStatuses] = useState<Status[]>([]);

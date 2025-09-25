@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from "react-i18next";
 import i18n from "../Locales/i18next";
 import type { Client, UserPreference } from '../Types/Types';
-import { getUserInfo } from '../Services/Api';
+import { getUserInfo } from '../Api/Api';
 import EditMyInfo from './EditMyInfo';
 import profileImage from '../assets/profile.svg';
 import './Profile.css';

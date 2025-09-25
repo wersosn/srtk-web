@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllEquipmentsInFacility } from "../Services/Api";
+import { getAllEquipmentsInFacility } from "../Api/Api";
 import type { Equipment, Track } from "../Types/Types";
 
 export function useEquipmentsInFacility(rentEquipment: boolean, track: Track | null, token: string | null) {

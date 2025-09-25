@@ -9,7 +9,7 @@ import '@fullcalendar/react/dist/vdom';
 import './ReservationCalendar.css';
 import type { Reservation } from '../Types/Types';
 import { parseAvailableDays } from '../Reservations/DateHelper';
-import { getReservationsInTrack } from "../Services/Api";
+import { getReservationsInTrack } from "../Api/Api";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from '../Hooks/useIsMobile';
 import { useTracks } from '../Hooks/useTracks';

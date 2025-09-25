@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getUserPreferences } from "../Services/Api";
+import { getUserPreferences } from "../Api/Api";
 
 export function useUserPreferences(userId: number | undefined, token: string | null, t: any) {
     const [elementsPerPage, setElementsPerPage] = useState<number>(0);

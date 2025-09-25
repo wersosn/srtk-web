@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getTrackAvailability } from "../Services/Api";
+import { getTrackAvailability } from "../Api/Api";
 import { isValidDateTime, parseAvailableDays } from "../Reservations/DateHelper";
 import type { Track } from "../Types/Types";
 

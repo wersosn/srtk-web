@@ -179,7 +179,7 @@ namespace srtk.Controllers
         }
 
         [HttpGet("export")]
-        public async Task<ActionResult<byte[]>> ExportReservationsToExcel(int trackId)
+        public async Task<ActionResult<byte[]>> ExportReservationsToExcel(int trackId, string language = "pl")
         {
             var track = await trackService.GetById(trackId);
             if (track == null)
@@ -188,14 +188,15 @@ namespace srtk.Controllers
                 return NotFound("Tor nie istnieje");
             }
 
-            var fileBytes = await service.ExportToExcel(trackId);
-            var fileName = $"Rezerwacje_{track.Name}.xlsx";
+            var title = language == "en" ? "Reservations" : "Rezerwacje";
+            var fileBytes = await service.ExportToExcel(trackId, language);
+            var fileName = $"{title}_{track.Name}.xlsx";
             logger.LogInformation("Wyeksportowano rezerwacje toru z Id {Id}", track.Id);
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         [HttpGet("exportPdf")]
-        public async Task<ActionResult<byte[]>> ExportReservationToPdf(int reservationId)
+        public async Task<ActionResult<byte[]>> ExportReservationToPdf(int reservationId, string language = "pl")
         {
             var reservation = await service.GetById(reservationId);
             if (reservation == null)
@@ -204,8 +205,9 @@ namespace srtk.Controllers
                 return NotFound("Rezerwacja nie istnieje");
             }
 
-            var fileBytes = await service.ExportToPdf(reservationId);
-            var fileName = $"Rezerwacja_toru_{reservation.Track?.Name}.pdf";
+            var title = language == "en" ? "Track_reservation" : "Rezerwacja_toru";
+            var fileBytes = await service.ExportToPdf(reservationId, language);
+            var fileName = $"{title}_{reservation.Track?.Name}.pdf";
             logger.LogInformation("Wyeksportowano rezerwację z Id {Id}", reservation.Id);
             return File(fileBytes, "application/pdf", fileName);
         }

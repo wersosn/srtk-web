@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Facility, Role, User } from '../Types/Types';
-import { getAllFacilities, getAllRoles } from '../Services/Api';
+import { getAllFacilities, getAllRoles } from '../Api/Api';
 import { useTranslation } from "react-i18next";
 import { useAuth } from './AuthContext';
 import api from "../Api/axios";

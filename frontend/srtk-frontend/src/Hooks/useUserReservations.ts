@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getUserReservations } from "../Services/Api";
+import { getUserReservations } from "../Api/Api";
 import type { Reservation } from "../Types/Types";
 
 export function useReservations(userId: number | undefined, token: string | null, t: any) {
