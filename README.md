@@ -13,6 +13,16 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 - [Instrukcja użytkowania](#instrukcja-użytkowania)
 
 ## Funkcjonalności
+- Autentykacja i autoryzacja użytkownika z pomocą tokenów JWT
+- Rezerwacja torów na określoną porę i czas, możliwość modyfikacji, anulowania oraz usunięcia rezerwacji + eksport szczegółów rezerwacji w formatach .xslx i .pdf
+- Aktualizacja dostepu torów w czasie rzeczywistym
+- Przeglądanie rezerwacji w formie kalendarza - na stronie głównej oraz w zakładce 'Moje rezerwacje' z rezerwacjami danego użytkownika
+- Historia rezerwacji w dedykowanej zakładce + opcje filtrowania
+- Wysyłanie powiadomień w aplikacji
+- Wysyłanie wiadomości mail, np. przy próbie resetu hasła
+- Panel administratora, z podziałem na dwie role (superadmin oraz admin danego obiektu), w którym można zarządzać torami, sprzętem, użytkownikami itp.
+- Logi administracyjne, do ewentualnego podglądu błędów
+- Dwie wersje językowe (polska oraz angielska) + dwa tryby (jasny i ciemny)
 
 ## Wykorzystane technologie
 *Backend (serwer REST API)*:
