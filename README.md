@@ -8,14 +8,18 @@ Składa się z następujących elementów: serwer w architekturze REST, aplikacj
 Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zarządzanie systemem i rezerwacjami, składanie rezerwacji na określoną porę i czas.
 
 ## Spis treści
+- [Architektura systemu](#architektura-systemu)
 - [Funkcjonalności](#funkcjonalności)
 - [Wykorzystane technologie](#wykorzystane-technologie)
+- [Instrukcja instalacji](#instrukcja-instalacji)
 - [Instrukcja użytkowania](#instrukcja-użytkowania)
+
+## Architektura systemu
 
 ## Funkcjonalności
 - Autentykacja i autoryzacja użytkownika z pomocą tokenów JWT
 - Rezerwacja torów na określoną porę i czas, możliwość modyfikacji, anulowania oraz usunięcia rezerwacji + eksport szczegółów rezerwacji w formatach .xslx i .pdf
-- Aktualizacja dostepu torów w czasie rzeczywistym
+- Aktualizacja dostępu torów w czasie rzeczywistym
 - Przeglądanie rezerwacji w formie kalendarza - na stronie głównej oraz w zakładce 'Moje rezerwacje' z rezerwacjami danego użytkownika
 - Historia rezerwacji w dedykowanej zakładce + opcje filtrowania
 - Wysyłanie powiadomień w aplikacji
@@ -45,6 +49,8 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 - FullCalendar
 - i18n
 - Playwright (testy e2e)
+
+## Instrukcja instalacji
 
 ## Instrukcja użytkowania
 
