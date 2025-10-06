@@ -772,7 +772,7 @@ namespace srtk.tests.Tests
             };
             await service.Add(reservation2);
 
-            var result = await service.ExportToExcel(track.Id);
+            var result = await service.ExportToExcel(track.Id, "pl");
             Assert.NotNull(result);
             Assert.True(result.Length > 0);
             output.WriteLine("Wynik: Wyeksportowano rezerwacje w formacie .xlsx");

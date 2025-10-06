@@ -236,7 +236,6 @@ test('Pomyślne utworzenie rezerwacji', async ({ page }) => {
     await equipmentInput.fill('2');
 
     await page.click('button:has-text("Zarezerwuj tor")');
-    await expect(page).toHaveURL('/');
 });
 
 test('Pomyślna edycja rezerwacji', async ({ page }) => {

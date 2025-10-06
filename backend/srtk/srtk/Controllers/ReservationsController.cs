@@ -35,6 +35,7 @@ namespace srtk.Controllers
         }
 
         [HttpGet("inTrack")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<ReservationDto>>> GetAllReservationsInTrack(int trackId)
         {
             var reservations = await service.GetAllInTrack(trackId);

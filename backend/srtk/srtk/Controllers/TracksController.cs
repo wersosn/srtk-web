@@ -23,6 +23,7 @@ namespace srtk.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<List<TrackDto>>> GetAllTracks()
         {
             var tracks = await service.GetAll();
