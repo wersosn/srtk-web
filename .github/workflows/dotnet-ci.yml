@@ -24,7 +24,7 @@ jobs:
 
     - name: Build Backend
       run: dotnet build ./backend/srtk/srtk.sln --configuration Release --no-restore
-      
+
 # --- Run tests ---
     - name: Run unit tests
-      run: dotnet test ./backend/tests/srtk.tests/srtk.tests.sln --no-build --verbosity normal
+      run: dotnet test ./backend/tests/srtk.tests/srtk.tests/srtk.tests.csproj --no-build --verbosity normal
