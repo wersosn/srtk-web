@@ -151,16 +151,19 @@ namespace srtk.Services
                 throw new Exception("Tor jest już zarezerwowany w tym czasie.");
             }
 
-            var equipmentReservations = reservation.EquipmentReservations.ToList();
-            foreach (var eqRes in equipmentReservations)
+            var equipmentIds = reservation.EquipmentReservations.Select(er => er.EquipmentId).ToList();
+            var existingEquipmentIds = await context.Equipments
+                .Where(e => equipmentIds.Contains(e.Id))
+                .Select(e => e.Id)
+                .ToListAsync();
+
+            var invalidEquipment = equipmentIds.Except(existingEquipmentIds).ToList();
+            if (invalidEquipment.Any())
             {
-                var equipmentExists = await context.Equipments.AnyAsync(e => e.Id == eqRes.EquipmentId);
-                if (!equipmentExists)
-                {
-                    throw new Exception($"Sprzęt {eqRes.Equipment?.Name} nie istnieje.");
-                }
+                throw new InvalidOperationException("Sprzęt nie istnieje.");
             }
 
+            var equipmentReservations = reservation.EquipmentReservations.ToList();
             reservation.EquipmentReservations.Clear();
             context.Reservations.Add(reservation);
 
@@ -176,12 +179,6 @@ namespace srtk.Services
 
             foreach (var eqRes in equipmentReservations)
             {
-                var equipmentExists = await context.Equipments.AnyAsync(e => e.Id == eqRes.EquipmentId);
-                if (!equipmentExists)
-                {
-                    throw new Exception("Sprzęt nie istnieje");
-                }
-
                 eqRes.ReservationId = reservation.Id;
                 context.EquipmentReservations.Add(eqRes);
             }
