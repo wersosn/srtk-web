@@ -73,13 +73,13 @@ Main functionalities: login and registration, availability calendar, system and 
 - User authentication and authorization using JWT tokens
 - Track reservations for a specific time and duration, with the ability to modify, cancel, and delete reservations + export reservation details in .xslx and .pdf formats
 - Real-time updates of track availability
-- Viewing reservations in calendar form – on the home page and in the “My Reservations” tab with the user’s reservations
+- Viewing reservations in calendar form - on the home page and in the 'My Reservations' tab with the user's reservations
 - Reservation history in a dedicated tab + filtering options
 - Sending in-app notifications
 - Sending email messages, e.g. during password reset attempts
 - Administrator panel with two roles (superadmin and facility-specific admin), allowing management of tracks, equipment, users, etc.
 - Administrative logs for potential error inspection
-- Two language versions (Polish and English) + two modes (light and dark)
+- Two language versions (Polish and English) + two UI modes (light and dark)
 
 ## Tech stack
 *Backend (REST API server)*:
