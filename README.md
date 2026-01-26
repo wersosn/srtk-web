@@ -56,3 +56,53 @@ Główne funkcjonalności: logowanie i rejestracja, kalendarz dostępności, zar
 
 ---
 # Reservation system for a cycle track
+The application is a computer system used to make reservations for a cycling track. The purpose of the entire system is to enable private users to reserve the track.
+It consists of the following components: a server based on REST architecture, a mobile application, and a web application (each implemented in any technology).
+Main functionalities: login and registration, availability calendar, system and reservation management, and making reservations for a specific time and duration.
+
+## Table of contents
+- [System architecture](#system-architecture)
+- [Functionalities](#functionalities)
+- [Tech stack](#tech-stack)
+- [Installation guide](#installation-guide)
+- [How to use](#how-to-use)
+
+## System architecture
+
+## Functionalities
+- User authentication and authorization using JWT tokens
+- Track reservations for a specific time and duration, with the ability to modify, cancel, and delete reservations + export reservation details in .xslx and .pdf formats
+- Real-time updates of track availability
+- Viewing reservations in calendar form – on the home page and in the “My Reservations” tab with the user’s reservations
+- Reservation history in a dedicated tab + filtering options
+- Sending in-app notifications
+- Sending email messages, e.g. during password reset attempts
+- Administrator panel with two roles (superadmin and facility-specific admin), allowing management of tracks, equipment, users, etc.
+- Administrative logs for potential error inspection
+- Two language versions (Polish and English) + two modes (light and dark)
+
+## Tech stack
+*Backend (REST API server)*:
+- C#
+- ASP.NET Core Web API
+- Entity Framework Core
+- PostgreSQL
+- Swagger
+- JWT (authentication)
+- CORS (API access for the frontend)
+- xUnit (unit tests)
+- Serilog (logs)
+
+*Frontend*:
+- React + Vite
+- TypeScript
+- HTML, CSS
+- Axios
+- React Bootstrap
+- FullCalendar
+- i18n
+- Playwright (e2e tests)
+
+## Installation guide
+
+## How to use
