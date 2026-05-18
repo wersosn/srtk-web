@@ -8,10 +8,15 @@ using System.Security.Claims;
 using PdfSharp.Fonts;
 using srtk.Resources;
 using Serilog;
+using srtk.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(opt =>
+{
+    opt.Filters.Add<LoggingFilter>();
+    opt.Filters.Add<APIExceptionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -117,6 +122,7 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 builder.Host.UseSerilog();
+builder.Services.AddScoped<LoggingFilter>();
 
 // Rejestracja fontów do generowania pdf:
 GlobalFontSettings.FontResolver = new CustomFontResolver();

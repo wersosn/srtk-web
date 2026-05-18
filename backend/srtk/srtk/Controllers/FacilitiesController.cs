@@ -84,6 +84,13 @@ namespace srtk.Controllers
             return Ok(new { message = "Obiekt został usunięty" });
         }
 
+        // API filter test:
+        [HttpGet("test-error")]
+        public IActionResult TestError()
+        {
+            throw new Exception("Test wyjątku");
+        }
+
         // HATEOAS:
         private void AddLinks(FacilityDto facility)
         {
