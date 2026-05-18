@@ -185,5 +185,19 @@ namespace srtk.Controllers
             logger.LogInformation("Usunięto użytkownika z Id {Id}", id);
             return Ok(new { message = "Użytkownik został usunięty" });
         }
+
+        [HttpPost("{id}/profile-image")]
+        [Authorize]
+        public async Task<IActionResult> UploadProfileImage(int id, IFormFile file)
+        {
+            var result = await service.UploadProfileImage(id, file);
+            if (result == null)
+            {
+                logger.LogWarning("Nie znaleziono użytkownika z Id {Id}", id);
+                return NotFound();
+            }
+            logger.LogInformation("Zmodyfikowano zdjęcie profilowe użytkownika z Id {Id}", id);
+            return Ok(result);
+        }
     }
 }

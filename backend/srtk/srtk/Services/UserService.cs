@@ -287,5 +287,42 @@ namespace srtk.Services
             await context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<UserDto?> UploadProfileImage(int id, IFormFile file)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var client = await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+            if (client == null)
+            {
+                return null;
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                throw new Exception("Brak pliku");
+            }
+
+            var folder = Path.Combine(Directory.GetCurrentDirectory(), "Files", "Profiles");
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var path = Path.Combine(folder, fileName);
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            client.ProfileImagePath = $"/files/Profiles/{fileName}";
+            await context.SaveChangesAsync();
+            return user.ToDto();
+        }
     }
 }

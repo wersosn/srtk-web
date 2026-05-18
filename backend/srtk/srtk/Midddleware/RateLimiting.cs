@@ -22,7 +22,7 @@
                 }
                 requests[ip]++;
 
-                if (requests[ip] > 25)
+                if (requests[ip] > 2500)
                 {
                     context.Response.StatusCode = 429;
                     await context.Response.WriteAsync("Rate limit przekroczony!");

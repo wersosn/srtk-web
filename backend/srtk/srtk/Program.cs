@@ -10,6 +10,7 @@ using srtk.Resources;
 using Serilog;
 using srtk.Filters;
 using srtk.Midddleware;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -170,6 +171,13 @@ app.Map("/ws", async context =>
 
 // Rate limiting:
 app.UseMiddleware<RateLimiting>();
+
+// Zdjêcia:
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Files")),
+    RequestPath = "/files"
+});
 
 // Dodatkowe nag³ówki bezpieczeñstwa:
 app.Use(async (context, next) =>
