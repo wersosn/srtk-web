@@ -25,6 +25,10 @@ namespace srtk.Controllers
         public async Task<ActionResult<List<FacilityDto>>> GetAllFacilities()
         {
             var facilities = await service.GetAll();
+            foreach (var facility in facilities)
+            {
+                AddLinks(facility);
+            }
             logger.LogInformation("Pobrano wszystkie obiekty, ilość: {Count}", facilities.Count);
             return facilities;
         }
@@ -38,6 +42,7 @@ namespace srtk.Controllers
                 logger.LogWarning("Nie znaleziono obiektu z Id {Id}", id);
                 return NotFound();
             }
+            AddLinks(facility);
             logger.LogInformation("Znaleziono obiekt z Id {Id}: {Name}", id, facility.Name);
             return facility;
         }
@@ -77,6 +82,41 @@ namespace srtk.Controllers
             }
             logger.LogInformation("Usunięto obiekt z Id {Id}", id);
             return Ok(new { message = "Obiekt został usunięty" });
+        }
+
+        // HATEOAS:
+        private void AddLinks(FacilityDto facility)
+        {
+            facility.Links.Add(new LinkDto
+            {
+                Rel = "all",
+                Href = Url.Action(nameof(GetAllFacilities))!,
+                Method = "GET"
+            });
+
+            facility.Links.Add(new LinkDto
+            {
+                Rel = "self",
+                Href = Url.Action(nameof(GetFacilityById), new { id = facility.Id })!,
+                Method = "GET"
+            });
+
+            if (User.IsInRole("Admin"))
+            {
+                facility.Links.Add(new LinkDto
+                {
+                    Rel = "update",
+                    Href = Url.Action(nameof(UpdateFacility), new { id = facility.Id })!,
+                    Method = "PUT"
+                });
+
+                facility.Links.Add(new LinkDto
+                {
+                    Rel = "delete",
+                    Href = Url.Action(nameof(DeleteFacility), new { id = facility.Id })!,
+                    Method = "DELETE"
+                });
+            }
         }
     }
 }

@@ -17,5 +17,7 @@ namespace srtk.DTO
         [Required(ErrorMessage = "Adres, pod którym znajduje się obiekt jest wymagany")]
         [StringLength(50, ErrorMessage = "Adres może mieć maksymalnie 50 znaków!")]
         public string Address { get; set; }
+
+        public List<LinkDto> Links { get; set; } = new();
     }
 }
