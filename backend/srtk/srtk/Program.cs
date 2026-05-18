@@ -141,6 +141,32 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll");
 
+// WebSocket:
+app.UseWebSockets();
+app.Map("/ws", async context =>
+{
+    if (!context.WebSockets.IsWebSocketRequest)
+    {
+        context.Response.StatusCode = 400;
+        return;
+    }
+
+    var socket = await context.WebSockets.AcceptWebSocketAsync();
+    var buffer = new byte[1024 * 4];
+    while (socket.State == System.Net.WebSockets.WebSocketState.Open)
+    {
+        var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        var message = System.Text.Encoding.UTF8.GetString(buffer, 0, result.Count);
+        var response = $"Echo: {message}";
+        var responseBytes = System.Text.Encoding.UTF8.GetBytes(response);
+        await socket.SendAsync(
+            new ArraySegment<byte>(responseBytes),
+            System.Net.WebSockets.WebSocketMessageType.Text,
+            true,
+            CancellationToken.None);
+    }
+});
+
 // Dodatkowe nag³ówki bezpieczeñstwa:
 app.Use(async (context, next) =>
 {

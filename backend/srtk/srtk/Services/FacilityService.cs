@@ -2,6 +2,8 @@
 using srtk.Models;
 using srtk.Mappings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace srtk.Services
 {
@@ -51,9 +53,9 @@ namespace srtk.Services
             }
 
             var facility = await context.Facilities.FindAsync(id);
-            if (facility == null) 
-            { 
-                return null; 
+            if (facility == null)
+            {
+                return null;
             }
             facility.Name = dto.Name;
             facility.City = dto.City;
