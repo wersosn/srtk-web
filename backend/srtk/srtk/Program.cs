@@ -9,6 +9,7 @@ using PdfSharp.Fonts;
 using srtk.Resources;
 using Serilog;
 using srtk.Filters;
+using srtk.Midddleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -166,6 +167,9 @@ app.Map("/ws", async context =>
             CancellationToken.None);
     }
 });
+
+// Rate limiting:
+app.UseMiddleware<RateLimiting>();
 
 // Dodatkowe nag³ówki bezpieczeñstwa:
 app.Use(async (context, next) =>
